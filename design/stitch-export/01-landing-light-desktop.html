@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Premium Living &amp; Flatmate Search</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "primary": "#005a71",
+                        "on-surface": "#1b1c1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-highest": "#e4e2df",
+                        "petrol": "#0E7490",
+                        "primary-fixed": "#b9eaff",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "inverse-primary": "#81d1f0",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#006781",
+                        "surface-container-high": "#eae8e5",
+                        "outline": "#6f787d",
+                        "inverse-surface": "#30312f",
+                        "tertiary": "#54534e",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#6c6b66",
+                        "deep-void": "#0B1114",
+                        "surface-dim": "#dbdad7",
+                        "on-primary-container": "#d3f1ff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "surface-container-low": "#f5f3f0",
+                        "electric-cyan": "#22D3EE",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#e5e2dc",
+                        "error": "#ba1a1a",
+                        "secondary": "#5e5e5d",
+                        "onyx": "#1D262B",
+                        "surface-variant": "#e4e2df",
+                        "on-primary-fixed": "#001f29",
+                        "on-secondary-container": "#636362",
+                        "primary-container": "#0e7490",
+                        "outline-variant": "#bec8cd",
+                        "surface-bright": "#fbf9f6",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-desktop": "80px",
+                        "stack-xs": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Ambient shadows and subtle effects */
+        .shadow-whisper {
+            box-shadow: 0 4px 4px rgba(0,0,0,0.04);
+        }
+        .shadow-soft-pop {
+            box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        /* Hide scrollbar for clean horizontal scrolls */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md antialiased overflow-x-hidden min-h-screen flex flex-col">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-sand-border shadow-none">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Brand -->
+<a class="font-title-md text-title-md font-bold text-on-surface" href="#">Homley</a>
+<!-- Desktop Navigation Links -->
+<div class="hidden md:flex items-center gap-gutter">
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-150" href="#">Browse homes</a>
+<a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-150" href="#">Find flatmates</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-stack-sm">
+<a class="text-on-surface-variant font-label-md text-label-md px-4 py-2 hover:bg-surface-container-low rounded-lg transition-colors" href="#">Sign in</a>
+<a class="bg-petrol text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg hover:scale-95 transition-transform duration-150 shadow-whisper" href="#">Get started</a>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pt-24 pb-32">
+<!-- Hero Section -->
+<section class="relative px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto pt-stack-xl pb-stack-xl lg:pt-32 lg:pb-32 flex flex-col items-center text-center">
+<!-- Abstract background shape -->
+<div class="absolute inset-0 z-0 overflow-hidden pointer-events-none flex justify-center items-center opacity-30">
+<div class="w-[800px] h-[800px] bg-primary-fixed rounded-full blur-[120px] absolute top-[-20%] left-[-10%]"></div>
+<div class="w-[600px] h-[600px] bg-secondary-container rounded-full blur-[100px] absolute bottom-[-10%] right-[-10%]"></div>
+</div>
+<div class="relative z-10 max-w-4xl">
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-on-surface mb-stack-lg tracking-tight">
+                    Find your next home.<br/>
+<span class="text-petrol">Find the right person to share it with.</span>
+</h1>
+<!-- Large AI Search Box -->
+<div class="max-w-2xl mx-auto mb-stack-xl bg-surface-container-lowest rounded-xl shadow-soft-pop border border-sand-border p-2 flex items-center gap-stack-sm focus-within:ring-2 focus-within:ring-primary focus-within:border-transparent transition-all">
+<div class="pl-3 flex items-center text-petrol">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<input class="flex-grow bg-transparent border-none focus:ring-0 text-body-lg font-body-lg text-on-surface placeholder:text-outline h-12" placeholder="Describe your ideal place or flatmate..." type="text"/>
+<button class="w-12 h-12 rounded-lg bg-petrol text-on-primary flex items-center justify-center hover:scale-95 transition-transform duration-150">
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Primary CTAs -->
+<div class="flex flex-wrap justify-center gap-stack-md">
+<button class="bg-petrol text-on-primary font-label-md text-label-md px-8 py-3 rounded-lg shadow-whisper hover:scale-95 transition-transform duration-150 flex items-center gap-2">
+                        Find my match
+                    </button>
+<button class="bg-surface-container-lowest text-on-surface font-label-md text-label-md px-8 py-3 rounded-lg border border-sand-border shadow-whisper hover:bg-surface-container-low transition-colors duration-150">
+                        Browse homes
+                    </button>
+<button class="bg-surface-container-lowest text-on-surface font-label-md text-label-md px-8 py-3 rounded-lg border border-sand-border shadow-whisper hover:bg-surface-container-low transition-colors duration-150">
+                        Find a flatmate
+                    </button>
+</div>
+</div>
+<!-- Trust Strip -->
+<div class="relative z-10 mt-stack-xl pt-stack-lg border-t border-sand-border w-full max-w-4xl flex flex-wrap justify-center gap-x-8 gap-y-4 text-on-surface-variant font-label-md text-label-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol text-sm">verified</span>
+                    AI-ranked matches
+                </div>
+<div class="hidden md:block w-1 h-1 rounded-full bg-sand-border self-center"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol text-sm">shield_person</span>
+                    Verified users
+                </div>
+<div class="hidden md:block w-1 h-1 rounded-full bg-sand-border self-center"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol text-sm">money_off</span>
+                    ₹0 brokerage
+                </div>
+<div class="hidden md:block w-1 h-1 rounded-full bg-sand-border self-center"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol text-sm">description</span>
+                    Rental agreements
+                </div>
+</div>
+</section>
+<!-- Two Card Split -->
+<section class="px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto py-stack-xl">
+<div class="grid md:grid-cols-2 gap-gutter">
+<!-- Looking for a place -->
+<div class="group relative rounded-2xl overflow-hidden bg-surface-container-lowest border border-sand-border shadow-whisper p-8 h-80 flex flex-col justify-end transition-transform hover:-translate-y-1 duration-300">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="A bright, sunlit modern apartment interior featuring a comfortable beige sofa, minimalist coffee table, and large windows with sheer white curtains. The aesthetic is 'Sophisticated Coastal' with warm wooden floors, potted green plants, and soft, natural daylight. The mood is welcoming, professional, and high-end residential." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAknBo5GIwCrhDvIv8jxH_7dvk9Kzu4WsEilqvLqusCuZ-r9qlAJvTXdgH3b2r8wIUi9hOzONuUdsVOsNwqWTGOF1dUYbFQiZfynvmvbD60tyNrR19-3_ggju3N2C7_a98BJz-tqx9Wf0IlXn6iMSv4_KxKBb6632MQFVrQAC6jKJCClGXRP0ufqgxApvfAeYe14exZUR_BX1eFI2OvhzLnNnple7h7X5oY3Lfjdu0MnI6wRGsbeXnq-A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-deep-void/80 to-transparent"></div>
+</div>
+<div class="relative z-10 text-on-primary">
+<div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-stack-md border border-white/30">
+<span class="material-symbols-outlined">search</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg mb-stack-xs font-semibold">Looking for a place?</h3>
+<p class="font-body-md text-body-md text-on-primary/80 mb-stack-md">Discover premium homes shared by verified individuals.</p>
+<a class="inline-flex items-center gap-2 font-label-md text-label-md hover:gap-3 transition-all" href="#">
+                            Start searching <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Have a room to fill -->
+<div class="group relative rounded-2xl overflow-hidden bg-surface-container-lowest border border-sand-border shadow-whisper p-8 h-80 flex flex-col justify-end transition-transform hover:-translate-y-1 duration-300">
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" data-alt="Two diverse young professionals laughing and chatting over coffee in a bright, modern kitchen with sleek white cabinets and natural stone countertops. The aesthetic is 'Sophisticated Coastal' with warm, ambient lighting, high-end finishes, and a relaxed yet structured atmosphere. The mood is friendly, trustworthy, and collaborative." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwcLn5B1x_6E34nuEfF2TxNtZPgxWSpQr8wvyMcYSTMVnJwUZaQEqdX_CBqX3iKY4mZp047K7cxxw4Man3zlfLwXYgzxOxnTo9WjGNj6ajJUjfy6bifCInis64i4Q89_rsYXpuR85iQJ_KLaeVYjFjJvi4tTdmuXGyUqHUeqONOC9qIka_6jIkDrpO6N0uLDIUmQIBhevOrgkfNotb9Vy-xYnnkPHYVxBvJAulUeg0pS8kOPtW0A_ECw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-deep-void/80 to-transparent"></div>
+</div>
+<div class="relative z-10 text-on-primary">
+<div class="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center mb-stack-md border border-white/30">
+<span class="material-symbols-outlined">night_shelter</span>
+</div>
+<h3 class="font-headline-lg text-headline-lg mb-stack-xs font-semibold">Have a room to fill?</h3>
+<p class="font-body-md text-body-md text-on-primary/80 mb-stack-md">Find reliable, verified flatmates tailored to your lifestyle.</p>
+<a class="inline-flex items-center gap-2 font-label-md text-label-md hover:gap-3 transition-all" href="#">
+                            List your room <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component) - Mobile Only -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface border-t border-sand-border shadow-sm flex justify-around items-end pb-safe-bottom h-20 px-2">
+<a class="flex flex-col items-center justify-center w-full py-2 hover:bg-surface-container-low text-primary font-label-md text-label-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+            Home
+        </a>
+<a class="flex flex-col items-center justify-center w-full py-2 hover:bg-surface-container-low text-on-secondary-fixed-variant font-label-md text-label-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">favorite</span>
+            Saved
+        </a>
+<a class="flex flex-col items-center justify-center w-full py-2 hover:bg-surface-container-low text-on-secondary-fixed-variant font-label-md text-label-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">search</span>
+            Search
+        </a>
+<a class="flex flex-col items-center justify-center w-full py-2 hover:bg-surface-container-low text-on-secondary-fixed-variant font-label-md text-label-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">chat</span>
+            Inbox
+        </a>
+<a class="flex flex-col items-center justify-center w-full py-2 hover:bg-surface-container-low text-on-secondary-fixed-variant font-label-md text-label-md active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+            Profile
+        </a>
+</nav>
+</body></html>

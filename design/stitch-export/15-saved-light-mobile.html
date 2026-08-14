@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Saved Items</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full overflow-hidden flex flex-col md:hidden">
+<!-- Header -->
+<header class="bg-surface-container-lowest pt-12 pb-4 px-margin-mobile border-b border-sand-border flex-shrink-0 z-10">
+<h1 class="font-headline-lg text-headline-lg font-bold text-petrol">Saved</h1>
+</header>
+<!-- Tabs -->
+<div class="flex-shrink-0 bg-surface-container-lowest border-b border-sand-border px-margin-mobile flex gap-6">
+<button class="py-3 font-title-md text-title-md text-petrol font-semibold border-b-2 border-petrol pb-2 relative top-[1px]">Homes</button>
+<button class="py-3 font-title-md text-title-md text-secondary hover:text-petrol transition-colors">Searches</button>
+</div>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto px-margin-mobile py-stack-md pb-[100px] flex flex-col gap-stack-lg">
+<!-- Saved Home Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm relative group cursor-pointer active:scale-95 transition-transform">
+<button aria-label="Remove from saved" class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface/80 backdrop-blur-sm text-petrol">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="h-48 w-full bg-surface-dim relative">
+<img class="w-full h-full object-cover" data-alt="A modern, sophisticated coastal apartment living room in Mumbai, featuring large windows with ocean views. The space is bright and airy with warm organic textures, light sand-colored walls, and subtle petrol blue accents in the decor. Premium real estate photography style, high contrast, inviting atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4ONLI2v_H7KJAZfA_jAt2MATlJkQhiaHqo_7R2XV8AWFZc-memooHP6d5xyAgXX6xnXP1_021aGpHoOoKX7gzcVtkY-um5HiaA680V3raJo9kEnjpFG4PoVpv4eDKob3iCnrTdwZHyq393spD4h5lE-kjefT19rCI4Sa73rcO6mMVQcnsAM94K89pmyaJMzI31f118ieCCVvwZp4DFuqHoqhcfdGFMeHaqLcpXfV5qVGC1B6jhK8CgQ"/>
+</div>
+<div class="p-4 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Sea View Penthouse</h2>
+<span class="font-title-md text-title-md text-petrol font-semibold whitespace-nowrap ml-2">₹1.2L <span class="font-body-md text-body-md text-secondary font-normal">/mo</span></span>
+</div>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">Bandra West, Mumbai • 3 Beds, 3 Baths</p>
+<div class="flex gap-2 mt-2">
+<span class="bg-surface-container-low px-2 py-1 rounded text-xs font-medium text-secondary">Furnished</span>
+<span class="bg-surface-container-low px-2 py-1 rounded text-xs font-medium text-secondary">Balcony</span>
+</div>
+</div>
+</article>
+<!-- Saved Home Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm relative group cursor-pointer active:scale-95 transition-transform">
+<button aria-label="Remove from saved" class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface/80 backdrop-blur-sm text-petrol">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="h-48 w-full bg-surface-dim relative">
+<img class="w-full h-full object-cover" data-alt="A minimalist, modern high-end studio apartment in Mumbai. The interior features clean lines, white oak flooring, and a sleek kitchen setup. Large floor-to-ceiling windows let in abundant natural light. The aesthetic is clean, professional, and sophisticated." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDlP2CFpQK2cIH9dJ-1qH_7ud5XZPNYIz-K7pVQRZ1k-o1Ztju-DypiD638i8ueAdisdce6mcT44U2Y9Iy2Uvph7yDFEoCJLKf4NI0nG8U17CGickFRbLUtXy1SPvkb1OaHXrWV3U2m__9jWizFXQvtBC6biShaWinHjW-kj3kWlVF8ye1smGLkRgyKuUB_BAvE4uFPHoJtqy3RQ-qONi2KBcuEBTknUlyyaYAd5FD0AuZeP0wowrJfVQ"/>
+</div>
+<div class="p-4 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Minimalist Studio</h2>
+<span class="font-title-md text-title-md text-petrol font-semibold whitespace-nowrap ml-2">₹65k <span class="font-body-md text-body-md text-secondary font-normal">/mo</span></span>
+</div>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">Andheri East, Mumbai • 1 Bed, 1 Bath</p>
+</div>
+</article>
+<!-- Saved Home Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm relative group cursor-pointer active:scale-95 transition-transform">
+<button aria-label="Remove from saved" class="absolute top-3 right-3 z-10 w-8 h-8 flex items-center justify-center rounded-full bg-surface/80 backdrop-blur-sm text-petrol">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+<div class="h-48 w-full bg-surface-dim relative">
+<img class="w-full h-full object-cover" data-alt="A luxurious duplex apartment living area with high ceilings and a modern staircase. The decor is sophisticated coastal with a mix of neutral sand tones and elegant modern furniture. Soft, natural light fills the space, creating a warm and premium ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbS1bg4VNlt19DAaG8TMzFNUoq4aaTndhc2XiOrJoS86Rqf-xrAgo-KV-m_nGQb0MDcJz9QUor-mc7aLiih8AfCDdVx7UmVr-sHjDqWMdXYp5rsEojULZ_xD2FdHbwS-ozwnCL3ehf5aiE8vohph1YXmmJ3loOhGuzWncB-ET7QicIwClFRTi5KiYCouStLInZvhHWmYCwd_BEvSD3O1UIEnqjBPcNO6CjUoadHDdVQuQEZnZimbdBDg"/>
+</div>
+<div class="p-4 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Luxury Duplex</h2>
+<span class="font-title-md text-title-md text-petrol font-semibold whitespace-nowrap ml-2">₹2.5L <span class="font-body-md text-body-md text-secondary font-normal">/mo</span></span>
+</div>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">Juhu, Mumbai • 4 Beds, 5 Baths</p>
+<div class="flex gap-2 mt-2">
+<span class="bg-surface-container-low px-2 py-1 rounded text-xs font-medium text-secondary">Premium</span>
+<span class="bg-surface-container-low px-2 py-1 rounded text-xs font-medium text-secondary">Pool</span>
+</div>
+</div>
+</article>
+</main>
+<!-- SideNavBar (Mobile Bottom Nav Shell) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-surface bg-surface-container-lowest shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+<!-- Tab 0: Explore -->
+<button class="flex flex-col items-center justify-center text-secondary hover:bg-sand-light active:scale-90 transition-transform duration-200 rounded-xl px-3 py-1 w-16">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-md text-[10px] leading-tight font-medium">Explore</span>
+</button>
+<!-- Tab 1: Saved (Active) -->
+<button class="flex flex-col items-center justify-center text-petrol bg-primary-container/10 active:scale-90 transition-transform duration-200 rounded-xl px-3 py-1 w-16">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-[10px] leading-tight font-medium">Saved</span>
+</button>
+<!-- Tab 2: AI Search (Raised Center Action) -->
+<div class="relative w-16 flex justify-center -top-4">
+<button class="absolute bg-petrol text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</button>
+<span class="font-label-md text-[10px] leading-tight font-medium text-secondary absolute bottom-[-20px]">AI Search</span>
+</div>
+<!-- Tab 3: Inbox -->
+<button class="flex flex-col items-center justify-center text-secondary hover:bg-sand-light active:scale-90 transition-transform duration-200 rounded-xl px-3 py-1 w-16">
+<span class="material-symbols-outlined mb-1">mail</span>
+<span class="font-label-md text-[10px] leading-tight font-medium">Inbox</span>
+</button>
+<!-- Tab 4: Profile -->
+<button class="flex flex-col items-center justify-center text-secondary hover:bg-sand-light active:scale-90 transition-transform duration-200 rounded-xl px-3 py-1 w-16">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-md text-[10px] leading-tight font-medium">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Onboarding</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary": "#ffffff",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "primary": "#005a71",
+                        "on-surface": "#1b1c1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-highest": "#e4e2df",
+                        "petrol": "#0E7490",
+                        "primary-fixed": "#b9eaff",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "inverse-primary": "#81d1f0",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#006781",
+                        "surface-container-high": "#eae8e5",
+                        "outline": "#6f787d",
+                        "inverse-surface": "#30312f",
+                        "tertiary": "#54534e",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#6c6b66",
+                        "deep-void": "#0B1114",
+                        "surface-dim": "#dbdad7",
+                        "on-primary-container": "#d3f1ff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "surface-container-low": "#f5f3f0",
+                        "electric-cyan": "#22D3EE",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#e5e2dc",
+                        "error": "#ba1a1a",
+                        "secondary": "#5e5e5d",
+                        "onyx": "#1D262B",
+                        "surface-variant": "#e4e2df",
+                        "on-primary-fixed": "#001f29",
+                        "on-secondary-container": "#636362",
+                        "primary-container": "#0e7490",
+                        "outline-variant": "#bec8cd",
+                        "surface-bright": "#fbf9f6",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-desktop": "80px",
+                        "stack-xs": "4px",
+                        "container-max": "1280px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    fontSize: {
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "label-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "title-md": ["20px", { lineHeight: "28px", fontWeight: "600" }],
+                        "display-lg-mobile": ["28px", { lineHeight: "36px", letterSpacing: "-0.01em", fontWeight: "700" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .chip {
+            transition: all 0.2s ease-in-out;
+        }
+        .chip.selected {
+            background-color: theme('colors.petrol');
+            border-color: theme('colors.petrol');
+            color: theme('colors.on-primary');
+            box-shadow: 0 4px 12px rgba(14, 116, 144, 0.3);
+            transform: translateY(-1px);
+        }
+        .glow-active {
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.6);
+        }
+        body {
+            background: radial-gradient(circle at top right, rgba(14, 116, 144, 0.15) 0%, transparent 40%),
+                        radial-gradient(circle at bottom left, rgba(11, 17, 20, 1) 0%, rgba(29, 38, 43, 1) 100%);
+            background-color: theme('colors.deep-void');
+        }
+    </style>
+</head>
+<body class="text-on-secondary font-body-md min-h-screen flex flex-col selection:bg-petrol selection:text-white antialiased overflow-x-hidden">
+<!-- Top Navigation Area (Wizard style, no full app bar) -->
+<header class="w-full px-margin-desktop py-8 flex justify-between items-center z-10 relative">
+<!-- Progress Segments -->
+<div class="flex gap-2 w-64 items-center">
+<div class="h-1.5 flex-1 rounded-full bg-petrol transition-all duration-500"></div>
+<div class="h-1.5 flex-1 rounded-full bg-petrol transition-all duration-500"></div>
+<div class="h-1.5 flex-1 rounded-full bg-electric-cyan glow-active transition-all duration-500"></div>
+<div class="h-1.5 flex-1 rounded-full bg-surface-variant/20 transition-all duration-500"></div>
+<div class="h-1.5 flex-1 rounded-full bg-surface-variant/20 transition-all duration-500"></div>
+<span class="ml-4 font-label-md text-label-md text-secondary-fixed-dim">3 of 5</span>
+</div>
+<!-- Skip Action -->
+<button class="font-label-md text-label-md text-secondary-fixed-dim hover:text-white transition-colors duration-200">
+            Skip for now
+        </button>
+</header>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center px-margin-desktop pb-24 z-10 relative">
+<div class="w-full max-w-3xl space-y-stack-xl">
+<!-- Header Texts -->
+<div class="text-center space-y-stack-sm mb-12">
+<h1 class="font-display-lg text-display-lg text-white tracking-tight">Define your vibe</h1>
+<p class="font-body-lg text-body-lg text-tertiary-fixed-dim max-w-xl mx-auto">
+                    Let's find flatmates who match your energy. Select the traits that best describe your lifestyle.
+                </p>
+</div>
+<div class="bg-onyx/50 backdrop-blur-md rounded-[24px] p-10 border border-outline-variant/10 shadow-2xl space-y-12">
+<!-- Category: Social -->
+<section class="space-y-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-electric-cyan text-2xl">celebration</span>
+<h2 class="font-title-md text-title-md text-white">Social Energy</h2>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Introvert
+                        </button>
+<button class="chip selected px-6 py-3 rounded-full border border-petrol text-on-primary font-label-md text-label-md">
+                            Ambivert
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Extrovert
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Homebody
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Partygoer
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Weekend Warrior
+                        </button>
+</div>
+</section>
+<hr class="border-outline-variant/10"/>
+<!-- Category: Cleanliness -->
+<section class="space-y-stack-md">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-electric-cyan text-2xl">cleaning_services</span>
+<h2 class="font-title-md text-title-md text-white">Cleanliness</h2>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Neat Freak
+                        </button>
+<button class="chip selected px-6 py-3 rounded-full border border-petrol text-on-primary font-label-md text-label-md">
+                            Tidy &amp; Organized
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Relaxed
+                        </button>
+<button class="chip px-6 py-3 rounded-full border border-outline-variant/30 text-secondary-fixed-dim hover:border-petrol hover:text-white font-label-md text-label-md bg-transparent">
+                            Messy but clean
+                        </button>
+</div>
+</section>
+</div>
+<!-- Footer Actions -->
+<div class="flex justify-between items-center pt-8">
+<button class="font-label-md text-label-md text-secondary-fixed-dim hover:text-white flex items-center gap-2 transition-colors duration-200">
+<span class="material-symbols-outlined text-xl">arrow_back</span>
+                    Back
+                </button>
+<button class="bg-petrol hover:bg-surface-tint text-on-primary px-10 py-4 rounded-xl font-title-md text-title-md shadow-[0_8px_24px_rgba(14,116,144,0.4)] transition-all duration-200 hover:-translate-y-1 active:scale-95 flex items-center gap-2">
+                    Continue
+                    <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</main>
+<script>
+        // Simple interaction script to toggle chip states
+        document.querySelectorAll('.chip').forEach(button => {
+            button.addEventListener('click', function() {
+                // For this demo, allow multiple selections per category, 
+                // toggle 'selected' class and adjust base classes.
+                if (this.classList.contains('selected')) {
+                    this.classList.remove('selected');
+                    this.classList.add('border-outline-variant/30', 'text-secondary-fixed-dim', 'bg-transparent');
+                    this.classList.remove('border-petrol', 'text-on-primary');
+                } else {
+                    this.classList.add('selected');
+                    this.classList.remove('border-outline-variant/30', 'text-secondary-fixed-dim', 'bg-transparent');
+                }
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley AI Search - Idle</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "primary": "#005a71",
+                    "on-surface": "#1b1c1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-highest": "#e4e2df",
+                    "petrol": "#0E7490",
+                    "primary-fixed": "#b9eaff",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "inverse-primary": "#81d1f0",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-tertiary-container": "#f0ece6",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#006781",
+                    "surface-container-high": "#eae8e5",
+                    "outline": "#6f787d",
+                    "inverse-surface": "#30312f",
+                    "tertiary": "#54534e",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#6c6b66",
+                    "deep-void": "#0B1114",
+                    "surface-dim": "#dbdad7",
+                    "on-primary-container": "#d3f1ff",
+                    "on-primary-fixed-variant": "#004d62",
+                    "sand-light": "#F7F5F2",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "surface-container-low": "#f5f3f0",
+                    "electric-cyan": "#22D3EE",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5d",
+                    "onyx": "#1D262B",
+                    "surface-variant": "#e4e2df",
+                    "on-primary-fixed": "#001f29",
+                    "on-secondary-container": "#636362",
+                    "primary-container": "#0e7490",
+                    "outline-variant": "#bec8cd",
+                    "surface-bright": "#fbf9f6",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "20px",
+                    "stack-xl": "48px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "margin-desktop": "80px",
+                    "stack-xs": "4px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "title-md": [
+                            "Inter"
+                    ],
+                    "display-lg-mobile": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .shadow-whisper { box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .shadow-soft-pop { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col antialiased">
+<!-- TopNavBar -->
+<nav class="bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 text-petrol dark:text-electric-cyan font-body-md text-body-md fixed top-0 w-full z-50 border-b border-sand-border dark:border-outline-variant shadow-none">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="font-title-md text-title-md font-bold text-on-surface dark:text-inverse-on-surface">Homley</div>
+<div class="hidden md:flex items-center gap-gutter">
+<a class="text-primary dark:text-primary-fixed-dim font-bold border-b-2 border-primary hover:text-primary dark:hover:text-primary-fixed transition-colors py-5 Active: scale-95 duration-150" href="#">Browse homes</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed transition-colors py-5" href="#">Find flatmates</a>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="font-label-md text-label-md text-on-surface hover:text-primary transition-colors hidden md:block">Sign in</button>
+<button class="bg-petrol text-on-primary font-label-md text-label-md px-4 py-2 rounded-lg hover:bg-primary transition-colors shadow-whisper Active: scale-95 duration-150">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow flex flex-col items-center justify-center pt-24 pb-safe-bottom px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full relative z-10">
+<div class="w-full max-w-3xl flex flex-col items-center text-center space-y-stack-xl">
+<h1 class="font-display-lg text-display-lg text-on-surface tracking-tight">What are you looking for?</h1>
+<div class="w-full relative group">
+<div class="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-title-md" data-icon="search" style="font-variation-settings: 'FILL' 0;">search</span>
+</div>
+<input autofocus="" class="w-full bg-surface-container-lowest border border-sand-border rounded-xl py-5 pl-14 pr-16 font-body-lg text-body-lg text-on-surface placeholder-outline focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent shadow-soft-pop transition-shadow" placeholder="e.g. 2 bedroom flat in Shoreditch under £2000" type="text"/>
+<div class="absolute inset-y-0 right-0 pr-4 flex items-center">
+<div class="bg-surface-container flex items-center justify-center rounded px-2 py-1 text-xs font-medium text-outline shadow-whisper border border-sand-border">
+<span class="material-symbols-outlined text-[14px]" data-icon="keyboard_return" style="font-variation-settings: 'FILL' 0;">keyboard_return</span>
+</div>
+</div>
+</div>
+<div class="flex flex-wrap justify-center gap-stack-sm pt-stack-sm">
+<button class="bg-surface-container-low hover:bg-surface-container border border-sand-border text-on-surface-variant font-label-md text-label-md py-2 px-4 rounded-full flex items-center gap-2 transition-colors Active: scale-95 duration-150 shadow-whisper">
+<span class="material-symbols-outlined text-[18px]" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 0;">auto_awesome</span>
+                    Pet-friendly apartments near parks
+                </button>
+<button class="bg-surface-container-low hover:bg-surface-container border border-sand-border text-on-surface-variant font-label-md text-label-md py-2 px-4 rounded-full flex items-center gap-2 transition-colors Active: scale-95 duration-150 shadow-whisper">
+<span class="material-symbols-outlined text-[18px]" data-icon="group" style="font-variation-settings: 'FILL' 0;">group</span>
+                    Flatmates looking in East London
+                </button>
+<button class="bg-surface-container-low hover:bg-surface-container border border-sand-border text-on-surface-variant font-label-md text-label-md py-2 px-4 rounded-full flex items-center gap-2 transition-colors Active: scale-95 duration-150 shadow-whisper">
+<span class="material-symbols-outlined text-[18px]" data-icon="home_work" style="font-variation-settings: 'FILL' 0;">home_work</span>
+                    Studios with a home office setup
+                </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-surface dark:bg-surface-dim font-label-md text-label-md fixed bottom-0 w-full z-50 rounded-t-xl border-t border-sand-border dark:border-outline-variant shadow-sm flex justify-around items-end pb-safe-bottom h-20 px-2">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest w-full h-full rounded-xl transition-colors Active: scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home" style="font-variation-settings: 'FILL' 0;">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest w-full h-full rounded-xl transition-colors Active: scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="favorite" style="font-variation-settings: 'FILL' 0;">favorite</span>
+<span>Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest w-full h-full rounded-xl transition-colors Active: scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="search" style="font-variation-settings: 'FILL' 1;">search</span>
+<span>Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest w-full h-full rounded-xl transition-colors Active: scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="chat" style="font-variation-settings: 'FILL' 0;">chat</span>
+<span>Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest w-full h-full rounded-xl transition-colors Active: scale-95 duration-150" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person" style="font-variation-settings: 'FILL' 0;">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</body></html>

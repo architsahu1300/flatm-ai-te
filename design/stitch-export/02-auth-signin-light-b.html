@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "sand-border": "#DFDCD6",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#efeeeb",
+                      "primary": "#005a71",
+                      "on-surface": "#1b1c1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-surface-variant": "#3f484c",
+                      "surface-container-highest": "#e4e2df",
+                      "petrol": "#0E7490",
+                      "primary-fixed": "#b9eaff",
+                      "error-container": "#ffdad6",
+                      "background": "#fbf9f6",
+                      "on-secondary-fixed-variant": "#464746",
+                      "inverse-primary": "#81d1f0",
+                      "on-background": "#1b1c1a",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#006781",
+                      "surface-container-high": "#eae8e5",
+                      "outline": "#6f787d",
+                      "inverse-surface": "#30312f",
+                      "tertiary": "#54534e",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#6c6b66",
+                      "deep-void": "#0B1114",
+                      "surface-dim": "#dbdad7",
+                      "on-primary-container": "#d3f1ff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary-container": "#e1dfde",
+                      "primary-fixed-dim": "#81d1f0",
+                      "surface-container-low": "#f5f3f0",
+                      "electric-cyan": "#22D3EE",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#e5e2dc",
+                      "error": "#ba1a1a",
+                      "secondary": "#5e5e5d",
+                      "onyx": "#1D262B",
+                      "surface-variant": "#e4e2df",
+                      "on-primary-fixed": "#001f29",
+                      "on-secondary-container": "#636362",
+                      "primary-container": "#0e7490",
+                      "outline-variant": "#bec8cd",
+                      "surface-bright": "#fbf9f6",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-mobile": "20px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-desktop": "80px",
+                      "stack-xs": "4px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fbf9f6;
+        }
+        .whisper-shadow {
+            box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background flex flex-col items-center justify-center min-h-[844px] w-full md:w-[390px] mx-auto relative overflow-hidden">
+<!-- Background Accents -->
+<div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-primary-fixed-dim/20 to-transparent -z-10"></div>
+<div class="absolute -top-32 -right-32 w-96 h-96 bg-primary-fixed-dim/30 rounded-full blur-3xl opacity-50 -z-10"></div>
+<!-- Main Container -->
+<div class="w-full px-margin-mobile flex flex-col gap-stack-lg z-10 w-[350px]">
+<!-- Header -->
+<div class="text-center mb-stack-md">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-petrol mb-stack-xs">Homley</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Welcome back to Premium Living</p>
+</div>
+<!-- Auth Card -->
+<div class="bg-surface-container-lowest rounded-xl whisper-shadow border border-sand-border p-stack-lg flex flex-col gap-stack-lg">
+<!-- Toggle -->
+<div class="flex p-1 bg-surface-container-low rounded-lg">
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface bg-surface-container-lowest rounded shadow-sm text-center">Email</button>
+<button class="flex-1 py-2 font-label-md text-label-md text-on-surface-variant rounded text-center">Phone</button>
+</div>
+<!-- Email Input -->
+<div class="flex flex-col gap-stack-xs">
+<label class="font-label-md text-label-md text-on-surface">Email address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-3 text-outline text-[20px]" data-icon="mail">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-sand-border rounded-lg font-body-md text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="name@example.com" type="email"/>
+</div>
+</div>
+<!-- Or Divider -->
+<div class="flex items-center gap-4">
+<div class="flex-1 h-[1px] bg-sand-border"></div>
+<span class="font-label-md text-label-md text-outline">or continue with</span>
+<div class="flex-1 h-[1px] bg-sand-border"></div>
+</div>
+<!-- Google Button -->
+<button class="w-full py-3 flex items-center justify-center gap-stack-sm bg-surface-container-lowest border border-sand-border rounded-lg hover:bg-surface-container-low transition-colors whisper-shadow">
+<img class="w-5 h-5 object-contain" data-alt="A small, crisp Google 'G' logo perfectly isolated on a transparent background, utilizing standard brand colors (blue, red, yellow, green) in a flat, modern corporate SaaS style, well-lit and high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoLcAff_H5Hf1YWO7JQN_pqm1dOXFV5p5o9ZHifSfr55MwLB1_qVymIeQQu5qXAlZ6af7ChxlGaUr1_2CUP5ZoP5LSLDEiuUHrvEfFu_kT1HE9IGY-ucI5tRvNk6CfOAfBfh5rx1jWrXtbxeJdA6AQujkNPQfUgyF6Qf5Dhuth7sDfWazNEMqHS6hykrp8pQchZ3Jjlx_I_k2dX9oigxKEav5Pbd_lFgSvCXYC87fVGaESI2-ZweHwhQ"/>
+<span class="font-label-md text-label-md text-on-surface">Google</span>
+</button>
+<!-- OTP Input (Mocked as next step) -->
+<div class="hidden flex-col gap-stack-md mt-stack-md" id="otpSection">
+<label class="font-label-md text-label-md text-on-surface text-center">Enter 6-digit code</label>
+<div class="flex justify-between gap-2">
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+<input class="w-12 h-14 text-center text-title-md font-title-md bg-surface-container-lowest border border-sand-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" maxlength="1" type="text"/>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full py-3 bg-petrol text-on-primary font-label-md text-label-md rounded-lg shadow-sm hover:scale-[0.98] transition-transform active:scale-95 mt-stack-sm">
+                Continue
+            </button>
+</div>
+<!-- Footer -->
+<p class="text-center font-body-md text-body-md text-on-surface-variant text-[12px]">
+            By continuing, you agree to our <a class="text-petrol underline" href="#">Terms of Service</a> and <a class="text-petrol underline" href="#">Privacy Policy</a>.
+        </p>
+</div>
+</body></html>

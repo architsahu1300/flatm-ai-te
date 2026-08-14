@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-highest": "#e4e2df",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-primary-container": "#d3f1ff",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "primary-container": "#0e7490",
+                      "sand-light": "#F7F5F2",
+                      "onyx": "#1D262B",
+                      "on-surface": "#1b1c1a",
+                      "surface-dim": "#dbdad7",
+                      "error": "#ba1a1a",
+                      "on-secondary-container": "#636362",
+                      "tertiary-fixed": "#e5e2dc",
+                      "tertiary-container": "#6c6b66",
+                      "inverse-primary": "#81d1f0",
+                      "secondary": "#5e5e5d",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "on-primary-fixed-variant": "#004d62",
+                      "surface-tint": "#006781",
+                      "secondary-fixed": "#e4e2e1",
+                      "surface": "#fbf9f6",
+                      "tertiary": "#54534e",
+                      "on-tertiary": "#ffffff",
+                      "petrol": "#0E7490",
+                      "on-tertiary-container": "#f0ece6",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "surface-container-high": "#eae8e5",
+                      "error-container": "#ffdad6",
+                      "secondary-container": "#e1dfde",
+                      "primary-fixed-dim": "#81d1f0",
+                      "outline": "#6f787d",
+                      "on-primary-fixed": "#001f29",
+                      "on-error-container": "#93000a",
+                      "background": "#fbf9f6",
+                      "on-secondary-fixed-variant": "#464746",
+                      "surface-variant": "#e4e2df",
+                      "electric-cyan": "#22D3EE",
+                      "on-primary": "#ffffff",
+                      "surface-container": "#efeeeb",
+                      "on-surface-variant": "#3f484c",
+                      "surface-container-lowest": "#ffffff",
+                      "primary": "#005a71",
+                      "outline-variant": "#bec8cd",
+                      "on-error": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "on-background": "#1b1c1a",
+                      "inverse-on-surface": "#f2f0ed",
+                      "primary-fixed": "#b9eaff",
+                      "deep-void": "#0B1114",
+                      "surface-bright": "#fbf9f6",
+                      "sand-border": "#DFDCD6",
+                      "surface-container-low": "#f5f3f0",
+                      "inverse-surface": "#30312f",
+                      "on-secondary-fixed": "#1b1c1b"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-xs": "4px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "margin-desktop": "80px",
+                      "stack-md": "16px",
+                      "stack-xl": "48px",
+                      "margin-mobile": "20px",
+                      "stack-sm": "8px",
+                      "stack-lg": "24px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: #1b1c1a; /* Dark background approximation based on theme */
+            color: #ffffff;
+        }
+        /* Adding font-variant-numeric for tabular numerals as requested */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-inverse-surface text-on-tertiary">
+<!-- Sidebar Layout -->
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 bg-surface-container-lowest/10 backdrop-blur-md border-r border-outline-variant/30 flex flex-col justify-between p-stack-lg hidden md:flex">
+<div>
+<div class="mb-stack-xl flex items-center gap-stack-sm text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[32px]">admin_panel_settings</span>
+<span class="font-headline-lg text-headline-lg tracking-tight">Homley</span>
+</div>
+<nav class="space-y-stack-sm">
+<a class="flex items-center gap-stack-md p-stack-sm rounded-lg text-secondary-fixed-dim hover:bg-tertiary-container hover:text-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">dashboard</span>
+<span class="font-body-md text-body-md">Overview</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-sm rounded-lg bg-primary-container text-on-primary-container transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">gavel</span>
+<span class="font-body-md text-body-md font-semibold">Moderation</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-sm rounded-lg text-secondary-fixed-dim hover:bg-tertiary-container hover:text-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">verified_user</span>
+<span class="font-body-md text-body-md">Verifications</span>
+</a>
+<a class="flex items-center gap-stack-md p-stack-sm rounded-lg text-secondary-fixed-dim hover:bg-tertiary-container hover:text-primary-fixed-dim transition-colors group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">flag</span>
+<span class="font-body-md text-body-md">User Reports</span>
+</a>
+</nav>
+</div>
+<div>
+<a class="flex items-center gap-stack-md p-stack-sm rounded-lg text-secondary-fixed-dim hover:bg-tertiary-container hover:text-primary-fixed-dim transition-colors" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto p-gutter md:p-margin-desktop bg-inverse-surface">
+<header class="flex justify-between items-center mb-stack-xl">
+<div>
+<h1 class="font-display-lg text-display-lg md:text-display-lg text-on-tertiary mb-stack-xs">Moderation Queue</h1>
+<p class="font-body-lg text-body-lg text-secondary-fixed-dim">Review and action pending reports and ID verifications.</p>
+</div>
+<div class="flex items-center gap-stack-md hidden sm:flex">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-lowest/10 border border-outline-variant/30 rounded-lg text-on-tertiary placeholder:text-outline focus:outline-none focus:border-primary-fixed-dim focus:ring-1 focus:ring-primary-fixed-dim transition-all shadow-sm" placeholder="Search ID or User..." type="text"/>
+</div>
+<button class="bg-surface-container-lowest/10 border border-outline-variant/30 p-2 rounded-lg hover:bg-surface-container-lowest/20 transition-colors relative">
+<span class="material-symbols-outlined text-on-tertiary">notifications</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- Bento Grid Layout for Dashboard Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-xl">
+<!-- Metric Card 1 -->
+<div class="bg-surface-container-lowest/5 border border-outline-variant/20 rounded-xl p-stack-lg flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px] text-primary-fixed-dim">flag</span>
+</div>
+<div class="mb-stack-md">
+<p class="font-label-md text-label-md text-secondary-fixed-dim uppercase tracking-wider">Pending Reports</p>
+</div>
+<div class="flex items-end gap-stack-sm">
+<span class="font-display-lg text-display-lg text-on-tertiary tabular-nums">42</span>
+<span class="font-label-md text-label-md text-error mb-2 flex items-center"><span class="material-symbols-outlined text-[16px]">arrow_upward</span> 12%</span>
+</div>
+</div>
+<!-- Metric Card 2 -->
+<div class="bg-surface-container-lowest/5 border border-outline-variant/20 rounded-xl p-stack-lg flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[64px] text-primary-fixed-dim">verified_user</span>
+</div>
+<div class="mb-stack-md">
+<p class="font-label-md text-label-md text-secondary-fixed-dim uppercase tracking-wider">ID Verifications</p>
+</div>
+<div class="flex items-end gap-stack-sm">
+<span class="font-display-lg text-display-lg text-on-tertiary tabular-nums">18</span>
+<span class="font-label-md text-label-md text-primary-fixed-dim mb-2 flex items-center"><span class="material-symbols-outlined text-[16px]">arrow_downward</span> 5%</span>
+</div>
+</div>
+<!-- Metric Card 3 -->
+<div class="bg-primary-container border border-primary-fixed-dim/30 rounded-xl p-stack-lg flex flex-col justify-between shadow-lg relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-32 h-32 bg-primary-fixed-dim/20 rounded-full blur-2xl"></div>
+<div class="mb-stack-md relative z-10">
+<p class="font-label-md text-label-md text-on-primary-container/80 uppercase tracking-wider">Active Moderators</p>
+</div>
+<div class="flex items-center justify-between relative z-10">
+<span class="font-display-lg text-display-lg text-on-primary-container tabular-nums">12</span>
+<div class="flex -space-x-3">
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A portrait of a young professional woman looking forward, wearing a dark blue turtleneck, lit by soft studio lighting with a dark background, embodying a modern tech corporate aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYBM3BCGJmB8Tgj0SI4jXegP7P5nYd4Cqwm7Ntlb3SGnJfMNpgNUGu8vl_foFQZ8BA8quPMEqLhqgL02lTKkCtqBO2-f933102k4rJcsgBCZBFgMKvZaSItaxDAYPqBcF8Ik_4EHB0S0f9QviJe4g-J_tZKc7x8QqnQ2i_y-gyjjcjSfPIVUKHmaU5N3Y1UfbveijyinJdCdCaegm_0ekHKfHYT1BR-b1Xfpj2BILsPtVNjecJMtKoUw"/>
+<img class="w-10 h-10 rounded-full border-2 border-primary-container object-cover" data-alt="A portrait of a middle-aged man with glasses and a slight smile, wearing a grey shirt, against a minimalist dark backdrop with dramatic side lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVQ-5TicU2aaAWwBUdRzKnW90dNbWwMs8kGBn98E7TD7OGVs_tC_ShkZi_E6oF7VoPb5jBgvuSgWck2f3BEFTWYhvB3DkYhZf_EyrO3TTTEDwwAf98Xap3FiAMo9EN8ECQODScXb-tEpNNIwCwsNf8aOv9a8oLjpxYl7fvguDspAi0zV_odoMTrK4ZkOfH82w1LOj8CE2YcJ02qeqiUvKJ04U5yZjLZVC7M1Zz2VdkAenQJ94yoldLCw"/>
+<div class="w-10 h-10 rounded-full border-2 border-primary-container bg-surface-container-lowest/20 flex items-center justify-center text-xs font-bold text-on-primary-container backdrop-blur-sm">+10</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Queue Section (Asymmetric Layout) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Left Column: Priority Reports Table -->
+<div class="lg:col-span-2 bg-surface-container-lowest/5 border border-outline-variant/20 rounded-xl p-stack-lg shadow-sm">
+<div class="flex justify-between items-center mb-stack-lg border-b border-outline-variant/20 pb-4">
+<h2 class="font-title-md text-title-md text-on-tertiary">Priority Reports</h2>
+<button class="font-label-md text-label-md text-primary-fixed-dim hover:text-electric-cyan transition-colors">View All</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-outline-variant/20">
+<th class="pb-3 font-label-md text-label-md text-secondary-fixed-dim font-normal">Report ID</th>
+<th class="pb-3 font-label-md text-label-md text-secondary-fixed-dim font-normal">User</th>
+<th class="pb-3 font-label-md text-label-md text-secondary-fixed-dim font-normal">Type</th>
+<th class="pb-3 font-label-md text-label-md text-secondary-fixed-dim font-normal">Status</th>
+<th class="pb-3 font-label-md text-label-md text-secondary-fixed-dim font-normal text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-tertiary tabular-nums">
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-lowest/5 transition-colors group">
+<td class="py-4">#RPT-8832</td>
+<td class="py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-xs">JS</div>
+<span>John S.</span>
+</td>
+<td class="py-4">Inappropriate Content</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-error/20 text-error text-xs font-semibold">High Priority</span>
+</td>
+<td class="py-4 text-right">
+<button class="px-4 py-1.5 rounded-lg border border-outline-variant/50 hover:bg-outline-variant/20 transition-colors text-sm">Review</button>
+</td>
+</tr>
+<tr class="border-b border-outline-variant/10 hover:bg-surface-container-lowest/5 transition-colors">
+<td class="py-4">#RPT-8831</td>
+<td class="py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-xs">AK</div>
+<span>Anna K.</span>
+</td>
+<td class="py-4">Spam / Scam</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-surface-container-lowest/20 text-secondary-fixed-dim text-xs font-semibold">Pending</span>
+</td>
+<td class="py-4 text-right">
+<button class="px-4 py-1.5 rounded-lg border border-outline-variant/50 hover:bg-outline-variant/20 transition-colors text-sm">Review</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-lowest/5 transition-colors">
+<td class="py-4">#RPT-8829</td>
+<td class="py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-container flex items-center justify-center text-xs">MR</div>
+<span>Mike R.</span>
+</td>
+<td class="py-4">Harassment</td>
+<td class="py-4">
+<span class="inline-flex items-center px-2 py-1 rounded-full bg-error/20 text-error text-xs font-semibold">High Priority</span>
+</td>
+<td class="py-4 text-right">
+<button class="px-4 py-1.5 rounded-lg border border-outline-variant/50 hover:bg-outline-variant/20 transition-colors text-sm">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column: Verification Queue (Glassmorphism inspired) -->
+<div class="bg-gradient-to-br from-surface-container-lowest/10 to-transparent border border-outline-variant/30 backdrop-blur-xl rounded-xl p-stack-lg shadow-lg">
+<div class="flex justify-between items-center mb-stack-md">
+<h2 class="font-title-md text-title-md text-on-tertiary">ID Verification</h2>
+<span class="material-symbols-outlined text-primary-fixed-dim">recent_actors</span>
+</div>
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-stack-lg">Users waiting for identity approval to list homes or contact hosts.</p>
+<div class="space-y-stack-md">
+<!-- Verification Item 1 -->
+<div class="bg-surface-container-lowest/5 p-4 rounded-lg border border-outline-variant/20 hover:border-primary-fixed-dim/50 transition-colors">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded bg-surface-container-lowest/20 object-cover" data-alt="A macro shot of a generic international passport cover lying on a dark textured desk, subtly lit with a cool blue hue to suggest security and verification context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYHFuNDDUTfBgLiRafepmL3SeYtk_w1wwZo5di5soU6dhil8ZpYF0Ov6du_Y34BqZ-JAoWwC3dOjN8dBVALKJZz4BEwJPBJMIn9muyBP7WNBueQGAtUujhFOOPD2sRyIr_HQhM5MQjcd41l4oEn-0ThtszAjWWSduA8ykUigzBr2ShFGmrf8LmeaY1teJIiC-HhbZosbV8-jfCX7f6tv4KSJhWv6Lr8WOOAuTj_zdEwcUq_5AU-U415Q"/>
+<div>
+<p class="font-label-md text-label-md text-on-tertiary font-semibold">Elena V.</p>
+<p class="font-body-md text-sm text-secondary-fixed-dim tabular-nums">Submitted 10m ago</p>
+</div>
+</div>
+<span class="bg-surface-container-lowest/20 px-2 py-1 rounded text-xs text-secondary-fixed-dim">Passport</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-on-primary py-1.5 rounded text-sm font-semibold hover:bg-primary/90 transition-colors active:scale-95 duration-200">Approve</button>
+<button class="flex-1 border border-outline-variant/50 py-1.5 rounded text-sm font-semibold hover:bg-surface-container-lowest/10 transition-colors active:scale-95 duration-200">Review</button>
+</div>
+</div>
+<!-- Verification Item 2 -->
+<div class="bg-surface-container-lowest/5 p-4 rounded-lg border border-outline-variant/20 hover:border-primary-fixed-dim/50 transition-colors">
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded bg-surface-container-lowest/20 object-cover" data-alt="A close up of a stylized driving license sitting on a dark minimal surface, blurred details for privacy, soft overhead lighting emphasizing a modern corporate security aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0cVUEeTsddYyL0vyivIxUxZYJ2afcXs6VzOl9VdVNqVjjIcZTqa2TNSR8wSHK_LoLtGtw2hAJyGNPGgs0mP9Zmb_2ccAIbMZrcVIt76bpqfI7lI1fT1JJ705rbrJ8Ko5IKtTDweo227cfzoqrGuAI8HtVNOmcNQ_RmonG9oPNg3UTdXo4sWVMjdddR_RXbc4poGjE9RlayHBNj2kJJEUipCmsz6xqf-r23FvomgGrhe2uvTmXCOsmhQ"/>
+<div>
+<p class="font-label-md text-label-md text-on-tertiary font-semibold">David T.</p>
+<p class="font-body-md text-sm text-secondary-fixed-dim tabular-nums">Submitted 45m ago</p>
+</div>
+</div>
+<span class="bg-surface-container-lowest/20 px-2 py-1 rounded text-xs text-secondary-fixed-dim">Driver's License</span>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 bg-primary text-on-primary py-1.5 rounded text-sm font-semibold hover:bg-primary/90 transition-colors active:scale-95 duration-200">Approve</button>
+<button class="flex-1 border border-outline-variant/50 py-1.5 rounded text-sm font-semibold hover:bg-surface-container-lowest/10 transition-colors active:scale-95 duration-200">Review</button>
+</div>
+</div>
+</div>
+<button class="w-full mt-stack-md py-3 text-center font-label-md text-label-md text-primary-fixed-dim hover:text-electric-cyan border border-dashed border-primary-fixed-dim/30 rounded-lg hover:bg-primary-fixed-dim/5 transition-colors">
+                        View All Verifications
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<!-- Mobile Navigation Bottom Bar (Matches BottomNavBar JSON structure for semantic shell logic) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 bg-surface dark:bg-surface-container-highest border-t border-outline-variant dark:border-on-tertiary-fixed-variant shadow-lg rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-md text-label-md text-[10px]">Overview</span>
+</a>
+<!-- Active Tab semantic mapping to Moderation intent -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gavel</span>
+<span class="font-label-md text-label-md text-[10px]">Mod</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined">verified_user</span>
+<span class="font-label-md text-label-md text-[10px]">Verify</span>
+</a>
+</nav>
+</body></html>

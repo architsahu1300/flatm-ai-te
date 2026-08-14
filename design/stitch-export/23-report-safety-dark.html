@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Report / Safety Dialogs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e4e2df",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-primary-container": "#d3f1ff",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "primary-container": "#0e7490",
+                    "sand-light": "#F7F5F2",
+                    "onyx": "#1D262B",
+                    "on-surface": "#1b1c1a",
+                    "surface-dim": "#dbdad7",
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#636362",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary-container": "#6c6b66",
+                    "inverse-primary": "#81d1f0",
+                    "secondary": "#5e5e5d",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "on-primary-fixed-variant": "#004d62",
+                    "surface-tint": "#006781",
+                    "secondary-fixed": "#e4e2e1",
+                    "surface": "#fbf9f6",
+                    "tertiary": "#54534e",
+                    "on-tertiary": "#ffffff",
+                    "petrol": "#0E7490",
+                    "on-tertiary-container": "#f0ece6",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "surface-container-high": "#eae8e5",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "outline": "#6f787d",
+                    "on-primary-fixed": "#001f29",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "surface-variant": "#e4e2df",
+                    "electric-cyan": "#22D3EE",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#005a71",
+                    "outline-variant": "#bec8cd",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1b1c1a",
+                    "inverse-on-surface": "#f2f0ed",
+                    "primary-fixed": "#b9eaff",
+                    "deep-void": "#0B1114",
+                    "surface-bright": "#fbf9f6",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-low": "#f5f3f0",
+                    "inverse-surface": "#30312f",
+                    "on-secondary-fixed": "#1b1c1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-xs": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "80px",
+                    "stack-md": "16px",
+                    "stack-xl": "48px",
+                    "margin-mobile": "20px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "title-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                    "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Modal Backdrop */
+        .modal-backdrop {
+            background-color: rgba(11, 17, 20, 0.8); /* deep-void with opacity */
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+<body class="bg-deep-void text-on-surface dark:bg-deep-void dark:text-inverse-on-surface font-body-md antialiased min-h-screen flex items-center justify-center p-margin-mobile">
+<!-- Container for Dialogs - Simulating Mobile Viewports side-by-side or stacked -->
+<div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-lg items-start">
+<!-- 1. Report Listing Modal -->
+<div class="relative bg-inverse-surface rounded-xl shadow-lg border border-outline/20 overflow-hidden max-w-sm w-full mx-auto flex flex-col h-[600px]">
+<!-- Header -->
+<div class="flex items-center justify-between p-stack-md border-b border-outline/20 bg-inverse-surface sticky top-0 z-10">
+<h2 class="font-title-md text-title-md text-inverse-on-surface">Report Listing</h2>
+<button aria-label="Close" class="p-2 rounded-full hover:bg-surface-variant/10 transition-colors text-inverse-on-surface">
+<span class="material-symbols-outlined text-xl">close</span>
+</button>
+</div>
+<!-- Content Scrollable -->
+<div class="p-stack-md overflow-y-auto flex-1 bg-inverse-surface">
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-stack-lg">
+                    Why are you reporting this listing? Your report is anonymous.
+                </p>
+<form class="space-y-stack-md">
+<!-- Options -->
+<label class="flex items-start gap-stack-sm p-3 rounded-lg border border-outline/20 hover:border-primary-fixed cursor-pointer transition-colors group">
+<input class="mt-1 text-petrol bg-transparent border-outline focus:ring-petrol focus:ring-offset-inverse-surface" name="report_reason" type="radio"/>
+<span class="font-body-md text-body-md text-inverse-on-surface group-hover:text-primary-fixed-dim">It's a scam or fraudulent</span>
+</label>
+<label class="flex items-start gap-stack-sm p-3 rounded-lg border border-outline/20 hover:border-primary-fixed cursor-pointer transition-colors group">
+<input class="mt-1 text-petrol bg-transparent border-outline focus:ring-petrol focus:ring-offset-inverse-surface" name="report_reason" type="radio"/>
+<span class="font-body-md text-body-md text-inverse-on-surface group-hover:text-primary-fixed-dim">Offensive content</span>
+</label>
+<label class="flex items-start gap-stack-sm p-3 rounded-lg border border-outline/20 hover:border-primary-fixed cursor-pointer transition-colors group">
+<input class="mt-1 text-petrol bg-transparent border-outline focus:ring-petrol focus:ring-offset-inverse-surface" name="report_reason" type="radio"/>
+<span class="font-body-md text-body-md text-inverse-on-surface group-hover:text-primary-fixed-dim">Incorrect or misleading details</span>
+</label>
+<label class="flex items-start gap-stack-sm p-3 rounded-lg border border-outline/20 hover:border-primary-fixed cursor-pointer transition-colors group">
+<input checked="" class="mt-1 text-petrol bg-transparent border-outline focus:ring-petrol focus:ring-offset-inverse-surface" name="report_reason" type="radio"/>
+<div class="flex flex-col w-full">
+<span class="font-body-md text-body-md text-inverse-on-surface group-hover:text-primary-fixed-dim">Something else</span>
+<!-- Textarea shown when selected -->
+<textarea class="mt-2 w-full bg-surface-variant/5 border border-outline/20 rounded-md p-2 text-inverse-on-surface focus:border-petrol focus:ring-1 focus:ring-petrol text-sm" placeholder="Please provide details..." rows="3"></textarea>
+</div>
+</label>
+</form>
+</div>
+<!-- Footer Actions -->
+<div class="p-stack-md border-t border-outline/20 bg-inverse-surface sticky bottom-0 z-10 flex gap-stack-sm">
+<button class="flex-1 py-3 px-4 rounded-lg font-label-md text-label-md border border-outline-variant text-inverse-on-surface hover:bg-surface-variant/10 transition-colors">Cancel</button>
+<button class="flex-1 py-3 px-4 rounded-lg font-label-md text-label-md bg-petrol text-on-primary hover:bg-petrol/90 transition-colors">Submit Report</button>
+</div>
+</div>
+<!-- 2. Block User Confirmation -->
+<div class="relative bg-inverse-surface rounded-xl shadow-lg border border-outline/20 overflow-hidden max-w-sm w-full mx-auto flex flex-col">
+<div class="p-stack-lg flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-error-container/20 flex items-center justify-center mb-stack-md">
+<span class="material-symbols-outlined text-3xl text-error-container" data-weight="fill">block</span>
+</div>
+<h3 class="font-title-md text-title-md text-inverse-on-surface mb-stack-xs">Block Sarah Jenkins?</h3>
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-stack-lg">
+                    They won't be able to send you messages or see your listings. They won't be notified that you blocked them.
+                </p>
+<div class="w-full flex flex-col gap-stack-sm">
+<button class="w-full py-3 px-4 rounded-lg font-label-md text-label-md bg-error text-on-error hover:bg-error/90 transition-colors">
+                        Block User
+                    </button>
+<button class="w-full py-3 px-4 rounded-lg font-label-md text-label-md border border-outline-variant text-inverse-on-surface hover:bg-surface-variant/10 transition-colors">
+                        Cancel
+                    </button>
+</div>
+</div>
+</div>
+<!-- 3. Scam Warning Interstitial -->
+<div class="relative bg-inverse-surface rounded-xl shadow-lg border border-outline/20 overflow-hidden max-w-sm w-full mx-auto flex flex-col border-t-4 border-t-error">
+<div class="p-stack-lg">
+<div class="flex items-center gap-stack-sm mb-stack-md text-error-container">
+<span class="material-symbols-outlined text-2xl" data-weight="fill">warning</span>
+<h2 class="font-title-md text-title-md">Safety Warning</h2>
+</div>
+<div class="bg-error-container/10 border border-error-container/20 rounded-lg p-4 mb-stack-lg">
+<p class="font-body-md text-body-md text-inverse-on-surface mb-stack-sm font-semibold">
+                        Protect yourself from scams
+                    </p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">
+                        This user is asking to communicate outside of Homley. To keep your money and personal info safe, always communicate and pay directly through our platform.
+                    </p>
+</div>
+<ul class="space-y-stack-sm mb-stack-lg">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm mt-1">check_circle</span>
+<span class="font-body-md text-body-md text-inverse-on-surface text-sm">Keep payments on Homley</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm mt-1">check_circle</span>
+<span class="font-body-md text-body-md text-inverse-on-surface text-sm">Don't share personal email/phone early</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim text-sm mt-1">check_circle</span>
+<span class="font-body-md text-body-md text-inverse-on-surface text-sm">Report suspicious behavior</span>
+</li>
+</ul>
+<div class="flex flex-col gap-stack-sm">
+<button class="w-full py-3 px-4 rounded-lg font-label-md text-label-md bg-petrol text-on-primary hover:bg-petrol/90 transition-colors">
+                        Understood, continue to chat
+                    </button>
+<button class="w-full py-3 px-4 rounded-lg font-label-md text-label-md text-secondary-fixed-dim hover:text-inverse-on-surface transition-colors">
+                        Report this user
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>

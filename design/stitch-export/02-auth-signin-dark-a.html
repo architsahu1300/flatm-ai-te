@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Sign In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "primary": "#005a71",
+                    "on-surface": "#1b1c1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-highest": "#e4e2df",
+                    "petrol": "#0E7490",
+                    "primary-fixed": "#b9eaff",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "inverse-primary": "#81d1f0",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-tertiary-container": "#f0ece6",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#006781",
+                    "surface-container-high": "#eae8e5",
+                    "outline": "#6f787d",
+                    "inverse-surface": "#30312f",
+                    "tertiary": "#54534e",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#6c6b66",
+                    "deep-void": "#0B1114",
+                    "surface-dim": "#dbdad7",
+                    "on-primary-container": "#d3f1ff",
+                    "on-primary-fixed-variant": "#004d62",
+                    "sand-light": "#F7F5F2",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "surface-container-low": "#f5f3f0",
+                    "electric-cyan": "#22D3EE",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5d",
+                    "onyx": "#1D262B",
+                    "surface-variant": "#e4e2df",
+                    "on-primary-fixed": "#001f29",
+                    "on-secondary-container": "#636362",
+                    "primary-container": "#0e7490",
+                    "outline-variant": "#bec8cd",
+                    "surface-bright": "#fbf9f6",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "20px",
+                    "stack-xl": "48px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "margin-desktop": "80px",
+                    "stack-xs": "4px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-deep-void text-inverse-on-surface h-screen flex items-center justify-center p-4">
+<!-- Ambient Background Texture -->
+<div class="absolute inset-0 z-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 50%);"></div>
+<!-- Centered Card -->
+<div class="relative z-10 w-full max-w-md bg-onyx rounded-[24px] shadow-2xl p-8 sm:p-10 flex flex-col gap-stack-lg border border-outline/20">
+<!-- Header -->
+<div class="text-center flex flex-col items-center gap-stack-sm">
+<h1 class="font-display-lg text-display-lg text-electric-cyan font-bold tracking-tight">Homley</h1>
+<p class="font-body-md text-body-md text-surface-dim">Welcome back. Enter your details to continue to Premium Living.</p>
+</div>
+<!-- Toggle (Email / Phone) -->
+<div class="flex bg-inverse-surface rounded-full p-1 shadow-inner mt-4">
+<button class="flex-1 font-label-md text-label-md py-2 rounded-full bg-onyx text-electric-cyan shadow-sm transition-all text-center">Email</button>
+<button class="flex-1 font-label-md text-label-md py-2 rounded-full text-surface-dim hover:text-white transition-all text-center">Phone</button>
+</div>
+<!-- Form Area -->
+<div class="flex flex-col gap-stack-md mt-2">
+<!-- Email Input -->
+<div class="flex flex-col gap-stack-xs">
+<label class="font-label-md text-label-md text-surface-dim" for="email">Email address</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline">mail</span>
+<input class="w-full bg-deep-void border border-outline/30 rounded-xl py-3 pl-12 pr-4 font-body-md text-body-md text-white placeholder-outline focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" id="email" placeholder="hello@example.com" type="email"/>
+</div>
+</div>
+<!-- OTP Input (Mocked as single input for layout, typically split) -->
+<div class="flex flex-col gap-stack-xs mt-2">
+<div class="flex justify-between items-end">
+<label class="font-label-md text-label-md text-surface-dim">Verification Code (OTP)</label>
+<button class="font-label-md text-label-md text-electric-cyan hover:text-white transition-colors">Send Code</button>
+</div>
+<div class="flex gap-2 justify-between">
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" type="text" value="4"/>
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" type="text" value="8"/>
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" placeholder="-" type="text"/>
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" placeholder="-" type="text"/>
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" placeholder="-" type="text"/>
+<input class="w-12 h-14 bg-deep-void border border-outline/30 rounded-lg text-center font-title-md text-title-md text-white focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan transition-colors" maxlength="1" placeholder="-" type="text"/>
+</div>
+</div>
+<button class="w-full bg-electric-cyan text-deep-void font-title-md text-title-md font-bold py-3 rounded-xl mt-4 hover:bg-white transition-colors hover:scale-[0.98] transform duration-150 shadow-[0_4px_14px_0_rgba(34,211,238,0.39)]">Sign In</button>
+</div>
+<!-- Divider -->
+<div class="flex items-center gap-4 py-2">
+<div class="flex-1 h-px bg-outline/20"></div>
+<span class="font-label-md text-label-md text-surface-dim uppercase tracking-wider text-[11px]">Or continue with</span>
+<div class="flex-1 h-px bg-outline/20"></div>
+</div>
+<!-- Social Auth -->
+<button class="w-full flex items-center justify-center gap-3 bg-inverse-surface border border-outline/20 font-body-md text-body-md text-white py-3 rounded-xl hover:bg-outline/10 transition-colors">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqf6qwu-blwZloBRnvx4gpIzym8cGuOUfxXVjN7yjP-Cs7VhyXPjoQM1nMAOAaXHI9IOAvspefynNQWV-4VEwUaUx0fQtzSNaGnMMBKy3cbanW8bKRhkmzbnjvPIB8sxqjsFNDqLN3GerI06hMkldiHNcLdlJ6U8NtJiCA_t5h28m-yU1vU19CzFXrRTtlmtoJstWpl7fiAHxdY-B5W9RaYE2x0nQgYC7IdU_OyO_KtcfcCyCtI9kAFw"/>
+            Continue with Google
+        </button>
+<p class="text-center font-label-md text-label-md text-surface-dim mt-2">
+            Don't have an account? <a class="text-electric-cyan hover:text-white transition-colors" href="#">Sign up</a>
+</p>
+</div>
+</body></html>

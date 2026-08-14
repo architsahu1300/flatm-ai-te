@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Plans &amp; Boost - Homley</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "surface-container-highest": "#e4e2df",
+                            "tertiary-fixed-dim": "#c9c6c0",
+                            "on-primary-container": "#d3f1ff",
+                            "on-tertiary-fixed": "#1c1c18",
+                            "primary-container": "#0e7490",
+                            "sand-light": "#F7F5F2",
+                            "onyx": "#1D262B",
+                            "on-surface": "#1b1c1a",
+                            "surface-dim": "#dbdad7",
+                            "error": "#ba1a1a",
+                            "on-secondary-container": "#636362",
+                            "tertiary-fixed": "#e5e2dc",
+                            "tertiary-container": "#6c6b66",
+                            "inverse-primary": "#81d1f0",
+                            "secondary": "#5e5e5d",
+                            "on-tertiary-fixed-variant": "#484742",
+                            "on-primary-fixed-variant": "#004d62",
+                            "surface-tint": "#006781",
+                            "secondary-fixed": "#e4e2e1",
+                            "surface": "#fbf9f6",
+                            "tertiary": "#54534e",
+                            "on-tertiary": "#ffffff",
+                            "petrol": "#0E7490",
+                            "on-tertiary-container": "#f0ece6",
+                            "secondary-fixed-dim": "#c7c6c5",
+                            "surface-container-high": "#eae8e5",
+                            "error-container": "#ffdad6",
+                            "secondary-container": "#e1dfde",
+                            "primary-fixed-dim": "#81d1f0",
+                            "outline": "#6f787d",
+                            "on-primary-fixed": "#001f29",
+                            "on-error-container": "#93000a",
+                            "background": "#fbf9f6",
+                            "on-secondary-fixed-variant": "#464746",
+                            "surface-variant": "#e4e2df",
+                            "electric-cyan": "#22D3EE",
+                            "on-primary": "#ffffff",
+                            "surface-container": "#efeeeb",
+                            "on-surface-variant": "#3f484c",
+                            "surface-container-lowest": "#ffffff",
+                            "primary": "#005a71",
+                            "outline-variant": "#bec8cd",
+                            "on-error": "#ffffff",
+                            "on-secondary": "#ffffff",
+                            "on-background": "#1b1c1a",
+                            "inverse-on-surface": "#f2f0ed",
+                            "primary-fixed": "#b9eaff",
+                            "deep-void": "#0B1114",
+                            "surface-bright": "#fbf9f6",
+                            "sand-border": "#DFDCD6",
+                            "surface-container-low": "#f5f3f0",
+                            "inverse-surface": "#30312f",
+                            "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "stack-xs": "4px",
+                            "gutter": "24px",
+                            "container-max": "1280px",
+                            "margin-desktop": "80px",
+                            "stack-md": "16px",
+                            "stack-xl": "48px",
+                            "margin-mobile": "20px",
+                            "stack-sm": "8px",
+                            "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                            "display-lg": ["Inter"],
+                            "label-md": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display-lg-mobile": ["Inter"],
+                            "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-surface dark:bg-deep-void text-on-surface dark:text-surface-bright min-h-screen flex flex-col antialiased">
+<!-- TopNavBar -->
+<nav aria-label="Main Navigation" class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-deep-void/80 backdrop-blur-sm shadow-sm">
+<div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-lg">
+<a class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary dark:text-on-primary-fixed tracking-tight" href="#">Homley</a>
+<div class="hidden md:flex items-center gap-stack-lg ml-stack-xl">
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors" href="#">Find flatmates</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="font-label-md text-label-md text-primary dark:text-on-primary-fixed hover:bg-surface-container dark:hover:bg-tertiary-container px-4 py-2 rounded-lg transition-colors active:scale-95 duration-200">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-4 py-2 rounded-lg shadow-sm hover:opacity-90 transition-opacity active:scale-95 duration-200">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pb-32">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-stack-xl">
+<header class="text-center mb-16 max-w-2xl mx-auto">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg mb-stack-md">Plans &amp; Boosts</h1>
+<p class="font-body-lg text-body-lg text-secondary dark:text-secondary-fixed-dim">Unlock premium features to find your perfect match faster or elevate your listing's visibility.</p>
+</header>
+<!-- Toggle (Seeker/Lister) -->
+<div class="flex justify-center mb-16">
+<div class="bg-surface-container dark:bg-tertiary-container rounded-full p-1 inline-flex">
+<button class="font-label-md text-label-md px-6 py-2 rounded-full bg-surface-container-lowest dark:bg-surface-variant text-on-surface dark:text-on-surface-variant shadow-sm transition-all" id="tab-seeker">For Seekers</button>
+<button class="font-label-md text-label-md px-6 py-2 rounded-full text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-all" id="tab-lister">For Listers</button>
+</div>
+</div>
+<!-- Seeker Plans Section -->
+<section class="mb-stack-xl" id="seeker-content">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter max-w-4xl mx-auto">
+<!-- Basic Plan -->
+<div class="bg-surface-container-lowest dark:bg-onyx rounded-xl p-6 md:p-8 shadow-sm border border-outline-variant dark:border-on-tertiary-fixed-variant flex flex-col relative overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+<div class="mb-6">
+<h3 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-2">Basic</h3>
+<p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim">Essential tools to start your search.</p>
+</div>
+<div class="mb-8 tabular-nums">
+<span class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg">$0</span>
+<span class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim">/month</span>
+</div>
+<ul class="space-y-4 mb-8 flex-grow">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-lg">check</span>
+<span class="font-body-md text-body-md">Browse all listings</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-lg">check</span>
+<span class="font-body-md text-body-md">Basic match filters</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-lg">check</span>
+<span class="font-body-md text-body-md">Send up to 5 messages/day</span>
+</li>
+</ul>
+<button class="w-full font-label-md text-label-md border border-sand-border dark:border-outline py-3 rounded-lg hover:bg-surface-container dark:hover:bg-tertiary-container transition-colors">Current Plan</button>
+</div>
+<!-- Premium Plan -->
+<div class="bg-petrol dark:bg-primary-container rounded-xl p-6 md:p-8 shadow-lg flex flex-col relative overflow-hidden transition-transform duration-300 hover:-translate-y-1">
+<div class="absolute top-4 right-4 bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm">
+<span class="font-label-md text-label-md text-on-primary">Recommended</span>
+</div>
+<div class="mb-6">
+<h3 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-primary mb-2">Premium</h3>
+<p class="font-body-md text-body-md text-on-primary/80">Accelerate your search with advanced insights.</p>
+</div>
+<div class="mb-8 tabular-nums">
+<span class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-primary">$19</span>
+<span class="font-body-md text-body-md text-on-primary/80">/month</span>
+</div>
+<ul class="space-y-4 mb-8 flex-grow text-on-primary">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+<span class="font-body-md text-body-md">Unlimited messaging</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+<span class="font-body-md text-body-md">Priority placement in applicant lists</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+<span class="font-body-md text-body-md">See detailed Match Scores *</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-on-primary text-lg">check_circle</span>
+<span class="font-body-md text-body-md">Read receipts on messages</span>
+</li>
+</ul>
+<button class="w-full font-label-md text-label-md bg-white text-petrol py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">Upgrade to Premium</button>
+</div>
+</div>
+<div class="mt-8 max-w-4xl mx-auto text-center">
+<p class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim text-sm max-w-lg mx-auto">* Match Scores are calculated using user-provided preferences and historical platform data. They are designed as a helpful guide, not an absolute guarantee of compatibility. We encourage honest communication before committing.</p>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav aria-label="Mobile Navigation" class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 bg-surface dark:bg-surface-container-highest shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container p-2 rounded-lg transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container p-2 rounded-lg transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container p-2 rounded-lg transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Ask AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container p-2 rounded-lg transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold p-2 rounded-lg transition-colors active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple tab toggle logic for demonstration
+        const tabSeeker = document.getElementById('tab-seeker');
+        const tabLister = document.getElementById('tab-lister');
+        
+        tabLister.addEventListener('click', () => {
+            alert("Lister boosts section would load here.");
+            // In a real app, we'd toggle visibility of sections
+        });
+    </script>
+</body></html>

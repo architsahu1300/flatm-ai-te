@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Homley - AI Search Results</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "sand-border": "#DFDCD6",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#efeeeb",
+                      "primary": "#005a71",
+                      "on-surface": "#1b1c1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-surface-variant": "#3f484c",
+                      "surface-container-highest": "#e4e2df",
+                      "petrol": "#0E7490",
+                      "primary-fixed": "#b9eaff",
+                      "error-container": "#ffdad6",
+                      "background": "#fbf9f6",
+                      "on-secondary-fixed-variant": "#464746",
+                      "inverse-primary": "#81d1f0",
+                      "on-background": "#1b1c1a",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#006781",
+                      "surface-container-high": "#eae8e5",
+                      "outline": "#6f787d",
+                      "inverse-surface": "#30312f",
+                      "tertiary": "#54534e",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#6c6b66",
+                      "deep-void": "#0B1114",
+                      "surface-dim": "#dbdad7",
+                      "on-primary-container": "#d3f1ff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary-container": "#e1dfde",
+                      "primary-fixed-dim": "#81d1f0",
+                      "surface-container-low": "#f5f3f0",
+                      "electric-cyan": "#22D3EE",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#e5e2dc",
+                      "error": "#ba1a1a",
+                      "secondary": "#5e5e5d",
+                      "onyx": "#1D262B",
+                      "surface-variant": "#e4e2df",
+                      "on-primary-fixed": "#001f29",
+                      "on-secondary-container": "#636362",
+                      "primary-container": "#0e7490",
+                      "outline-variant": "#bec8cd",
+                      "surface-bright": "#fbf9f6",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-mobile": "20px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-desktop": "80px",
+                      "stack-xs": "4px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Hide scrollbar for clean mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Match Ring Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 116, 144, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(14, 116, 144, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(14, 116, 144, 0); }
+        }
+        
+        .match-ring-active {
+            animation: pulse-ring 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md w-full max-w-[390px] mx-auto min-h-screen relative overflow-x-hidden md:hidden">
+<!-- Header / Refinement Bar -->
+<header class="fixed top-0 w-full max-w-[390px] bg-surface/90 backdrop-blur-md z-40 px-margin-mobile pt-12 pb-4 shadow-sm border-b border-sand-border">
+<div class="flex items-center justify-between mb-4">
+<div>
+<h1 class="font-title-md text-title-md text-on-surface">AI Matches</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">"2 bed near beach under 2k"</p>
+</div>
+<button aria-label="Edit Search" class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center text-petrol hover:bg-surface-container-highest transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.04)]">
+<span class="material-symbols-outlined" data-icon="tune" style="font-variation-settings: 'FILL' 0;">tune</span>
+</button>
+</div>
+<!-- Intent Chips -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-1 -mx-margin-mobile px-margin-mobile">
+<button class="shrink-0 px-4 py-2 rounded-full bg-petrol text-on-primary font-label-md text-label-md shadow-[0_2px_8px_rgba(14,116,144,0.15)]">Best Match</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-lowest text-on-surface border border-sand-border font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.04)]">Lowest Price</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-lowest text-on-surface border border-sand-border font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.04)]">Closest to Beach</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-lowest text-on-surface border border-sand-border font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-[0_2px_4px_rgba(0,0,0,0.04)]">Newest</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-36 pb-28 px-margin-mobile flex flex-col gap-stack-lg">
+<!-- Ranked Card 1 (98% Match) -->
+<article class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] overflow-hidden relative">
+<div class="absolute top-4 left-4 z-10 bg-surface-container-lowest/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm border border-sand-border/50">
+<span class="material-symbols-outlined text-petrol text-sm" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-md text-label-md text-petrol font-semibold">98% Match</span>
+</div>
+<button aria-label="Save Property" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-petrol shadow-sm border border-sand-border/50">
+<span class="material-symbols-outlined" data-icon="favorite" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+<div class="w-full h-56 relative bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A bright, modern coastal apartment living room with large floor-to-ceiling windows showing a distant ocean view. The space is decorated in a sophisticated coastal style with light oak wood floors, white linen sofas, and subtle petrol blue accents. Natural sunlight floods the room, creating a warm, airy atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAerzVrgv6QlOhPSswxxKFsSfdtYpkGEaqbI85x_9pVZSDyTKhsiioD5x_-OzDKN26FJtzCHdmibH5PPg508gY3x6B6k11IYmYUemMjI8CHO8ETtzWf3zIWE7j96IKD5ISdMhAVlHdRj7YJi72DNp7O9IsIQBastF-fiuqHwDwZV5rjnEesBSD7LvUC97i-rc_NNrpLhXCfch_Viqvw_ChCUYDDetAM2hhASEUTJgqbfqvJIQUECyn4fQ"/>
+</div>
+<div class="p-5 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">The Seascape Residence</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Bondi Beach • 2 Bed • 2 Bath</p>
+</div>
+<div class="text-right">
+<p class="font-title-md text-title-md text-petrol">$1,850<span class="font-body-md text-body-md text-on-surface-variant text-sm font-normal">/wk</span></p>
+</div>
+</div>
+<hr class="border-sand-border my-2"/>
+<div class="flex flex-col gap-2">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-petrol mt-0.5" data-icon="check_circle" style="font-variation-settings: 'FILL' 1; font-size: 20px;">check_circle</span>
+<p class="font-body-md text-body-md text-on-surface">Hits all criteria: Under budget, 5 min walk to beach, modern finishes.</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-outline mt-0.5" data-icon="info" style="font-variation-settings: 'FILL' 1; font-size: 20px;">info</span>
+<p class="font-body-md text-body-md text-on-surface-variant">Available in 2 weeks, slightly earlier than your requested date.</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Ranked Card 2 (85% Match) -->
+<article class="bg-surface-container-lowest rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.08)] overflow-hidden relative">
+<div class="absolute top-4 left-4 z-10 bg-surface-container-lowest/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1 shadow-sm border border-sand-border/50">
+<span class="material-symbols-outlined text-petrol text-sm" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-md text-label-md text-petrol font-semibold">85% Match</span>
+</div>
+<button aria-label="Save Property" class="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-surface-container-lowest/90 backdrop-blur-sm flex items-center justify-center text-on-surface-variant hover:text-petrol shadow-sm border border-sand-border/50">
+<span class="material-symbols-outlined" data-icon="favorite" style="font-variation-settings: 'FILL' 0;">favorite</span>
+</button>
+<div class="w-full h-48 relative bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="A stylish urban loft apartment interior near a coastal city center. Features exposed brick walls painted white, polished concrete floors, and modern minimalist furniture. Sunlight streams through industrial-style windows. The decor uses a soft, light mode palette with teal and warm wood accents, presenting a sophisticated, clean aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC48VBSVc8iPACymPiZDjFoJuhVKAtxXHiRnXoXWfl6JKGZqgsqgqEtgr28cFduo5f5xRFqJT2zMUM53tdBE8cFM484VnvlmM3sINeuoXazA4mGL6dd4JYMctdqAa921ha4hgyRmi6yhX4ZmEv0rB4QWnONd2d2B0nCaHw2ZsizxAkrgwZUB5QkbFk5tx6R6Pkd3EnvnkxuKEjz_NlsnB9iMsNIRZyfNt2rxio90dMcHeiTwxNQry3WsA"/>
+</div>
+<div class="p-5 flex flex-col gap-stack-sm">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Coastal Loft</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Tamarama • 2 Bed • 1 Bath</p>
+</div>
+<div class="text-right">
+<p class="font-title-md text-title-md text-petrol">$1,600<span class="font-body-md text-body-md text-on-surface-variant text-sm font-normal">/wk</span></p>
+</div>
+</div>
+<hr class="border-sand-border my-2"/>
+<div class="flex flex-col gap-2">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-petrol mt-0.5" data-icon="check_circle" style="font-variation-settings: 'FILL' 1; font-size: 20px;">check_circle</span>
+<p class="font-body-md text-body-md text-on-surface">Well under budget, modern, 2 bedrooms as requested.</p>
+</div>
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-error mt-0.5" data-icon="warning" style="font-variation-settings: 'FILL' 1; font-size: 20px;">warning</span>
+<p class="font-body-md text-body-md text-on-surface-variant">15 min walk to the beach, slightly further than ideal.</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Loading Indicator for more results -->
+<div class="flex justify-center py-4">
+<div class="w-8 h-8 rounded-full border-2 border-sand-border border-t-petrol animate-spin"></div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-surface-dim font-label-md text-label-md fixed bottom-0 w-full z-50 rounded-t-xl border-t border-sand-border dark:border-outline-variant shadow-sm flex justify-around items-end pb-safe-bottom h-20 px-2 max-w-[390px]">
+<button aria-label="Home" class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest p-2 rounded-lg transition-colors w-16 h-16 group">
+<span class="material-symbols-outlined group-active:scale-95 duration-150 mb-1" data-icon="home" style="font-variation-settings: 'FILL' 0;">home</span>
+<span class="text-[10px] font-medium">Home</span>
+</button>
+<button aria-label="Saved" class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest p-2 rounded-lg transition-colors w-16 h-16 group">
+<span class="material-symbols-outlined group-active:scale-95 duration-150 mb-1" data-icon="favorite" style="font-variation-settings: 'FILL' 0;">favorite</span>
+<span class="text-[10px] font-medium">Saved</span>
+</button>
+<!-- Active State: Search -->
+<button aria-label="Search" class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim hover:bg-surface-container-low dark:hover:bg-surface-container-highest p-2 rounded-lg transition-colors w-16 h-16 group relative">
+<div class="absolute -top-3 bg-petrol w-12 h-12 rounded-full flex items-center justify-center shadow-[0_4px_12px_rgba(14,116,144,0.3)] match-ring-active text-on-primary">
+<span class="material-symbols-outlined group-active:scale-95 duration-150" data-icon="search" style="font-variation-settings: 'FILL' 1;">search</span>
+</div>
+<span class="text-[10px] font-bold mt-6">Search</span>
+</button>
+<button aria-label="Inbox" class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest p-2 rounded-lg transition-colors w-16 h-16 group">
+<span class="material-symbols-outlined group-active:scale-95 duration-150 mb-1" data-icon="chat" style="font-variation-settings: 'FILL' 0;">chat</span>
+<span class="text-[10px] font-medium">Inbox</span>
+</button>
+<button aria-label="Profile" class="flex flex-col items-center justify-center text-on-secondary-fixed-variant dark:text-outline hover:bg-surface-container-low dark:hover:bg-surface-container-highest p-2 rounded-lg transition-colors w-16 h-16 group">
+<span class="material-symbols-outlined group-active:scale-95 duration-150 mb-1" data-icon="person" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-[10px] font-medium">Profile</span>
+</button>
+</nav>
+<!-- Safe area spacing for mobile browsers -->
+<style>
+        .pb-safe-bottom {
+            padding-bottom: env(safe-area-inset-bottom, 16px);
+        }
+    </style>
+</body></html>

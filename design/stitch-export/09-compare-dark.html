@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Compare Matches</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-tertiary-fixed": "#1c1c18",
+                "primary-fixed-dim": "#81d1f0",
+                "on-surface-variant": "#3f484c",
+                "secondary": "#5e5e5d",
+                "tertiary-fixed": "#e5e2dc",
+                "primary-container": "#0e7490",
+                "surface-container-low": "#f5f3f0",
+                "surface-container-high": "#eae8e5",
+                "surface-variant": "#e4e2df",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed-variant": "#484742",
+                "primary-fixed": "#b9eaff",
+                "background": "#fbf9f6",
+                "tertiary-container": "#6c6b66",
+                "onyx": "#1D262B",
+                "error": "#ba1a1a",
+                "surface-tint": "#006781",
+                "sand-border": "#DFDCD6",
+                "inverse-on-surface": "#f2f0ed",
+                "inverse-surface": "#30312f",
+                "on-background": "#1b1c1a",
+                "secondary-fixed-dim": "#c7c6c5",
+                "on-error-container": "#93000a",
+                "petrol": "#0E7490",
+                "on-secondary-container": "#636362",
+                "on-primary": "#ffffff",
+                "surface-container-lowest": "#ffffff",
+                "on-primary-fixed-variant": "#004d62",
+                "on-primary-container": "#d3f1ff",
+                "sand-light": "#F7F5F2",
+                "on-tertiary-container": "#f0ece6",
+                "on-secondary-fixed": "#1b1c1b",
+                "outline": "#6f787d",
+                "secondary-container": "#e1dfde",
+                "on-primary-fixed": "#001f29",
+                "on-error": "#ffffff",
+                "on-secondary-fixed-variant": "#464746",
+                "on-tertiary": "#ffffff",
+                "surface-dim": "#dbdad7",
+                "on-surface": "#1b1c1a",
+                "electric-cyan": "#22D3EE",
+                "tertiary-fixed-dim": "#c9c6c0",
+                "secondary-fixed": "#e4e2e1",
+                "inverse-primary": "#81d1f0",
+                "surface-bright": "#fbf9f6",
+                "outline-variant": "#bec8cd",
+                "tertiary": "#54534e",
+                "surface-container-highest": "#e4e2df",
+                "deep-void": "#0B1114",
+                "error-container": "#ffdad6",
+                "surface": "#fbf9f6",
+                "primary": "#005a71",
+                "surface-container": "#efeeeb"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "margin-desktop": "80px",
+                "container-max": "1280px",
+                "stack-xl": "48px",
+                "stack-sm": "8px",
+                "gutter": "24px",
+                "stack-lg": "24px",
+                "stack-md": "16px",
+                "margin-mobile": "20px",
+                "stack-xs": "4px"
+        },
+        "fontFamily": {
+                "body-lg": [
+                        "Inter"
+                ],
+                "display-lg-mobile": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "title-md": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "title-md": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+  body {
+    background-color: #0B1114; /* deep-void equivalent */
+    color: #fbf9f6;
+  }
+  .surface-card {
+    background-color: #151E24;
+  }
+  .success-soft {
+    background-color: #064E3B;
+    color: #34d399; /* emerald-400 */
+  }
+  .brand-soft-strip {
+    background-color: #164E63;
+    color: #81d1f0; /* primary-fixed-dim */
+  }
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Scrollbar hiding for the table */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+</style>
+</head>
+<body class="font-sans antialiased flex flex-col h-screen overflow-hidden">
+<!-- Main Content Canvas (Background) -->
+<main class="flex-1 relative overflow-y-auto pb-24">
+<!-- Map placeholder / Background content -->
+<div class="absolute inset-0 w-full h-full opacity-40">
+<div class="bg-cover bg-center w-full h-full blur-sm" data-alt="A dark themed digital map interface of a coastal city, showing glowing street lines and subtle neon blue accents representing real estate hotspots. The map is viewed from a slight isometric angle, creating depth. The overall aesthetic is sophisticated, modern, and moody, fitting a premium SaaS application in dark mode. Soft focus on the edges." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAi1QFZA6Q6kdjQF8t3GpguhtuWZd1P6l2p2Tfahqo97qdAKAuhM2UA-wTXXns-x2vZKCEJ9vyNDQCsC6I8LMii8smgiUW5GQu3ZLmT2lV5unL59WODwnu_D1ITApDSfj0dP3P8qTr1kiK-7Z4BO1bomoDrK0jc8p1NSypH_6y8RHj767LWRkwRQhC0vTcWXy1CcB8uWsiAx59_DUhL_4Ybvc-LsY7co16P7VJRWklUALE-cJO49wxupg')"></div>
+</div>
+<div class="relative z-10 px-margin-mobile pt-12 flex justify-between items-center">
+<button class="w-10 h-10 rounded-full surface-card flex items-center justify-center border border-outline-variant/30 text-on-surface-variant hover:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<div class="font-title-md text-title-md text-surface-bright">Compare</div>
+<button class="w-10 h-10 rounded-full surface-card flex items-center justify-center border border-outline-variant/30 text-on-surface-variant hover:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">more_vert</span>
+</button>
+</div>
+</main>
+<!-- Bottom Sheet Compare View -->
+<div class="fixed bottom-20 left-0 w-full surface-card rounded-t-3xl shadow-[0_-8px_32px_rgba(0,0,0,0.4)] z-40 transition-transform duration-300 ease-in-out border-t border-outline-variant/20 flex flex-col" style="max-height: 85vh;">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center pt-4 pb-2">
+<div class="w-12 h-1.5 bg-outline-variant/30 rounded-full"></div>
+</div>
+<!-- AI Summary Strip -->
+<div class="mx-margin-mobile mb-4 rounded-xl brand-soft-strip p-3 flex items-start gap-3 border border-primary-container/30">
+<span class="material-symbols-outlined text-electric-cyan shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">temp_preferences_custom</span>
+<p class="font-label-md text-label-md text-primary-fixed-dim leading-snug">
+<strong class="text-electric-cyan font-semibold">AI Insight:</strong> 'The Marina Loft' offers the best match for your commute and budget, though 'Oceanview Room' has premium furnishing.
+        </p>
+</div>
+<!-- Compare Table Area (Horizontally Scrollable) -->
+<div class="flex-1 overflow-x-auto no-scrollbar px-margin-mobile pb-6">
+<div class="min-w-[600px] pb-4"> <!-- Ensure enough width for 3 columns -->
+<!-- Headers (Property Cards) -->
+<div class="grid grid-cols-4 gap-4 mb-6 sticky top-0 bg-[#151E24] z-10 pt-2">
+<div class="col-span-1 flex flex-col justify-end pb-2">
+<span class="font-label-md text-label-md text-outline">Comparing 3 selected matches</span>
+</div>
+<!-- Property 1 -->
+<div class="col-span-1 surface-card border border-outline-variant/20 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden">
+<div class="w-full h-20 rounded-lg bg-cover bg-center" data-alt="A modern, high-end loft apartment interior with large industrial windows overlooking a marina. The space features exposed brick, sleek dark gray furniture, and warm ambient lighting. The style is sophisticated coastal, blending urban luxury with seaside elements. High quality, realistic real estate photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBE5Jd6NUUHQ_X0iOfmJe1-prfFqqOYoLeZL6VioiYRIfpxgUF3uwN1f44DzTLRruXwf_WmzssrSusmKtwsoPtQeeG5yC9sAxzScQB3a4l9JH02_-3h8bYaBjNtFF1adN4L21FfCSSD_DB7Z0SUFf-072XuYIc0O7htjb0_IusyqPg0qWEfjIn2D8o0EQ1W-Ux5wpjHy94z0ae-Zqn-ink8nIirEb0W7Th24osdwaWliIKqjXQVofoNNA')"></div>
+<div>
+<h4 class="font-title-md text-title-md text-surface-bright leading-tight truncate">The Marina Loft</h4>
+<p class="font-label-md text-label-md text-outline truncate">12 Harbour St</p>
+</div>
+</div>
+<!-- Property 2 -->
+<div class="col-span-1 surface-card border border-outline-variant/20 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden">
+<div class="w-full h-20 rounded-lg bg-cover bg-center" data-alt="A bright, airy bedroom in a coastal home with large windows showing an ocean view. The room is styled with minimalist Scandinavian furniture, light oak wood, and soft white linens. Sun is streaming in, creating a warm, inviting atmosphere. Premium real estate listing photo." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCNXyfoUU5SwebV1bfjxFcZBt4jtm9kS01HhBHF5YRjR7MRM74Z9nZrQa4sXQIzQzoOwEcYVOCg6ioc-1xtu9cy1OCw5M9C6cMLAT61QSFEOfqjKLHRAgRENhjZbD7bsCOGVAU7ZudA_1URbJ_T2o3jDSnFqNeQufVK78GFRfm_zHCDHusHq90yfSPv-tsJkQy-_0zKgJZf4NMHeZ8oYmLHkiMlpD2t2yx1mVtUPl1sTmzrN_D_oKdKdQ')"></div>
+<div>
+<h4 class="font-title-md text-title-md text-surface-bright leading-tight truncate">Oceanview Room</h4>
+<p class="font-label-md text-label-md text-outline truncate">45 Coastal Drive</p>
+</div>
+</div>
+<!-- Property 3 -->
+<div class="col-span-1 surface-card border border-outline-variant/20 rounded-xl p-3 flex flex-col gap-2 relative overflow-hidden">
+<div class="w-full h-20 rounded-lg bg-cover bg-center" data-alt="A cozy, well-lit studio apartment featuring modern, space-saving furniture and a neutral color palette with subtle teal accents. The space includes a small, sleek kitchen area and a comfortable living space. Shot with professional interior lighting, emphasizing a clean and practical living environment." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCYaeg_C8WOCIiFbeCGnDjBaYs21rIUH147erw4mqGy2F9sGWA0_ZYB2ROdiHSVmxfRY6rxJcA2ymNqivArHC5horjU-tyoOavOXoQcKZC_iLGgLN4A1EavZAlivx5t6PNtnpV9cOE5S6Ka9dX6sOCdkogkP-6-_OwBJOTEkyeIFqhUXoE6F5fFUTIzd9BIamm1apiLZHkXNAFqUJbYYvEMfmiTr59nMp-UwxNgfC9Vrc9z9IsnhmqNwA')"></div>
+<div>
+<h4 class="font-title-md text-title-md text-surface-bright leading-tight truncate">City Studio</h4>
+<p class="font-label-md text-label-md text-outline truncate">88 Metro Way</p>
+</div>
+</div>
+</div>
+<!-- Table Rows -->
+<div class="flex flex-col gap-4">
+<!-- Match % -->
+<div class="grid grid-cols-4 gap-4 items-center py-2 border-b border-outline-variant/10">
+<div class="col-span-1 font-label-md text-label-md text-outline flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">percent</span> Match
+                    </div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2 rounded-lg success-soft font-medium border border-[#064E3B]">98%</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2">92%</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2">85%</div>
+</div>
+<!-- Rent -->
+<div class="grid grid-cols-4 gap-4 items-center py-2 border-b border-outline-variant/10">
+<div class="col-span-1 font-label-md text-label-md text-outline flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">payments</span> Rent
+                    </div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2">$1,200/mo</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2 rounded-lg success-soft font-medium border border-[#064E3B]">$950/mo</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright tabular-nums flex items-center justify-center p-2">$1,050/mo</div>
+</div>
+<!-- Commute -->
+<div class="grid grid-cols-4 gap-4 items-center py-2 border-b border-outline-variant/10">
+<div class="col-span-1 font-label-md text-label-md text-outline flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">commute</span> Commute
+                    </div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright flex flex-col items-center justify-center p-2 rounded-lg success-soft font-medium border border-[#064E3B]">
+<span class="tabular-nums">15 min</span>
+<span class="text-[10px] text-emerald-400/70">Walk</span>
+</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright flex flex-col items-center justify-center p-2">
+<span class="tabular-nums">45 min</span>
+<span class="text-[10px] text-outline">Transit</span>
+</div>
+<div class="col-span-1 font-body-md text-body-md text-surface-bright flex flex-col items-center justify-center p-2">
+<span class="tabular-nums">25 min</span>
+<span class="text-[10px] text-outline">Bike</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BottomNavBar JSON implementation -->
+<nav class="bg-surface dark:bg-surface-container fixed bottom-0 w-full z-50 rounded-t-xl border-t border-sand-border dark:border-outline-variant shadow-[0_-4px_24px_rgba(0,0,0,0.08)] fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-20">
+<!-- Explore (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-16 h-16 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">explore</span>
+<span class="font-label-md text-label-md mt-1">Explore</span>
+</a>
+<!-- Saved (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-16 h-16 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+<span class="font-label-md text-label-md mt-1">Saved</span>
+</a>
+<!-- Ask AI (Active/Center Raised) -->
+<a class="flex flex-col items-center justify-center text-petrol dark:text-primary-fixed-dim font-bold hover:bg-surface-container-low transition-colors scale-110 -mt-6" href="#">
+<div class="w-14 h-14 rounded-full bg-electric-cyan flex items-center justify-center shadow-[0_4px_16px_rgba(34,211,238,0.3)] border-4 border-[#151E24]">
+<span class="material-symbols-outlined text-[#151E24]" style="font-variation-settings: 'FILL' 1;">search</span>
+</div>
+<span class="font-label-md text-label-md mt-1">Ask AI</span>
+</a>
+<!-- Inbox (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-16 h-16 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">chat_bubble</span>
+<span class="font-label-md text-label-md mt-1">Inbox</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-16 h-16 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

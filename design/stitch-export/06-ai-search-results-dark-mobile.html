@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - AI Search Results</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "primary": "#005a71",
+                    "on-surface": "#1b1c1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-highest": "#e4e2df",
+                    "petrol": "#0E7490",
+                    "primary-fixed": "#b9eaff",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "inverse-primary": "#81d1f0",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-tertiary-container": "#f0ece6",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#006781",
+                    "surface-container-high": "#eae8e5",
+                    "outline": "#6f787d",
+                    "inverse-surface": "#30312f",
+                    "tertiary": "#54534e",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#6c6b66",
+                    "deep-void": "#0B1114",
+                    "surface-dim": "#dbdad7",
+                    "on-primary-container": "#d3f1ff",
+                    "on-primary-fixed-variant": "#004d62",
+                    "sand-light": "#F7F5F2",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "surface-container-low": "#f5f3f0",
+                    "electric-cyan": "#22D3EE",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5d",
+                    "onyx": "#1D262B",
+                    "surface-variant": "#e4e2df",
+                    "on-primary-fixed": "#001f29",
+                    "on-secondary-container": "#636362",
+                    "primary-container": "#0e7490",
+                    "outline-variant": "#bec8cd",
+                    "surface-bright": "#fbf9f6",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "20px",
+                    "stack-xl": "48px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "margin-desktop": "80px",
+                    "stack-xs": "4px",
+                    "container-max": "1280px",
+                    "safe-bottom": "env(safe-area-inset-bottom)"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.onyx');
+            color: theme('colors.surface-bright');
+        }
+        .ai-gradient-text {
+            background: linear-gradient(90deg, theme('colors.electric-cyan'), theme('colors.primary-fixed-dim'));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .match-ring-high {
+            background: conic-gradient(theme('colors.electric-cyan') 92%, transparent 0);
+        }
+        .match-ring-med {
+            background: conic-gradient(theme('colors.primary-fixed-dim') 78%, transparent 0);
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen pb-24 md:pb-0 font-body-md text-body-md overflow-x-hidden">
+<!-- Top nav (mobile search header) -->
+<header class="sticky top-0 z-40 bg-onyx/90 backdrop-blur-md px-margin-mobile py-stack-md border-b border-outline-variant/20">
+<div class="flex items-center gap-stack-md mb-stack-sm">
+<button class="text-electric-cyan p-2 -ml-2 rounded-full hover:bg-surface-container-highest/20">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex-1">
+<h1 class="font-title-md text-title-md ai-gradient-text">AI Curated Results</h1>
+<p class="font-label-md text-label-md text-secondary-fixed-dim">"Modern studio near coastal paths with fast wifi under $2000"</p>
+</div>
+</div>
+<!-- Intent Chips -->
+<div class="flex gap-stack-sm overflow-x-auto pb-2 scrollbar-hide no-scrollbar -mx-margin-mobile px-margin-mobile">
+<button class="shrink-0 flex items-center gap-2 bg-surface-container-highest/10 border border-electric-cyan/30 text-electric-cyan px-4 py-2 rounded-full font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+                Strict Match
+            </button>
+<button class="shrink-0 bg-surface-container-highest/10 border border-outline-variant/30 text-secondary-fixed-dim px-4 py-2 rounded-full font-label-md text-label-md hover:border-electric-cyan/50">
+                Price: &lt; $2k
+            </button>
+<button class="shrink-0 bg-surface-container-highest/10 border border-outline-variant/30 text-secondary-fixed-dim px-4 py-2 rounded-full font-label-md text-label-md hover:border-electric-cyan/50">
+                Near Coast
+            </button>
+<button class="shrink-0 bg-surface-container-highest/10 border border-outline-variant/30 text-secondary-fixed-dim px-4 py-2 rounded-full font-label-md text-label-md hover:border-electric-cyan/50">
+                Studio
+            </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="px-margin-mobile py-stack-lg max-w-container-max mx-auto space-y-stack-lg">
+<div class="flex items-center justify-between mb-stack-sm">
+<h2 class="font-title-md text-title-md text-surface-bright">Top Matches</h2>
+<span class="font-label-md text-label-md text-secondary-fixed-dim">3 places found</span>
+</div>
+<!-- Ranked Card 1 (92% Match) -->
+<article class="bg-surface-container-highest/5 rounded-xl overflow-hidden border border-outline-variant/20 shadow-lg relative">
+<div class="absolute top-4 left-4 z-10">
+<div class="relative w-12 h-12 rounded-full bg-onyx/80 backdrop-blur-sm flex items-center justify-center">
+<div class="absolute inset-0 rounded-full match-ring-high opacity-80" style="-webkit-mask: radial-gradient(transparent 55%, black 56%); mask: radial-gradient(transparent 55%, black 56%);"></div>
+<span class="font-title-md text-title-md text-electric-cyan font-bold text-[14px]">92%</span>
+</div>
+</div>
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<button class="w-10 h-10 rounded-full bg-onyx/80 backdrop-blur-sm flex items-center justify-center text-surface-bright hover:text-error transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="relative h-48 w-full">
+<img class="w-full h-full object-cover" data-alt="A modern, high-end studio apartment living space with large windows overlooking a coastal view. The interior is decorated in a sophisticated corporate modern aesthetic with dark petrol and bright white accents. Warm sunlight streams in, creating soft ambient shadows on the pristine hardwood floors. The setting is luxurious and approachable, captured in high-definition photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWaGNUGSy3b6HWA9zCdZ_0b6i2pMMVDDgPERC6zkUcqJZEghBv7fQLRADBn6g1TUK0OB7BE9auCMayEXb4OwxucjfqvMSHpbzzSBHtRr2z4zhKq-sPpvAvntYkrvxJjYIYEYrF9OtKrWlttnFYCl4Kqu51aVULKLkUATZO4gD9OLPQ6Idfc47vnLH3zKliYCAcgcsYqAuVB0HR8FoJqIKh_qWv26TGeRJWHw3DXTZ25Z6rmJVdvFA_gg"/>
+<div class="absolute inset-0 bg-gradient-to-t from-onyx via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<h3 class="font-title-md text-title-md text-surface-bright">Oceanview Studio Loft</h3>
+<p class="font-body-md text-body-md text-secondary-fixed-dim">Downtown Waterfront • $1,850/mo</p>
+</div>
+</div>
+<div class="p-stack-md space-y-stack-sm bg-surface-container-highest/5">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-electric-cyan mt-1">check_circle</span>
+<div>
+<p class="font-label-md text-label-md text-surface-bright">Perfect Location Match</p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">2 min walk to coastal path, meets your requirement.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-electric-cyan mt-1">wifi</span>
+<div>
+<p class="font-label-md text-label-md text-surface-bright">Verified Fast WiFi</p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">Fiber optic installed, suitable for remote work.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 opacity-70">
+<span class="material-symbols-outlined text-outline mt-1">warning</span>
+<div>
+<p class="font-label-md text-label-md text-outline">Layout Compromise</p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">Open plan, no distinct separate workspace.</p>
+</div>
+</div>
+</div>
+</article>
+<!-- Ranked Card 2 (78% Match) -->
+<article class="bg-surface-container-highest/5 rounded-xl overflow-hidden border border-outline-variant/20 shadow-lg relative">
+<div class="absolute top-4 left-4 z-10">
+<div class="relative w-12 h-12 rounded-full bg-onyx/80 backdrop-blur-sm flex items-center justify-center">
+<div class="absolute inset-0 rounded-full match-ring-med opacity-80" style="-webkit-mask: radial-gradient(transparent 55%, black 56%); mask: radial-gradient(transparent 55%, black 56%);"></div>
+<span class="font-title-md text-title-md text-primary-fixed-dim font-bold text-[14px]">78%</span>
+</div>
+</div>
+<div class="absolute top-4 right-4 z-10 flex gap-2">
+<button class="w-10 h-10 rounded-full bg-onyx/80 backdrop-blur-sm flex items-center justify-center text-surface-bright hover:text-error transition-colors">
+<span class="material-symbols-outlined">favorite</span>
+</button>
+</div>
+<div class="relative h-48 w-full">
+<img class="w-full h-full object-cover" data-alt="A clean, sophisticated studio apartment interior featuring modern minimalist furniture in petrol blue and soft sand tones. The room is well-lit with natural light, but lacks a direct ocean view, instead showing a vibrant city street through the window. The aesthetic is professional, modern SaaS-inspired real estate living, highly ordered and premium." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvoYCancNGIBMnsqcV9iu0RqtAMj-zRXrGZmaHC3qQGK0FvMTgEkoQFwfzyaHtLtJgfFDgv-q71_7yxI5t-YLWZgDc_aroK9DDdaQsX1VJwJ58vHlN-bjijqREGgQgWi90EfZ1rTBbb4kMTZkgLW9TsPiWmLTZmI39jGaCEJ15snHH4w6SA5bDpNu6aw8BveSWFX0KsstnIZhiPt5zdu30S5a4E7stiF4q3Ap0B8UQc2BFEerzxUyw7w"/>
+<div class="absolute inset-0 bg-gradient-to-t from-onyx via-transparent to-transparent"></div>
+<div class="absolute bottom-4 left-4 right-4">
+<h3 class="font-title-md text-title-md text-surface-bright">The Beacon Studio</h3>
+<p class="font-body-md text-body-md text-secondary-fixed-dim">Arts District • $1,600/mo</p>
+</div>
+</div>
+<div class="p-stack-md space-y-stack-sm bg-surface-container-highest/5">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary-fixed-dim mt-1">check_circle</span>
+<div>
+<p class="font-label-md text-label-md text-surface-bright">Excellent Value</p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">Well under your $2,000 budget cap.</p>
+</div>
+</div>
+<div class="flex items-start gap-3 opacity-70">
+<span class="material-symbols-outlined text-outline mt-1">directions_walk</span>
+<div>
+<p class="font-label-md text-label-md text-outline">Location Note</p>
+<p class="font-body-md text-body-md text-secondary-fixed-dim text-sm">15 min walk to coast, slightly further than ideal.</p>
+</div>
+</div>
+</div>
+</article>
+</main>
+<!-- Refinement Bar (Floating) -->
+<div class="fixed bottom-24 left-0 w-full px-margin-mobile z-40 md:hidden pointer-events-none">
+<div class="bg-surface-container-highest/10 backdrop-blur-lg border border-outline-variant/30 rounded-full p-2 flex items-center justify-center gap-4 shadow-lg pointer-events-auto mx-auto max-w-[280px]">
+<span class="font-label-md text-label-md text-secondary-fixed-dim pl-2">Not quite right?</span>
+<button class="bg-petrol text-on-primary px-4 py-2 rounded-full font-label-md text-label-md flex items-center gap-2 hover:bg-primary transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span>
+                 Refine
+             </button>
+</div>
+</div>
+<!-- Bottom Nav Bar (Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-dim shadow-sm flex justify-around items-end pb-safe-bottom h-20 px-2 md:hidden">
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest rounded-lg p-2 transition-colors w-16 h-16">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-md text-[10px] leading-tight">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest rounded-lg p-2 transition-colors w-16 h-16">
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label-md text-[10px] leading-tight">Saved</span>
+</button>
+<button class="flex flex-col items-center justify-center text-electric-cyan hover:bg-surface-container-highest rounded-lg p-2 transition-colors w-16 h-16 scale-95 duration-150">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-md text-[10px] leading-tight font-bold">Search</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest rounded-lg p-2 transition-colors w-16 h-16">
+<span class="material-symbols-outlined mb-1">chat</span>
+<span class="font-label-md text-[10px] leading-tight">Inbox</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest rounded-lg p-2 transition-colors w-16 h-16">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-md text-[10px] leading-tight">Profile</span>
+</button>
+</nav>
+<!-- Side Nav (Desktop - Hidden on Mobile) -->
+<aside class="hidden md:flex fixed top-0 left-0 h-full w-64 border-r border-outline-variant/20 bg-surface-dim shadow-none flex-col gap-stack-sm py-stack-lg z-50">
+<div class="px-margin-mobile mb-stack-lg">
+<h1 class="font-title-md text-title-md font-bold text-inverse-on-surface">Homley</h1>
+<p class="font-label-md text-label-md text-secondary-fixed-dim">Premium Living</p>
+</div>
+<nav class="flex flex-col gap-1 flex-1">
+<a class="bg-secondary text-on-secondary rounded-lg px-4 py-3 mx-2 flex items-center gap-3 translate-x-1 duration-200" href="#">
+<span class="material-symbols-outlined">search</span>
+<span class="font-body-md text-body-md font-medium">Browse</span>
+</a>
+<a class="text-on-secondary-fixed-variant px-4 py-3 mx-2 hover:bg-surface-container-highest rounded-lg transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md text-body-md">Flatmates</span>
+</a>
+<a class="text-on-secondary-fixed-variant px-4 py-3 mx-2 hover:bg-surface-container-highest rounded-lg transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-body-md text-body-md">Saved</span>
+</a>
+<a class="text-on-secondary-fixed-variant px-4 py-3 mx-2 hover:bg-surface-container-highest rounded-lg transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-body-md text-body-md">Messages</span>
+</a>
+</nav>
+<div class="mt-auto">
+<a class="text-on-secondary-fixed-variant px-4 py-3 mx-2 hover:bg-surface-container-highest rounded-lg transition-all flex items-center gap-3" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+</div>
+</aside>
+</body></html>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Explore</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface-variant": "#3f484c",
+                        "secondary": "#5e5e5d",
+                        "tertiary-fixed": "#e5e2dc",
+                        "primary-container": "#0e7490",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-high": "#eae8e5",
+                        "surface-variant": "#e4e2df",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "primary-fixed": "#b9eaff",
+                        "background": "#0B1114",
+                        "tertiary-container": "#6c6b66",
+                        "onyx": "#1D262B",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#006781",
+                        "sand-border": "#DFDCD6",
+                        "inverse-on-surface": "#f2f0ed",
+                        "inverse-surface": "#30312f",
+                        "on-background": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-error-container": "#93000a",
+                        "petrol": "#0E7490",
+                        "on-secondary-container": "#636362",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-primary-container": "#d3f1ff",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "outline": "#6f787d",
+                        "secondary-container": "#e1dfde",
+                        "on-primary-fixed": "#001f29",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#151E24",
+                        "on-surface": "#ffffff",
+                        "electric-cyan": "#22D3EE",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "secondary-fixed": "#e4e2e1",
+                        "inverse-primary": "#81d1f0",
+                        "surface-bright": "#fbf9f6",
+                        "outline-variant": "#374151",
+                        "tertiary": "#54534e",
+                        "surface-container-highest": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "error-container": "#ffdad6",
+                        "surface": "#151E24",
+                        "primary": "#22D3EE",
+                        "surface-container": "#1D262B"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "container-max": "1280px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-mobile": "20px",
+                        "stack-xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-lg min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm h-16">
+<div class="flex justify-between items-center max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-full">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-headline-lg-mobile tracking-tight text-primary-fixed-dim" href="#">Homley</a>
+<nav class="hidden md:flex gap-6">
+<a class="text-primary-fixed-dim font-semibold border-b-2 border-primary pb-1 flex items-center font-body-md text-body-md" href="#">Browse homes</a>
+<a class="text-outline hover:text-primary-fixed-dim transition-colors flex items-center font-body-md text-body-md" href="#">Find flatmates</a>
+</nav>
+</div>
+<div class="hidden md:flex items-center gap-4">
+<button class="font-label-md text-label-md text-outline hover:text-primary-fixed-dim transition-colors">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-4 py-2 rounded-lg hover:opacity-90 transition-opacity shadow-sm">Get started</button>
+</div>
+</div>
+</header>
+<!-- Main Content Layout -->
+<div class="flex-1 max-w-container-max mx-auto w-full px-margin-desktop pt-24 pb-12 flex gap-gutter">
+<!-- Left Sidebar Filter (Persistent) -->
+<aside class="w-[280px] hidden lg:block shrink-0 h-[calc(100vh-120px)] sticky top-24 overflow-y-auto">
+<div class="bg-surface rounded-xl p-6 border border-outline-variant space-y-stack-lg shadow-sm">
+<div>
+<h3 class="font-title-md text-title-md mb-4 text-on-surface">Filters</h3>
+<div class="space-y-stack-md">
+<!-- Location Search -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg pl-10 pr-4 py-2 font-body-md text-body-md text-on-surface placeholder:text-outline focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Search locality..." type="text"/>
+</div>
+<!-- Price Range -->
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-2">Price Range (₹)</label>
+<div class="flex items-center gap-2">
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md tabular-nums text-on-surface placeholder:text-outline" placeholder="Min" type="number"/>
+<span class="text-outline">-</span>
+<input class="w-full bg-surface-container border border-outline-variant rounded-lg px-3 py-2 font-body-md text-body-md tabular-nums text-on-surface placeholder:text-outline" placeholder="Max" type="number"/>
+</div>
+</div>
+<!-- BHK -->
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-2">Property Type</label>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full border border-primary text-primary bg-primary/10 font-label-md text-label-md transition-colors">1 BHK</button>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant text-outline hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">2 BHK</button>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant text-outline hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">3 BHK</button>
+<button class="px-3 py-1.5 rounded-full border border-outline-variant text-outline hover:border-primary hover:text-primary transition-colors font-label-md text-label-md">4+ BHK</button>
+</div>
+</div>
+<!-- Amenities -->
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-2">Amenities</label>
+<div class="space-y-2">
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Furnished</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="w-4 h-4 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<span class="font-body-md text-body-md text-outline group-hover:text-primary transition-colors">Balcony</span>
+</label>
+<label class="flex items-center gap-2 cursor-pointer group">
+<input checked="" class="w-4 h-4 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-background" type="checkbox"/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Parking</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-4 border-t border-outline-variant">
+<button class="w-full bg-surface-container border border-outline-variant text-on-surface hover:text-primary hover:border-primary py-2 rounded-lg font-label-md text-label-md transition-all">Reset Filters</button>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas - Grid -->
+<main class="flex-1 w-full">
+<div class="mb-stack-lg flex justify-between items-end">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-2">Premium Homes in Mumbai</h1>
+<p class="font-body-md text-body-md text-outline">124 properties matching your criteria</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md text-outline">Sort by:</span>
+<select class="bg-surface border border-outline-variant rounded-lg px-3 py-1.5 font-body-md text-body-md text-on-surface focus:outline-none focus:border-primary">
+<option>Recommended</option>
+<option>Price: Low to High</option>
+<option>Price: High to Low</option>
+<option>Newest</option>
+</select>
+</div>
+</div>
+<!-- 3-Column Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter">
+<!-- Listing Card 1 -->
+<article class="bg-surface rounded-xl border border-outline-variant overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern luxury apartment living room in a dark themed coastal design. Large floor to ceiling windows overlooking an ocean. Dim dramatic lighting illuminating sleek furniture with cyan accents. High-end real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDvUuzp6LKluLXoq6qUFegV6d6e02B_X_OL-JUcnnXs0mB9DCAfYJ1keBPNzXdCkTtRdhpZeBw49MVFEfswOrzO9YsDpAPt5AJjCWS5vryRO2zUyjVvp0Q34c-W4Vc0ePENY174rfBDc2JzV7i_l3J9tauPiBbs85hPN0ooJRtTsMUxO0yT_MENXvek9uBw6L1yw4wfskMbLLr008Sk_8xL8iEnIndMl8f6QQ6wv0rKvaSVtuWFoPW3gg"/>
+<div class="absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded text-primary font-label-md text-[12px] flex items-center gap-1 border border-primary/20">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                            Verified
+                        </div>
+<button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface/50 backdrop-blur-sm flex items-center justify-center text-on-surface hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+</button>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-title-md text-[18px] leading-snug text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Sea View Apartment</h3>
+<p class="font-body-md text-[14px] text-outline flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                    Bandra West
+                                </p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4 mt-2">
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">2 BHK</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">1,200 sqft</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">Furnished</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-title-md text-title-md text-on-surface tabular-nums">₹ 1,50,000<span class="font-body-md text-[12px] text-outline font-normal">/mo</span></p>
+</div>
+<button class="bg-petrol text-on-primary hover:opacity-90 px-4 py-2 rounded-lg font-label-md text-label-md transition-opacity">View</button>
+</div>
+</div>
+</article>
+<!-- Listing Card 2 -->
+<article class="bg-surface rounded-xl border border-outline-variant overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sophisticated modern kitchen interior in a dark themed coastal design. Sleek dark cabinetry with cyan accent lighting under the counters. High-end stainless steel appliances. Dramatic real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdavbzZi8q_w7v9gaAQGJQ_atZHrD6rBWm2PPwvc-PN4oRWMHWh_2jdei8U5ROvpx-Fme_aPHFQPf2DJpxCgBgqZlbKhKmz5w5zLgjsNXBLfvcBiEKwp-SamWe6KUOR4RjX_xEGVQxoNzlpa8nBITXnm7lI301QSHOKj6v1aM_E-DmXOQrgRdZ-mBnwyIoIqhrvyTwtToruSenn3Qh0N_alGcTcW2gfWCY2WWE2kHAhXyVoLWWAa0Mog"/>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-title-md text-[18px] leading-snug text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Minimalist Studio</h3>
+<p class="font-body-md text-[14px] text-outline flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                    Juhu
+                                </p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4 mt-2">
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">1 RK</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">450 sqft</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">Semi</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-title-md text-title-md text-on-surface tabular-nums">₹ 65,000<span class="font-body-md text-[12px] text-outline font-normal">/mo</span></p>
+</div>
+<button class="bg-petrol text-on-primary hover:opacity-90 px-4 py-2 rounded-lg font-label-md text-label-md transition-opacity">View</button>
+</div>
+</div>
+</article>
+<!-- Listing Card 3 -->
+<article class="bg-surface rounded-xl border border-outline-variant overflow-hidden hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A spacious bedroom interior with a panoramic city view at night. Dark themed sophisticated decor with petrol blue bedding and cyan ambient light strips. Luxury real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1k-cz37VnTO3lXgWA1tyAlA7c_K4QkdffrwdSX2l1ndY1s-32hDQUE0MjNRyT8Bo61D4WBUBzIaj78RnmMw48ZHiq2L3-fJCNOViR-HxB1MbPZghHV7Gn6oJxh4cDW53ssKed6JW6fd8VP0kPE2AZHzcst8LOqFV0s2w7oxqzXKDZi3_A8fMYKUXGpnaJqJL-pKhrWOl0_1HA4jFUm3VnzeZBtToVxJU1azbcZ50rCfqpqq_HIvmtLw"/>
+<div class="absolute top-3 left-3 bg-surface/90 backdrop-blur-sm px-2 py-1 rounded text-primary font-label-md text-[12px] flex items-center gap-1 border border-primary/20">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                            Verified
+                        </div>
+</div>
+<div class="p-4 flex-1 flex flex-col">
+<div class="flex justify-between items-start mb-2">
+<div>
+<h3 class="font-title-md text-[18px] leading-snug text-on-surface line-clamp-1 group-hover:text-primary transition-colors">Penthouse Suite</h3>
+<p class="font-body-md text-[14px] text-outline flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                                    Worli
+                                </p>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4 mt-2">
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">4 BHK</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">3,500 sqft</span>
+<span class="px-2 py-1 bg-surface-container rounded text-on-surface-variant font-label-md text-[12px]">Lux</span>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant flex items-center justify-between">
+<div>
+<p class="font-title-md text-title-md text-on-surface tabular-nums">₹ 4,50,000<span class="font-body-md text-[12px] text-outline font-normal">/mo</span></p>
+</div>
+<button class="bg-petrol text-on-primary hover:opacity-90 px-4 py-2 rounded-lg font-label-md text-label-md transition-opacity">View</button>
+</div>
+</div>
+</article>
+</div>
+<div class="mt-12 flex justify-center">
+<button class="px-6 py-3 border border-outline-variant text-on-surface hover:text-primary hover:border-primary rounded-lg font-label-md text-label-md transition-colors flex items-center gap-2">
+                    Load More
+                    <span class="material-symbols-outlined text-[18px]">expand_more</span>
+</button>
+</div>
+</main>
+</div>
+</body></html>

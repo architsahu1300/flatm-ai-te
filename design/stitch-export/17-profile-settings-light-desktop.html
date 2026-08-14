@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Profile &amp; Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            }
+        }
+    </script>
+<style>
+        .whisper-shadow { box-shadow: 0 4px 24px -4px rgba(0,0,0,0.04); }
+        .soft-pop-shadow { box-shadow: 0 12px 32px -8px rgba(0,0,0,0.08); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen">
+<!-- Top Navigation (Hidden on Mobile) -->
+<header class="hidden md:flex bg-surface/80 backdrop-blur-md border-b border-sand-border shadow-sm fixed top-0 w-full z-50 transition-all duration-300">
+<div class="max-w-container-max mx-auto px-margin-desktop w-full h-20 flex items-center justify-between">
+<div class="flex items-center gap-gutter">
+<a class="font-display-lg text-display-lg font-bold text-petrol tracking-tight" href="#">Homley</a>
+<nav class="hidden lg:flex items-center gap-8 ml-8">
+<a class="font-body-md text-body-md text-secondary hover:text-petrol transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-secondary hover:text-petrol transition-colors" href="#">Find flatmates</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-secondary hover:text-petrol transition-colors px-4 py-2 scale-95 active:opacity-80">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-6 py-3 rounded-lg shadow-sm hover:opacity-90 scale-95 active:opacity-80 transition-all">Get started</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-24 md:pt-32 pb-32 md:pb-24 flex flex-col lg:flex-row gap-gutter relative">
+<!-- Left: Settings Sidebar -->
+<aside class="w-full lg:w-1/4 sticky top-32 h-fit mb-8 lg:mb-0">
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-surface-container-low text-petrol font-label-md text-label-md font-semibold transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                    Account
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-sand-light hover:text-petrol font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">home</span>
+                    Listings
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-sand-light hover:text-petrol font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">favorite</span>
+                    Saved
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-sand-light hover:text-petrol font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">payments</span>
+                    Payments
+                </a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary hover:bg-sand-light hover:text-petrol font-label-md text-label-md transition-colors" href="#">
+<span class="material-symbols-outlined">security</span>
+                    Security
+                </a>
+</nav>
+</aside>
+<!-- Right: Profile Details -->
+<section class="w-full lg:w-3/4 flex flex-col gap-stack-lg">
+<div class="mb-4">
+<h1 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface">Profile &amp; Settings</h1>
+<p class="font-body-md text-body-md text-secondary mt-1">Manage your account and flatmate preferences.</p>
+</div>
+<!-- Account Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-6 whisper-shadow border border-sand-border flex items-center gap-6">
+<div class="relative w-20 h-20 rounded-full overflow-hidden border-2 border-surface-container">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a young professional male in a well-lit modern apartment setting, warm lighting, approachable demeanor, high quality." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmBbnltb2yO97F9ujtMT8AQ6LQAwR3NE-ZduKpc8T3tkoxOOSY64rb8Vq2nDEjmS5A0smAv3UAnmGlk514GWJ3mHkqXU8NZEoPqVPy2ZoaKZIkXVaP6Lz-5D_0nuFHzZUBo2VN69c0_7qj8bqRjD2xyfF2JuN3kC2mhnFCTmANc-kdcZ11ECbD0GZEezWlgxmvqq7BTd7EtsL-dN1brNo1jd4SeNCH6yT6WTT8Rf9YXRIQU-8Qm_z9OQ"/>
+</div>
+<div class="flex-1">
+<h2 class="font-title-md text-title-md text-on-surface">Arjun Malhotra</h2>
+<p class="font-body-md text-body-md text-secondary">arjun.malhotra@example.com</p>
+</div>
+<button class="font-label-md text-label-md border border-sand-border text-on-surface px-4 py-2 rounded-lg hover:bg-sand-light transition-colors">Edit</button>
+</div>
+<!-- Flatmate Card Manager -->
+<div class="bg-surface-container-lowest rounded-2xl p-8 whisper-shadow border border-sand-border mt-stack-md flex flex-col gap-stack-lg relative overflow-hidden">
+<!-- Header -->
+<div class="flex justify-between items-start border-b border-sand-border pb-6">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface flex items-center gap-2">
+                            Your Flatmate Card
+                        </h2>
+<p class="font-body-md text-body-md text-secondary mt-1 max-w-lg">This is how you appear to others on Homley when they are searching for flatmates.</p>
+</div>
+<!-- Go Live Toggle -->
+<div class="flex items-center gap-3 bg-surface-container-low px-4 py-2 rounded-full border border-sand-border">
+<span class="flex h-3 w-3 relative">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-petrol opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-petrol"></span>
+</span>
+<span class="font-label-md text-label-md text-petrol font-semibold">Live</span>
+<label class="relative inline-flex items-center cursor-pointer ml-2">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-9 h-5 bg-sand-border peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-petrol"></div>
+</label>
+</div>
+</div>
+<!-- Form Content -->
+<div class="flex flex-col gap-stack-lg">
+<!-- Intent Toggle -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Intent</label>
+<div class="flex bg-surface-container-low p-1 rounded-xl w-fit border border-sand-border">
+<button class="px-6 py-2 rounded-lg bg-surface-container-lowest shadow-sm font-label-md text-label-md text-on-surface border border-sand-border">Looking for flat</button>
+<button class="px-6 py-2 rounded-lg text-secondary font-label-md text-label-md hover:text-on-surface transition-colors">Have a flat</button>
+</div>
+</div>
+<!-- About Textarea -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">About Me</label>
+<textarea class="w-full bg-surface-container-lowest border border-sand-border rounded-xl p-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-petrol focus:border-transparent outline-none transition-all placeholder:text-outline" placeholder="Tell potential flatmates a bit about your lifestyle, habits, and what you're looking for..." rows="4"></textarea>
+</div>
+<!-- Details Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Budget -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Monthly Budget Range (₹)</label>
+<div class="flex items-center gap-2">
+<input class="w-full bg-surface-container-lowest border border-sand-border rounded-xl px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-petrol focus:border-transparent outline-none transition-all tabular-nums" placeholder="Min" type="text" value="25,000"/>
+<span class="text-secondary">-</span>
+<input class="w-full bg-surface-container-lowest border border-sand-border rounded-xl px-4 py-3 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-petrol focus:border-transparent outline-none transition-all tabular-nums" placeholder="Max" type="text" value="40,000"/>
+</div>
+</div>
+<!-- Preferred Areas -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-2">Preferred Areas</label>
+<div class="border border-sand-border rounded-xl p-3 bg-surface-container-lowest min-h-[50px] flex flex-wrap gap-2 items-center focus-within:ring-2 focus-within:ring-petrol transition-all">
+<span class="inline-flex items-center gap-1 bg-surface-container px-3 py-1 rounded-full font-label-md text-label-md text-on-surface">
+                                    Bandra West <button class="hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 bg-surface-container px-3 py-1 rounded-full font-label-md text-label-md text-on-surface">
+                                    Khar <button class="hover:text-error transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</span>
+<input class="flex-1 bg-transparent border-none focus:ring-0 p-0 font-body-md text-body-md text-on-surface placeholder:text-outline outline-none min-w-[100px]" placeholder="Add area..." type="text"/>
+</div>
+</div>
+</div>
+<div class="flex justify-end pt-4 border-t border-sand-border">
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-6 py-3 rounded-lg shadow-sm hover:opacity-90 transition-opacity">Save Changes</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-surface bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-2xl">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-2xl">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-4 py-2 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

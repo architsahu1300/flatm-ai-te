@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Agreements</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "surface-container-highest": "#e4e2df",
+                            "tertiary-fixed-dim": "#c9c6c0",
+                            "on-primary-container": "#d3f1ff",
+                            "on-tertiary-fixed": "#1c1c18",
+                            "primary-container": "#0e7490",
+                            "sand-light": "#F7F5F2",
+                            "onyx": "#1D262B",
+                            "on-surface": "#1b1c1a",
+                            "surface-dim": "#dbdad7",
+                            "error": "#ba1a1a",
+                            "on-secondary-container": "#636362",
+                            "tertiary-fixed": "#e5e2dc",
+                            "tertiary-container": "#6c6b66",
+                            "inverse-primary": "#81d1f0",
+                            "secondary": "#5e5e5d",
+                            "on-tertiary-fixed-variant": "#484742",
+                            "on-primary-fixed-variant": "#004d62",
+                            "surface-tint": "#006781",
+                            "secondary-fixed": "#e4e2e1",
+                            "surface": "#fbf9f6",
+                            "tertiary": "#54534e",
+                            "on-tertiary": "#ffffff",
+                            "petrol": "#0E7490",
+                            "on-tertiary-container": "#f0ece6",
+                            "secondary-fixed-dim": "#c7c6c5",
+                            "surface-container-high": "#eae8e5",
+                            "error-container": "#ffdad6",
+                            "secondary-container": "#e1dfde",
+                            "primary-fixed-dim": "#81d1f0",
+                            "outline": "#6f787d",
+                            "on-primary-fixed": "#001f29",
+                            "on-error-container": "#93000a",
+                            "background": "#fbf9f6",
+                            "on-secondary-fixed-variant": "#464746",
+                            "surface-variant": "#e4e2df",
+                            "electric-cyan": "#22D3EE",
+                            "on-primary": "#ffffff",
+                            "surface-container": "#efeeeb",
+                            "on-surface-variant": "#3f484c",
+                            "surface-container-lowest": "#ffffff",
+                            "primary": "#005a71",
+                            "outline-variant": "#bec8cd",
+                            "on-error": "#ffffff",
+                            "on-secondary": "#ffffff",
+                            "on-background": "#1b1c1a",
+                            "inverse-on-surface": "#f2f0ed",
+                            "primary-fixed": "#b9eaff",
+                            "deep-void": "#0B1114",
+                            "surface-bright": "#fbf9f6",
+                            "sand-border": "#DFDCD6",
+                            "surface-container-low": "#f5f3f0",
+                            "inverse-surface": "#30312f",
+                            "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "stack-xs": "4px",
+                            "gutter": "24px",
+                            "container-max": "1280px",
+                            "margin-desktop": "80px",
+                            "stack-md": "16px",
+                            "stack-xl": "48px",
+                            "margin-mobile": "20px",
+                            "stack-sm": "8px",
+                            "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                            "display-lg": ["Inter"],
+                            "label-md": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display-lg-mobile": ["Inter"],
+                            "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                            "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                            "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                            "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                            "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                            "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                            "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                            "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for inner lists to keep UI clean */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: theme('colors.outline-variant');
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen pb-24 md:pb-0">
+<!-- Top Navigation (Desktop) -->
+<nav class="hidden md:flex sticky top-0 w-full z-50 backdrop-blur-sm border-b border-outline-variant dark:border-on-tertiary-fixed-variant shadow-sm bg-surface/80 dark:bg-surface/80">
+<div class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto w-full">
+<div class="font-display-lg text-display-lg text-primary dark:text-on-primary-fixed tracking-tight">Homley</div>
+<div class="flex items-center gap-stack-lg font-body-md text-body-md">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors active:scale-95 duration-200" href="#">Browse homes</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors active:scale-95 duration-200" href="#">Find flatmates</a>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="font-label-md text-label-md text-primary dark:text-primary-fixed-dim hover:bg-surface-container px-4 py-2 rounded-lg transition-colors active:scale-95 duration-200">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-6 py-3 rounded-lg hover:bg-primary transition-colors shadow-[0_4px_12px_rgba(14,116,144,0.15)] active:scale-95 duration-200">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-xl">
+<header class="mb-stack-xl">
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-onyx">Agreements</h1>
+<p class="font-body-md text-body-md text-secondary mt-stack-xs">Manage your leases, applications, and legal documents.</p>
+</header>
+<!-- Master-Detail Layout -->
+<div class="flex flex-col lg:flex-row gap-gutter items-start">
+<!-- Left Column: List View -->
+<div class="w-full lg:w-[420px] shrink-0 flex flex-col gap-stack-md">
+<!-- Filters -->
+<div class="flex gap-stack-sm mb-stack-sm overflow-x-auto pb-2 custom-scrollbar">
+<button class="px-4 py-1.5 rounded-full bg-onyx text-white font-label-md text-label-md whitespace-nowrap border border-onyx">All Documents</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-lowest text-secondary border border-sand-border hover:border-outline font-label-md text-label-md whitespace-nowrap transition-colors">Action Required</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-lowest text-secondary border border-sand-border hover:border-outline font-label-md text-label-md whitespace-nowrap transition-colors">Active</button>
+<button class="px-4 py-1.5 rounded-full bg-surface-container-lowest text-secondary border border-sand-border hover:border-outline font-label-md text-label-md whitespace-nowrap transition-colors">Past</button>
+</div>
+<!-- Card: Pending Signature (Active Selected State) -->
+<article class="bg-surface-container-lowest rounded-xl border-2 border-primary-container p-stack-md shadow-[0_4px_24px_rgba(0,0,0,0.06)] cursor-pointer relative overflow-hidden transition-all duration-200">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex justify-between items-start mb-stack-md pl-2">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant">
+<span class="material-symbols-outlined text-[16px] text-tertiary">edit_document</span>
+<span class="font-label-md text-label-md text-onyx">Pending Signature</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">Updated 2h ago</span>
+</div>
+<div class="flex gap-stack-md pl-2">
+<img class="w-20 h-20 rounded-lg object-cover border border-sand-border shrink-0" data-alt="A sophisticated coastal apartment exterior featuring white rendered walls, warm timber cladding, and a glass balcony overlooking a calm ocean. Shot in bright, natural daylight with a modern, high-end architectural photography style. The color palette is neutral with natural blues and warm wood tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlErm81KtL0wRKtre89LsvzFug4lzGj4bLF3okPGFZaqX1pU7mU5lJzHfLknB7Xofb65J-IKaCvo6vvQPRzg_ie-bw8TGmhS0dO6_g7kP1yymKUHZIdDirbPN9UOSTZSCHe7q2fis_bOq65AiBoz_AH5S9frHDWNn2x59PgmXi7dZREcXMBcGW3uIKNjfgKTMoGiIGMzZF6OdeabeOLV_D7LA6W2dfr6MorUkWRPsLpg8clQN6XIrE4g"/>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h3 class="font-title-md text-title-md text-onyx leading-tight">124 Seaside Avenue, Apt 4B</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">12 Month Fixed Term Lease</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-sand-border flex justify-between items-center pl-2">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover z-10" data-alt="A professional headshot of a smiling woman in her 30s with dark hair, wearing a light blue blazer against a blurred bright coastal background. Soft natural lighting, high-end corporate lifestyle photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbVJM_GOASRDHxoMrp1ddrjFYz4gk7LNwWAThJXH2N-Vm8JlsUghvhryxCUfZKRfM5wT_hiPdXRBzleKkWd0kLQfYk1qWPG8gkUF0ghWhgy01fhEfxG7SnFL3OkaOB_IGZUEBJnl1YuWtVifYvp81hW1tgfh4syRwkASf8JLGsmhvx1cfJCpUTAoGzt9i9fW0-LLG68_r1kud_C0mztQENy7Hq8EkpTHVKGgfN7_eYXX6gezOB3fhzoA"/>
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-lowest object-cover z-0" data-alt="A professional headshot of a man in his 40s with short grey hair, wearing a crisp white shirt against a neutral grey studio background. Clean, modern, trustworthy aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa4bTwqeWAavfMwTw4QW-A-UJoc2mArIayWBrNuffvX1mGmmG9n8IETOH0Fy5V4YZGO3WCZ5lyAzPjV2wWHZHYQdO4AUZ_fMRMVrXZe-NTSlW1goBMbTW17cxlhgV_2ediuE9d3XhY41UFZNnIeqtDfT74-GSsDjqguquy9qQuwRjSDnNYoIkoCtQTZNlEBVRkPs70zHXjGHzRUcx5KS8d8bN3lEGt0gmDo7qs4H_nnD4IWwNzMtDdoA"/>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md text-secondary block">Monthly Rent</span>
+<span class="font-title-md text-title-md text-onyx tabular-nums">$3,200</span>
+</div>
+</div>
+</article>
+<!-- Card: Active -->
+<article class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-md shadow-[0_2px_8px_rgba(0,0,0,0.02)] hover:shadow-[0_4px_16px_rgba(0,0,0,0.04)] cursor-pointer transition-all duration-200 hover:border-outline-variant">
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-container border border-sand-border">
+<span class="material-symbols-outlined text-[16px] text-primary">check_circle</span>
+<span class="font-label-md text-label-md text-onyx">Active</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">Expires Oct 2025</span>
+</div>
+<div class="flex gap-stack-md">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high border border-sand-border flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[32px]">home_work</span>
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h3 class="font-title-md text-title-md text-onyx leading-tight">88 Harbor View Drive</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">Periodic Tenancy</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-sand-border flex justify-between items-center">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container text-on-primary-container flex items-center justify-center font-label-md text-[12px] z-10">JS</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-tertiary-container text-white flex items-center justify-center font-label-md text-[12px] z-0">LM</div>
+</div>
+<div class="text-right">
+<span class="font-label-md text-label-md text-secondary block">Monthly Rent</span>
+<span class="font-title-md text-title-md text-onyx tabular-nums">$2,850</span>
+</div>
+</div>
+</article>
+<!-- Card: Past -->
+<article class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-md opacity-75 hover:opacity-100 transition-opacity duration-200 cursor-pointer">
+<div class="flex justify-between items-start mb-stack-md">
+<div class="flex items-center gap-2 px-2.5 py-1 rounded-md bg-surface-dim border border-sand-border">
+<span class="material-symbols-outlined text-[16px] text-tertiary">history</span>
+<span class="font-label-md text-label-md text-tertiary">Completed</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">Ended May 2023</span>
+</div>
+<div class="flex gap-stack-md">
+<div class="w-20 h-20 rounded-lg bg-surface-container-high border border-sand-border flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-secondary text-[32px]">apartment</span>
+</div>
+<div class="flex flex-col justify-between py-1">
+<div>
+<h3 class="font-title-md text-title-md text-onyx leading-tight">21a Sandpiper Lane</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">6 Month Lease</p>
+</div>
+</div>
+</div>
+</article>
+</div>
+<!-- Right Column: Detail View (Bento Grid) -->
+<div class="w-full flex-1 lg:sticky lg:top-28 flex flex-col gap-stack-lg">
+<!-- Detail Header Card -->
+<div class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-lg shadow-[0_4px_24px_rgba(0,0,0,0.04)] flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
+<div>
+<div class="flex items-center gap-3 mb-2">
+<span class="px-2.5 py-1 rounded-md bg-surface-container-high border border-outline-variant font-label-md text-[12px] text-onyx flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">edit_document</span> Action Required
+                            </span>
+<span class="font-body-md text-[14px] text-secondary">Ref: LSE-2024-892</span>
+</div>
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-onyx tracking-tight">124 Seaside Avenue, Apt 4B</h2>
+<p class="font-body-lg text-body-lg text-secondary mt-1">Residential Tenancy Agreement (Fixed Term)</p>
+</div>
+<div class="flex gap-3 w-full md:w-auto">
+<button class="flex-1 md:flex-none flex justify-center items-center gap-2 px-6 py-3 rounded-lg border border-sand-border bg-surface text-onyx font-label-md text-label-md hover:bg-surface-container-lowest hover:border-outline transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+<button class="flex-1 md:flex-none flex justify-center items-center gap-2 px-6 py-3 rounded-lg bg-petrol text-white font-label-md text-label-md hover:bg-primary transition-colors shadow-[0_4px_12px_rgba(14,116,144,0.15)] active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[20px]">download</span>
+                            Download PDF
+                        </button>
+</div>
+</div>
+<!-- Grid Layout for inner details -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-lg">
+<!-- Signature Status Box -->
+<div class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col">
+<h3 class="font-title-md text-title-md text-onyx mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">draw</span>
+                            Signature Status
+                        </h3>
+<div class="relative flex-1 py-4">
+<!-- Vertical Line -->
+<div class="absolute left-6 top-8 bottom-8 w-[2px] bg-surface-container-high rounded-full"></div>
+<!-- Step 1: Landlord -->
+<div class="flex gap-4 relative mb-8">
+<div class="w-12 h-12 rounded-full bg-surface-container border border-sand-border flex items-center justify-center shrink-0 z-10">
+<span class="material-symbols-outlined text-primary">check_circle</span>
+</div>
+<div class="flex-1 pt-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-onyx">Landlord (Robert Vance)</p>
+<p class="font-body-md text-[14px] text-primary font-medium">Signed</p>
+</div>
+<span class="font-body-md text-[13px] text-secondary tabular-nums">Oct 24, 09:41 AM</span>
+</div>
+</div>
+</div>
+<!-- Step 2: Tenant -->
+<div class="flex gap-4 relative">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest border-2 border-petrol flex items-center justify-center shrink-0 z-10 shadow-[0_0_0_4px_rgba(14,116,144,0.1)]">
+<span class="material-symbols-outlined text-petrol animate-pulse">schedule</span>
+</div>
+<div class="flex-1 pt-1">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-label-md text-onyx">Tenant (You)</p>
+<p class="font-body-md text-[14px] text-onyx font-medium">Pending Signature</p>
+</div>
+</div>
+<button class="mt-3 px-4 py-2 rounded-lg bg-surface-container border border-outline-variant text-onyx font-label-md text-[13px] hover:bg-surface-container-high transition-colors">Review &amp; Sign</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Details Summary Box -->
+<div class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-stack-md">
+<h3 class="font-title-md text-title-md text-onyx flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">assignment</span>
+                            Key Terms
+                        </h3>
+<div class="space-y-4 flex-1">
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="font-body-md text-[15px] text-secondary">Rent Amount</span>
+<span class="font-label-md text-[15px] text-onyx tabular-nums">$3,200 / month</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="font-body-md text-[15px] text-secondary">Bond / Deposit</span>
+<span class="font-label-md text-[15px] text-onyx tabular-nums">$6,400</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="font-body-md text-[15px] text-secondary">Lease Term</span>
+<span class="font-label-md text-[15px] text-onyx">12 Months</span>
+</div>
+<div class="flex justify-between items-center py-2 border-b border-surface-container">
+<span class="font-body-md text-[15px] text-secondary">Commencement</span>
+<span class="font-label-md text-[15px] text-onyx tabular-nums">Nov 01, 2024</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Version History Box (Full Width) -->
+<div class="bg-surface-container-lowest rounded-xl border border-sand-border p-stack-lg shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+<h3 class="font-title-md text-title-md text-onyx mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">history</span>
+                        Document History
+                    </h3>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-sand-border text-secondary font-label-md text-[13px]">
+<th class="py-3 font-medium">Version</th>
+<th class="py-3 font-medium">Action</th>
+<th class="py-3 font-medium">Date</th>
+<th class="py-3 font-medium text-right">User</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-[14px]">
+<tr class="border-b border-surface-container last:border-0 hover:bg-surface-container-low transition-colors">
+<td class="py-3 font-medium text-onyx">v1.2</td>
+<td class="py-3 text-secondary">Sent for Tenant signature</td>
+<td class="py-3 text-secondary tabular-nums">Oct 24, 09:41 AM</td>
+<td class="py-3 text-right text-onyx">System</td>
+</tr>
+<tr class="border-b border-surface-container last:border-0 hover:bg-surface-container-low transition-colors">
+<td class="py-3 font-medium text-onyx">v1.2</td>
+<td class="py-3 text-secondary">Signed by Landlord</td>
+<td class="py-3 text-secondary tabular-nums">Oct 24, 09:41 AM</td>
+<td class="py-3 text-right text-onyx">Robert Vance</td>
+</tr>
+<tr class="border-b border-surface-container last:border-0 hover:bg-surface-container-low transition-colors">
+<td class="py-3 font-medium text-onyx">v1.1</td>
+<td class="py-3 text-secondary">Terms revised (Pet Clause added)</td>
+<td class="py-3 text-secondary tabular-nums">Oct 23, 14:20 PM</td>
+<td class="py-3 text-right text-onyx">Property Mgr</td>
+</tr>
+<tr class="border-b border-surface-container last:border-0 hover:bg-surface-container-low transition-colors">
+<td class="py-3 font-medium text-onyx">v1.0</td>
+<td class="py-3 text-secondary">Document drafted</td>
+<td class="py-3 text-secondary tabular-nums">Oct 22, 10:00 AM</td>
+<td class="py-3 text-right text-onyx">System</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 bg-surface dark:bg-surface-container-highest rounded-t-xl border-t border-outline-variant dark:border-on-tertiary-fixed-variant shadow-lg">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined text-[24px]">search</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined text-[24px]">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined text-[24px]">auto_awesome</span>
+<span class="font-label-md text-[10px] mt-1">Ask AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined text-[24px]">chat_bubble</span>
+<span class="font-label-md text-[10px] mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

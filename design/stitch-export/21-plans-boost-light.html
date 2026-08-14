@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Plans &amp; Boost - Homley</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "surface-container-highest": "#e4e2df",
+                            "tertiary-fixed-dim": "#c9c6c0",
+                            "on-primary-container": "#d3f1ff",
+                            "on-tertiary-fixed": "#1c1c18",
+                            "primary-container": "#0e7490",
+                            "sand-light": "#F7F5F2",
+                            "onyx": "#1D262B",
+                            "on-surface": "#1b1c1a",
+                            "surface-dim": "#dbdad7",
+                            "error": "#ba1a1a",
+                            "on-secondary-container": "#636362",
+                            "tertiary-fixed": "#e5e2dc",
+                            "tertiary-container": "#6c6b66",
+                            "inverse-primary": "#81d1f0",
+                            "secondary": "#5e5e5d",
+                            "on-tertiary-fixed-variant": "#484742",
+                            "on-primary-fixed-variant": "#004d62",
+                            "surface-tint": "#006781",
+                            "secondary-fixed": "#e4e2e1",
+                            "surface": "#fbf9f6",
+                            "tertiary": "#54534e",
+                            "on-tertiary": "#ffffff",
+                            "petrol": "#0E7490",
+                            "on-tertiary-container": "#f0ece6",
+                            "secondary-fixed-dim": "#c7c6c5",
+                            "surface-container-high": "#eae8e5",
+                            "error-container": "#ffdad6",
+                            "secondary-container": "#e1dfde",
+                            "primary-fixed-dim": "#81d1f0",
+                            "outline": "#6f787d",
+                            "on-primary-fixed": "#001f29",
+                            "on-error-container": "#93000a",
+                            "background": "#fbf9f6",
+                            "on-secondary-fixed-variant": "#464746",
+                            "surface-variant": "#e4e2df",
+                            "electric-cyan": "#22D3EE",
+                            "on-primary": "#ffffff",
+                            "surface-container": "#efeeeb",
+                            "on-surface-variant": "#3f484c",
+                            "surface-container-lowest": "#ffffff",
+                            "primary": "#005a71",
+                            "outline-variant": "#bec8cd",
+                            "on-error": "#ffffff",
+                            "on-secondary": "#ffffff",
+                            "on-background": "#1b1c1a",
+                            "inverse-on-surface": "#f2f0ed",
+                            "primary-fixed": "#b9eaff",
+                            "deep-void": "#0B1114",
+                            "surface-bright": "#fbf9f6",
+                            "sand-border": "#DFDCD6",
+                            "surface-container-low": "#f5f3f0",
+                            "inverse-surface": "#30312f",
+                            "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "stack-xs": "4px",
+                            "gutter": "24px",
+                            "container-max": "1280px",
+                            "margin-desktop": "80px",
+                            "stack-md": "16px",
+                            "stack-xl": "48px",
+                            "margin-mobile": "20px",
+                            "stack-sm": "8px",
+                            "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                            "display-lg": ["Inter"],
+                            "label-md": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "body-lg": ["Inter"],
+                            "body-md": ["Inter"],
+                            "display-lg-mobile": ["Inter"],
+                            "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                            "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-sans antialiased pb-24 md:pb-0">
+<!-- Top Navigation (Desktop) -->
+<header class="hidden md:flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto bg-surface/80 backdrop-blur-sm sticky top-0 w-full z-50 transition-all duration-300">
+<div class="flex items-center gap-gutter">
+<a class="font-display-lg text-display-lg text-primary tracking-tight hover:opacity-80 transition-opacity" href="#">Homley</a>
+<nav class="hidden lg:flex items-center gap-6 ml-8">
+<a class="text-secondary font-body-md text-body-md hover:text-primary transition-colors" href="#">Browse homes</a>
+<a class="text-secondary font-body-md text-body-md hover:text-primary transition-colors" href="#">Find flatmates</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<a class="text-primary font-label-md text-label-md hover:opacity-80 transition-opacity px-4 py-2" href="#">Sign in</a>
+<a class="bg-petrol text-white font-label-md text-label-md px-6 py-2.5 rounded-full hover:bg-primary-container transition-colors shadow-sm active:scale-95 duration-200" href="#">Get started</a>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-xl">
+<!-- Header -->
+<div class="text-center mb-stack-xl max-w-2xl mx-auto">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-stack-sm">Choose Your Plan</h1>
+<p class="font-body-lg text-body-lg text-secondary">Unlock premium features to find your perfect flatmate faster.</p>
+</div>
+<!-- Pricing Cards -->
+<div class="grid md:grid-cols-2 gap-gutter max-w-4xl mx-auto mb-stack-xl">
+<!-- Free Plan -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg border border-sand-border shadow-sm flex flex-col relative">
+<div class="mb-stack-md">
+<h3 class="font-title-md text-title-md text-on-surface mb-stack-xs">Free Seeker</h3>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-headline-lg text-on-surface tabular-nums">₹0</span>
+<span class="font-body-md text-body-md text-secondary">/ forever</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-secondary mb-stack-lg border-b border-sand-border pb-stack-md">Essential tools to get you started on your search.</p>
+<ul class="space-y-stack-md flex-grow mb-stack-lg">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Basic profile creation</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Browse all listings</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Standard match scores</span>
+</li>
+<li class="flex items-start gap-3 opacity-50">
+<span class="material-symbols-outlined text-outline text-xl">close</span>
+<span class="font-body-md text-body-md text-secondary">Direct messaging</span>
+</li>
+</ul>
+<button class="w-full py-3 rounded-lg border border-sand-border font-label-md text-label-md text-on-surface hover:bg-surface-container transition-colors active:scale-95 duration-200">Current Plan</button>
+</div>
+<!-- Premium Plan -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg border-2 border-primary shadow-md flex flex-col relative transform md:-translate-y-4">
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white font-label-md text-[12px] px-3 py-1 rounded-full whitespace-nowrap">
+                    Most Popular
+                </div>
+<div class="mb-stack-md">
+<h3 class="font-title-md text-title-md text-primary mb-stack-xs">Premium Seeker</h3>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-lg text-headline-lg text-on-surface tabular-nums">₹499</span>
+<span class="font-body-md text-body-md text-secondary">/ month</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-secondary mb-stack-lg border-b border-sand-border pb-stack-md">Supercharge your search and connect instantly.</p>
+<ul class="space-y-stack-md flex-grow mb-stack-lg">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Everything in Free</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface font-medium">Unlimited direct messaging</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Advanced AI matchmaking insights</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+<span class="font-body-md text-body-md text-on-surface">Read receipts</span>
+</li>
+</ul>
+<button class="w-full py-3 rounded-lg bg-petrol text-white font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm active:scale-95 duration-200">Upgrade to Premium</button>
+</div>
+</div>
+<!-- Boost Section -->
+<div class="max-w-3xl mx-auto bg-surface-container rounded-xl p-stack-lg md:p-stack-xl">
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-stack-lg mb-stack-lg">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface flex items-center gap-2 mb-stack-xs">
+<span class="material-symbols-outlined text-primary">rocket_launch</span>
+                        Boost Your Listing
+                    </h2>
+<p class="font-body-md text-body-md text-secondary">Get seen by more seekers instantly.</p>
+</div>
+<!-- Chips -->
+<div class="flex flex-wrap gap-stack-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none bg-surface-container-lowest border border-sand-border rounded-xl p-stack-sm px-4 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none transition-all text-center group cursor-pointer active:scale-95 duration-200">
+<div class="font-label-md text-label-md text-on-surface mb-1 tabular-nums group-hover:text-primary">₹99</div>
+<div class="text-[12px] text-secondary">3 Days</div>
+</button>
+<button class="flex-1 md:flex-none bg-surface-container-lowest border-2 border-primary rounded-xl p-stack-sm px-4 focus:outline-none transition-all text-center group cursor-pointer active:scale-95 duration-200 shadow-sm relative">
+<div class="absolute -top-2 -right-2 bg-electric-cyan w-4 h-4 rounded-full border-2 border-surface-container-lowest"></div>
+<div class="font-label-md text-label-md text-primary mb-1 tabular-nums">₹199</div>
+<div class="text-[12px] text-secondary">7 Days</div>
+</button>
+<button class="flex-1 md:flex-none bg-surface-container-lowest border border-sand-border rounded-xl p-stack-sm px-4 hover:border-primary focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none transition-all text-center group cursor-pointer active:scale-95 duration-200">
+<div class="font-label-md text-label-md text-on-surface mb-1 tabular-nums group-hover:text-primary">₹299</div>
+<div class="text-[12px] text-secondary">14 Days</div>
+</button>
+</div>
+</div>
+<div class="flex items-start gap-3 bg-surface-container-lowest/50 p-stack-md rounded-lg border border-sand-border/50">
+<span class="material-symbols-outlined text-secondary text-lg mt-0.5">info</span>
+<p class="font-body-sm text-sm text-secondary italic">Honest note: Boosting raises visibility by showing you higher in search results — it never changes core compatibility match scores.</p>
+</div>
+<div class="mt-stack-lg text-right">
+<button class="bg-petrol text-white font-label-md text-label-md px-6 py-2.5 rounded-lg hover:bg-primary-container transition-colors shadow-sm active:scale-95 duration-200 w-full md:w-auto">
+                    Apply 7-Day Boost (₹199)
+                </button>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 bg-surface border-t border-outline-variant shadow-lg rounded-t-xl transition-transform duration-300">
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-all duration-150 p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1">search</span>
+<span class="font-label-md text-[10px]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-all duration-150 p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label-md text-[10px]">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-all duration-150 p-2 rounded-lg w-16 relative" href="#">
+<div class="absolute top-1 right-3 w-2 h-2 bg-electric-cyan rounded-full"></div>
+<span class="material-symbols-outlined mb-1">auto_awesome</span>
+<span class="font-label-md text-[10px]">Ask AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-all duration-150 p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1">chat_bubble</span>
+<span class="font-label-md text-[10px]">Messages</span>
+</a>
+<!-- Active Profile Tab (since it relates to account/plans) -->
+<a class="flex flex-col items-center justify-center text-primary font-bold active:scale-90 transition-all duration-150 p-2 rounded-lg w-16" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

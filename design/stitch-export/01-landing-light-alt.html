@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Premium Living</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary": "#ffffff",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "primary": "#005a71",
+                        "on-surface": "#1b1c1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-highest": "#e4e2df",
+                        "petrol": "#0E7490",
+                        "primary-fixed": "#b9eaff",
+                        "error-container": "#ffdad6",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "inverse-primary": "#81d1f0",
+                        "on-background": "#1b1c1a",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-error-container": "#93000a",
+                        "surface-tint": "#006781",
+                        "surface-container-high": "#eae8e5",
+                        "outline": "#6f787d",
+                        "inverse-surface": "#30312f",
+                        "tertiary": "#54534e",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#6c6b66",
+                        "deep-void": "#0B1114",
+                        "surface-dim": "#dbdad7",
+                        "on-primary-container": "#d3f1ff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "surface-container-low": "#f5f3f0",
+                        "electric-cyan": "#22D3EE",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed": "#e5e2dc",
+                        "error": "#ba1a1a",
+                        "secondary": "#5e5e5d",
+                        "onyx": "#1D262B",
+                        "surface-variant": "#e4e2df",
+                        "on-primary-fixed": "#001f29",
+                        "on-secondary-container": "#636362",
+                        "primary-container": "#0e7490",
+                        "outline-variant": "#bec8cd",
+                        "surface-bright": "#fbf9f6",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "20px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-desktop": "80px",
+                        "stack-xs": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface w-[390px] mx-auto min-h-screen relative pb-[100px] overflow-x-hidden shadow-2xl md:w-full md:shadow-none">
+<!-- Mobile Top App Bar -->
+<header class="fixed top-0 w-[390px] md:w-full z-50 bg-surface/90 backdrop-blur-md flex justify-between items-center h-16 px-margin-mobile border-b border-sand-border shadow-sm">
+<div class="font-title-md text-title-md font-bold text-petrol">Homley</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-lowest border border-sand-border shadow-[0_4px_4px_rgba(0,0,0,0.04)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-on-surface-variant">menu</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="pt-24 px-margin-mobile flex flex-col gap-stack-xl">
+<!-- Hero Section -->
+<section class="flex flex-col gap-stack-lg mt-stack-md">
+<div class="flex flex-col gap-stack-sm text-center">
+<span class="inline-block px-3 py-1 rounded-full bg-surface-container-high text-petrol font-label-md text-label-md self-center mb-2">Premium Living Spaces</span>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface">Find your perfect home, instantly.</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">AI-powered search to match you with spaces that fit your lifestyle and budget.</p>
+</div>
+<!-- AI Search Box (Soft-Pop) -->
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_12px_24px_rgba(0,0,0,0.08)] border border-sand-border flex flex-col gap-stack-md relative z-10">
+<div class="flex items-center gap-3 border-b border-surface-variant pb-3">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-on-surface placeholder-outline outline-none" placeholder="Describe your ideal home..." type="text"/>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="bg-surface-container px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors text-sm flex items-center gap-1 border border-transparent hover:border-sand-border">
+<span class="material-symbols-outlined text-[16px]">location_on</span> London
+                    </button>
+<button class="bg-surface-container px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors text-sm flex items-center gap-1 border border-transparent hover:border-sand-border">
+<span class="material-symbols-outlined text-[16px]">payments</span> £1k - £2k
+                    </button>
+<button class="bg-surface-container px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:bg-surface-container-high transition-colors text-sm flex items-center gap-1 border border-transparent hover:border-sand-border">
+<span class="material-symbols-outlined text-[16px]">bed</span> 2 Beds
+                    </button>
+</div>
+<button class="w-full bg-petrol text-white rounded-lg py-3 font-title-md text-title-md hover:bg-primary-container transition-colors shadow-[0_4px_4px_rgba(0,0,0,0.04)] active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">search</span> Search Homes
+                </button>
+</div>
+</section>
+<!-- Image Feature (Card) -->
+<section class="rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.06)] bg-surface-container-lowest border border-sand-border relative group">
+<div class="bg-cover bg-center w-full h-48 transition-transform duration-700 group-hover:scale-105" data-alt="A modern, brightly lit luxury apartment interior with floor-to-ceiling windows overlooking a vibrant city skyline during golden hour. The space features minimalist coastal decor, white oak floors, and a plush cream sofa. The lighting is warm and natural, creating an inviting, high-end atmosphere suited for a premium real estate app. The color palette focuses on whites, soft sands, and subtle teal accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApebaIXedmdPyyWibPhQXBCoT_ITyKU0v4ExVy1NueAadJqUEMK16Nqv4bMl3PeU8gH8JDBcxfKXj1d6yEIF3zn3A2tWaqtaZw_sxYiWhG64cQdWU_ZD98EOs7a69ToKNXrrThH3fVhFIeIVmrEhLPULXPkkbiIwZixkwYA1DAaM0YtXGKs0qdaCc0y62t6LtzeldkyjzL_SIrYeWsrc2UIXYA106lTgH6Pw6Tzb081OCXNU7xT9a-SQ')"></div>
+<div class="p-4 absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent pt-12">
+<h3 class="font-title-md text-title-md text-white">Curated Spaces</h3>
+<p class="font-body-md text-body-md text-white/90 text-sm">Hand-picked premium flats.</p>
+</div>
+<div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-petrol text-sm" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-on-surface text-xs font-bold">4.9</span>
+</div>
+</section>
+<!-- How It Works (Bento-ish) -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">How it works</h2>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-sand-border shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-2">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center mb-1 text-petrol">
+<span class="material-symbols-outlined">tune</span>
+</div>
+<h4 class="font-title-md text-title-md text-sm">1. Preferences</h4>
+<p class="font-body-md text-body-md text-xs text-on-surface-variant leading-tight">Tell our AI what matters most.</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 border border-sand-border shadow-[0_2px_8px_rgba(0,0,0,0.02)] flex flex-col gap-2">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center mb-1 text-petrol">
+<span class="material-symbols-outlined">auto_awesome_mosaic</span>
+</div>
+<h4 class="font-title-md text-title-md text-sm">2. Matches</h4>
+<p class="font-body-md text-body-md text-xs text-on-surface-variant leading-tight">Review tailored property lists.</p>
+</div>
+<div class="col-span-2 bg-petrol rounded-xl p-4 shadow-[0_8px_16px_rgba(14,116,144,0.15)] flex items-center justify-between group cursor-pointer active:scale-[0.98] transition-transform">
+<div class="flex flex-col gap-1 text-white">
+<h4 class="font-title-md text-title-md text-sm">3. Book Viewing</h4>
+<p class="font-body-md text-body-md text-xs text-white/80 leading-tight">Schedule instantly in-app.</p>
+</div>
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
+<span class="material-symbols-outlined text-white">arrow_forward</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="flex flex-col items-center gap-4 py-6 border-t border-b border-sand-border mt-4 mb-8">
+<p class="font-label-md text-label-md text-on-surface-variant text-center uppercase tracking-wider text-xs">Trusted by 10,000+ Renters</p>
+<div class="flex gap-6 justify-center opacity-60 grayscale flex-wrap">
+<!-- Logos (simulated with text for constraints) -->
+<span class="font-title-md text-title-md font-bold text-on-surface">Forbes</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">TechCrunch</span>
+<span class="font-title-md text-title-md font-bold text-on-surface">Wired</span>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Shared Component implementation) -->
+<nav class="fixed bottom-0 w-[390px] md:w-full z-50 rounded-t-xl bg-surface shadow-sm border-t border-sand-border flex justify-around items-end pb-safe-bottom h-20 px-2">
+<!-- Tab 1: Home (Active) -->
+<button class="flex flex-col items-center justify-center text-primary pb-3 w-16 group active:scale-95 duration-150 relative">
+<div class="absolute inset-0 bg-surface-container-lowest opacity-0 group-hover:opacity-100 rounded-lg -z-10 transition-opacity m-1"></div>
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md text-[10px] leading-none">Home</span>
+</button>
+<!-- Tab 2: Saved -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant pb-3 w-16 group hover:text-petrol transition-colors active:scale-95 duration-150 relative">
+<div class="absolute inset-0 bg-surface-container-low opacity-0 group-hover:opacity-100 rounded-lg -z-10 transition-opacity m-1"></div>
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label-md text-label-md text-[10px] leading-none">Saved</span>
+</button>
+<!-- Tab 3: Search (Raised AI Button) -->
+<div class="relative -top-6">
+<button class="w-14 h-14 bg-petrol rounded-full flex flex-col items-center justify-center text-white shadow-[0_8px_16px_rgba(14,116,144,0.3)] hover:bg-primary-container transition-colors active:scale-90 duration-150 border-4 border-surface border-b-0">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+</button>
+<span class="font-label-md text-label-md text-[10px] text-on-secondary-fixed-variant text-center block mt-1 absolute w-full -bottom-4">Search</span>
+</div>
+<!-- Tab 4: Inbox -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant pb-3 w-16 group hover:text-petrol transition-colors active:scale-95 duration-150 relative">
+<div class="absolute inset-0 bg-surface-container-low opacity-0 group-hover:opacity-100 rounded-lg -z-10 transition-opacity m-1"></div>
+<div class="relative">
+<span class="material-symbols-outlined mb-1">chat</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full"></span>
+</div>
+<span class="font-label-md text-label-md text-[10px] leading-none">Inbox</span>
+</button>
+<!-- Tab 5: Profile -->
+<button class="flex flex-col items-center justify-center text-on-secondary-fixed-variant pb-3 w-16 group hover:text-petrol transition-colors active:scale-95 duration-150 relative">
+<div class="absolute inset-0 bg-surface-container-low opacity-0 group-hover:opacity-100 rounded-lg -z-10 transition-opacity m-1"></div>
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-md text-label-md text-[10px] leading-none">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Rental Agreement Wizard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter", "sans-serif"],
+                        "title-md": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "headline-lg": ["Inter", "sans-serif"],
+                        "display-lg-mobile": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-deep-void text-surface-container-lowest antialiased min-h-screen font-body-md">
+<!-- Top Navigation (Contextually Suppressed as it's a linear wizard, but keeping a simplified header for 'close/back' context) -->
+<header class="fixed top-0 w-full z-50 bg-deep-void/80 backdrop-blur-md border-b border-onyx h-20 flex items-center px-margin-desktop shadow-sm">
+<div class="max-w-container-max mx-auto w-full flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button aria-label="Back to listing" class="text-electric-cyan hover:text-white transition-colors p-2 rounded-full hover:bg-onyx flex items-center justify-center group">
+<span class="material-symbols-outlined text-[24px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+</button>
+<div class="font-headline-lg text-headline-lg font-black text-electric-cyan tracking-tight">Homley</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md text-outline-variant">Draft saved at 10:42 AM</span>
+<button class="font-label-md text-label-md text-electric-cyan hover:text-white transition-colors border border-onyx px-4 py-2 rounded-full hover:border-outline-variant">Save &amp; Exit</button>
+</div>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="pt-32 pb-margin-desktop max-w-container-max mx-auto px-margin-desktop grid grid-cols-12 gap-gutter">
+<!-- Left Sidebar: Progress / Steps -->
+<aside class="col-span-3 sticky top-32 h-fit hidden md:block">
+<nav aria-label="Wizard Progress" class="space-y-stack-sm">
+<!-- Step 1: Completed -->
+<div class="flex items-start gap-3 p-3 rounded-xl hover:bg-onyx/50 transition-colors cursor-pointer group">
+<div class="mt-1 bg-petrol/20 text-electric-cyan rounded-full w-6 h-6 flex items-center justify-center ring-1 ring-petrol/50 group-hover:ring-electric-cyan transition-all">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-surface-container-lowest">Tenant Details</div>
+<div class="font-label-md text-label-md text-outline-variant mt-1">Verified via Homley ID</div>
+</div>
+</div>
+<div class="ml-6 w-[1px] h-4 bg-onyx"></div>
+<!-- Step 2: Active -->
+<div class="flex items-start gap-3 p-3 rounded-xl bg-onyx border border-outline-variant/30 shadow-[0_4px_24px_rgba(0,0,0,0.2)]">
+<div class="mt-1 bg-electric-cyan text-deep-void rounded-full w-6 h-6 flex items-center justify-center font-bold text-sm">
+                        2
+                    </div>
+<div>
+<div class="font-title-md text-title-md text-electric-cyan">Terms &amp; Clauses</div>
+<div class="font-label-md text-label-md text-surface-container-lowest mt-1">Review financial commitments</div>
+</div>
+</div>
+<div class="ml-6 w-[1px] h-4 bg-onyx"></div>
+<!-- Step 3: Pending -->
+<div class="flex items-start gap-3 p-3 rounded-xl opacity-50 cursor-not-allowed">
+<div class="mt-1 border border-outline-variant text-outline-variant rounded-full w-6 h-6 flex items-center justify-center font-bold text-sm">
+                        3
+                    </div>
+<div>
+<div class="font-title-md text-title-md text-outline-variant">Signatures</div>
+<div class="font-label-md text-label-md text-outline-variant mt-1">Digital signing via Aadhaar</div>
+</div>
+</div>
+</nav>
+<!-- Support Card -->
+<div class="mt-stack-xl p-4 rounded-xl border border-onyx bg-deep-void relative overflow-hidden group">
+<div class="absolute inset-0 bg-gradient-to-br from-petrol/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="flex items-center gap-3 relative z-10">
+<div class="p-2 bg-onyx rounded-full text-electric-cyan">
+<span class="material-symbols-outlined">support_agent</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-surface-container-lowest">Need help?</div>
+<a class="font-label-md text-label-md text-electric-cyan hover:underline" href="#">Chat with Homley Expert</a>
+</div>
+</div>
+</div>
+</aside>
+<!-- Right Content: The "Document" Surface -->
+<section class="col-span-12 md:col-span-9 bg-[#1D282F] rounded-2xl border border-onyx shadow-2xl p-margin-mobile md:p-stack-xl flex flex-col gap-stack-xl">
+<!-- Header -->
+<div>
+<h1 class="font-display-lg text-display-lg text-surface-container-lowest">Review Lease Terms</h1>
+<p class="font-body-lg text-body-lg text-outline-variant mt-2 max-w-2xl">Please review the financial terms and specific clauses set by the landlord for Apt 4B, Seaface Towers, Mumbai.</p>
+</div>
+<!-- Financial Summary (Tabular Numbers) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 border border-onyx rounded-xl p-6 bg-deep-void/40 backdrop-blur-sm">
+<div>
+<div class="font-label-md text-label-md text-outline-variant mb-1 flex items-center gap-1">Monthly Rent <span class="material-symbols-outlined text-[14px] text-outline cursor-help" title="Due on 1st of every month">info</span></div>
+<div class="font-headline-lg text-headline-lg text-surface-container-lowest font-mono tracking-tight tabular-nums">₹85,000</div>
+</div>
+<div class="hidden md:block w-px h-full bg-onyx mx-auto"></div>
+<div>
+<div class="font-label-md text-label-md text-outline-variant mb-1 flex items-center gap-1">Security Deposit <span class="material-symbols-outlined text-[14px] text-outline cursor-help" title="Refundable at end of tenure">info</span></div>
+<div class="font-headline-lg text-headline-lg text-surface-container-lowest font-mono tracking-tight tabular-nums">₹2,50,000</div>
+</div>
+<div class="hidden md:block w-px h-full bg-onyx mx-auto"></div>
+<div>
+<div class="font-label-md text-label-md text-outline-variant mb-1">Lock-in Period</div>
+<div class="font-headline-lg text-headline-lg text-surface-container-lowest tracking-tight">11 Months</div>
+</div>
+</div>
+<!-- High-Fidelity Clause Cards -->
+<div class="flex flex-col gap-4">
+<h2 class="font-title-md text-title-md text-surface-container-lowest border-b border-onyx pb-2">Key Clauses</h2>
+<!-- Clause 1 -->
+<div class="p-5 rounded-xl border border-onyx bg-deep-void/20 hover:border-petrol/50 transition-colors group flex gap-4">
+<div class="mt-1 text-electric-cyan">
+<span class="material-symbols-outlined text-[24px]">home_repair_service</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-surface-container-lowest mb-2">Maintenance &amp; Repairs</h3>
+<p class="font-body-md text-body-md text-outline-variant leading-relaxed">Minor repairs up to ₹2,000 shall be borne by the Tenant. Major structural repairs and appliance breakdowns (not due to negligence) are the Landlord's responsibility. AC servicing must be done bi-annually by the Tenant.</p>
+</div>
+<div class="flex items-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-onyx peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-petrol"></div>
+</label>
+</div>
+</div>
+<!-- Clause 2 -->
+<div class="p-5 rounded-xl border border-onyx bg-deep-void/20 hover:border-petrol/50 transition-colors group flex gap-4">
+<div class="mt-1 text-electric-cyan">
+<span class="material-symbols-outlined text-[24px]">pets</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-surface-container-lowest mb-2">Pet Policy</h3>
+<p class="font-body-md text-body-md text-outline-variant leading-relaxed">Only small domestic pets (dogs under 15kg or cats) are permitted. Tenant is strictly liable for any damage to fixtures or flooring caused by pets. Additional pet deposit of ₹10,000 applies.</p>
+</div>
+<div class="flex items-center">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-onyx peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-petrol"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Action Area -->
+<div class="mt-stack-lg pt-stack-lg border-t border-onyx flex flex-col sm:flex-row items-center justify-between gap-4">
+<div class="font-label-md text-label-md text-outline-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                    By continuing, you agree to these terms.
+                </div>
+<div class="flex gap-3 w-full sm:w-auto">
+<button class="flex-1 sm:flex-none px-6 py-3 rounded-lg border border-onyx text-surface-container-lowest font-label-md text-label-md hover:bg-onyx transition-colors">Back</button>
+<button class="flex-1 sm:flex-none px-6 py-3 rounded-lg bg-petrol text-white font-label-md text-label-md hover:bg-electric-cyan hover:text-deep-void transition-colors shadow-[0_4px_12px_rgba(14,116,144,0.3)] flex items-center justify-center gap-2">
+                        Proceed to Signatures
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+</body></html>

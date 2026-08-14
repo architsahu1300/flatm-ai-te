@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Find Flatmates - Homley</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                            "on-tertiary-fixed": "#1c1c18",
+                            "primary-fixed-dim": "#81d1f0",
+                            "on-surface-variant": "#3f484c",
+                            "secondary": "#5e5e5d",
+                            "tertiary-fixed": "#e5e2dc",
+                            "primary-container": "#0e7490",
+                            "surface-container-low": "#f5f3f0",
+                            "surface-container-high": "#eae8e5",
+                            "surface-variant": "#e4e2df",
+                            "on-secondary": "#ffffff",
+                            "on-tertiary-fixed-variant": "#484742",
+                            "primary-fixed": "#b9eaff",
+                            "background": "#fbf9f6",
+                            "tertiary-container": "#6c6b66",
+                            "onyx": "#1D262B",
+                            "error": "#ba1a1a",
+                            "surface-tint": "#006781",
+                            "sand-border": "#DFDCD6",
+                            "inverse-on-surface": "#f2f0ed",
+                            "inverse-surface": "#30312f",
+                            "on-background": "#1b1c1a",
+                            "secondary-fixed-dim": "#c7c6c5",
+                            "on-error-container": "#93000a",
+                            "petrol": "#0E7490",
+                            "on-secondary-container": "#636362",
+                            "on-primary": "#ffffff",
+                            "surface-container-lowest": "#151E24", /* Overriding for dark mode card surface as requested */
+                            "on-primary-fixed-variant": "#004d62",
+                            "on-primary-container": "#d3f1ff",
+                            "sand-light": "#F7F5F2",
+                            "on-tertiary-container": "#f0ece6",
+                            "on-secondary-fixed": "#1b1c1b",
+                            "outline": "#6f787d",
+                            "secondary-container": "#e1dfde",
+                            "on-primary-fixed": "#001f29",
+                            "on-error": "#ffffff",
+                            "on-secondary-fixed-variant": "#464746",
+                            "on-tertiary": "#ffffff",
+                            "surface-dim": "#dbdad7",
+                            "on-surface": "#1b1c1a",
+                            "electric-cyan": "#22D3EE",
+                            "tertiary-fixed-dim": "#c9c6c0",
+                            "secondary-fixed": "#e4e2e1",
+                            "inverse-primary": "#81d1f0",
+                            "surface-bright": "#fbf9f6",
+                            "outline-variant": "#bec8cd",
+                            "tertiary": "#54534e",
+                            "surface-container-highest": "#e4e2df",
+                            "deep-void": "#0B1114",
+                            "error-container": "#ffdad6",
+                            "surface": "#0B1114", /* Set surface to deep-void as requested background */
+                            "primary": "#005a71",
+                            "surface-container": "#efeeeb"
+                    },
+                    "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "full": "9999px"
+                    },
+                    "spacing": {
+                            "margin-desktop": "80px",
+                            "container-max": "1280px",
+                            "stack-xl": "48px",
+                            "stack-sm": "8px",
+                            "gutter": "24px",
+                            "stack-lg": "24px",
+                            "stack-md": "16px",
+                            "margin-mobile": "20px",
+                            "stack-xs": "4px"
+                    },
+                    "fontFamily": {
+                            "body-lg": ["Inter"],
+                            "display-lg-mobile": ["Inter"],
+                            "label-md": ["Inter"],
+                            "display-lg": ["Inter"],
+                            "title-md": ["Inter"],
+                            "headline-lg": ["Inter"],
+                            "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                            "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                            "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                            "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                            "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                            "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #0B1114; /* Forcing dark background per prompt */
+            color: #ffffff; /* Default text color for dark mode */
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* Compatibility Ring Animation */
+        .comp-ring {
+            stroke-dasharray: 100;
+            stroke-dashoffset: 100;
+            animation: fillRing 1.5s ease-out forwards;
+        }
+        @keyframes fillRing {
+            to { stroke-dashoffset: var(--target-offset); }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-body-md bg-surface text-on-surface">
+<!-- TopNavBar (Hidden on Mobile, Flex on MD) -->
+<nav class="hidden md:flex justify-between items-center max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-16 bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 fixed top-0 w-full z-50 border-b border-sand-border dark:border-outline-variant shadow-sm transition-all duration-300" id="topNav">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-headline-lg-mobile tracking-tight text-petrol dark:text-primary-fixed-dim" href="#">Homley</a>
+<div class="flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-petrol transition-colors font-body-md text-body-md hover:opacity-90 transition-opacity" href="#">Browse homes</a>
+<a class="text-petrol font-semibold border-b-2 border-petrol pb-1 font-body-md text-body-md hover:opacity-90 transition-opacity scale-95 transition-transform duration-200" href="#">Find flatmates</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-petrol transition-colors font-body-md text-body-md">Sign in</button>
+<button class="bg-petrol text-on-primary px-4 py-2 rounded-lg font-body-md text-body-md hover:opacity-90 transition-opacity shadow-sm">Get started</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="pt-24 pb-32 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<!-- Header & Filters -->
+<header class="mb-stack-xl">
+<h1 class="font-headline-lg text-headline-lg mb-stack-md text-on-primary">Discover your perfect flatmate</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed-dim mb-stack-lg max-w-2xl">Connect with people who share your lifestyle, budget, and living preferences.</p>
+<div class="flex flex-wrap gap-stack-sm items-center bg-surface-container-lowest p-stack-sm rounded-xl border border-outline-variant/30">
+<button class="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-variant/20 hover:bg-surface-variant/40 transition-colors text-primary-fixed-dim font-label-md text-label-md border border-outline-variant/50">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+                    Filters
+                </button>
+<div class="h-6 w-[1px] bg-outline-variant/30 mx-2"></div>
+<button class="px-4 py-2 rounded-lg bg-surface-variant/10 hover:bg-surface-variant/30 transition-colors text-on-primary font-label-md text-label-md border border-outline-variant/30">
+                    Budget: $1k - $2k
+                </button>
+<button class="px-4 py-2 rounded-lg bg-surface-variant/10 hover:bg-surface-variant/30 transition-colors text-on-primary font-label-md text-label-md border border-outline-variant/30">
+                    Move-in: Sep
+                </button>
+<button class="px-4 py-2 rounded-lg bg-surface-variant/10 hover:bg-surface-variant/30 transition-colors text-on-primary font-label-md text-label-md border border-outline-variant/30 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">pets</span>
+                    Pet friendly
+                </button>
+<button class="px-4 py-2 rounded-lg bg-surface-variant/10 hover:bg-surface-variant/30 transition-colors text-on-primary font-label-md text-label-md border border-outline-variant/30">
+                    Cleanliness: Very tidy
+                </button>
+</div>
+</header>
+<!-- Bento Grid of Candidates -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-[24px] border border-outline-variant/20 overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-colors duration-300 relative group">
+<!-- Comp Ring -->
+<div class="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm border border-outline-variant/20 flex items-center justify-center">
+<svg class="w-10 h-10 -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-outline-variant/30" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-electric-cyan comp-ring" cx="18" cy="18" fill="none" r="16" stroke-width="3" style="--target-offset: 8; stroke-dasharray: 100;"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-electric-cyan">92%</span>
+</div>
+<div class="h-48 relative">
+<div class="bg-cover bg-center w-full h-full" data-alt="A portrait of a young professional in their 20s, styled in modern casual attire, smiling warmly against an urban coffee shop background. The lighting is cinematic with soft, high-key illumination highlighting their features, establishing a friendly, approachable, and premium lifestyle aesthetic. Colors emphasize deep blacks, crisp whites, and a touch of warm organic tones." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuChb5Kf-dFEpk8f8EM2uNBVsR3V4z19mm1AkDEEvYqvfW2N5W4mhmd3JtqdC6LEMkkFMPI8dHC4ep_OMoMsPtaJBRoFHexEJLIxWFZl6wbYJLHcBiLxuqlAPAdM0DW9aT8-etF4qwV9P61T2QIWEGlnD7NmM1J4YqgRBvs2RlNyP0xThKWob2FN_5xuWTb7YZyJq9Sii6ByCguB-Ph8_wU8HtX0pNaQ6HLFmLVK_MdPHhLjr8vz12IFtg')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-4 left-6 right-6">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="font-title-md text-title-md text-on-primary">Alex Chen, 26</h2>
+<span class="material-symbols-outlined text-electric-cyan text-[18px]" style="font-variation-settings: 'FILL' 1;" title="ID Verified">verified</span>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed-dim font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Downtown &amp; Surrounds
+                        </div>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex flex-wrap gap-2 mb-stack-md">
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">$1,200 - $1,500/mo</span>
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">Sep 1st</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-stack-lg">
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Early bird</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Tidy</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Has a dog</span>
+</div>
+<!-- Shared Traits Strip -->
+<div class="mt-auto mb-stack-md bg-surface-variant/10 rounded-lg p-3 flex items-start gap-2 border border-outline-variant/10">
+<span class="material-symbols-outlined text-electric-cyan text-[16px] mt-0.5" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<p class="font-body-md text-[13px] text-primary-fixed-dim italic leading-tight">✦ You both prefer quiet homes · Both non-smokers</p>
+</div>
+<button class="w-full bg-petrol hover:bg-petrol/90 text-on-primary font-label-md text-label-md py-3 rounded-xl transition-colors shadow-sm flex justify-center items-center gap-2 group-hover:bg-electric-cyan group-hover:text-onyx duration-300">
+                        Message
+                        <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest rounded-[24px] border border-outline-variant/20 overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-colors duration-300 relative group">
+<div class="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm border border-outline-variant/20 flex items-center justify-center">
+<svg class="w-10 h-10 -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-outline-variant/30" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-electric-cyan comp-ring" cx="18" cy="18" fill="none" r="16" stroke-width="3" style="--target-offset: 15; stroke-dasharray: 100;"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-electric-cyan">85%</span>
+</div>
+<div class="h-48 relative">
+<div class="bg-cover bg-center w-full h-full" data-alt="A portrait of a creative professional in their late 20s, with a relaxed, artsy style, photographed outdoors in a vibrant park setting during golden hour. The lighting is warm and dynamic, evoking a friendly, reliable, and premium coastal lifestyle aesthetic. Colors emphasize deep blacks, pristine whites, and warm earthy greens." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSvxjyhCxxn1lwZ6aIJq9hFzcZYdhDEIGoFaASchX0_V9Fg16Lgj8V5_e7ZlTSrXK69aR0-DBoypPWOAYtjr1gBDjYIIomanjRJvdB0mi4-OT7lJhambEis5KuKcbLHSgR586YOZMmei3OZYP_godIj365Mv5KUhEEGp9qw4Tr2EVAGKj3yp96yb4CiEtsw8YnrrvFcrt_BmS5t1CcXv_RIi9X3PSo-MS1hMxVj3_Xhui7FWLt0Lp6QA')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-4 left-6 right-6">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="font-title-md text-title-md text-on-primary">Jordan Smith, 28</h2>
+<span class="material-symbols-outlined text-electric-cyan text-[18px]" style="font-variation-settings: 'FILL' 1;" title="ID Verified">verified</span>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed-dim font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            Westside
+                        </div>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex flex-wrap gap-2 mb-stack-md">
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">$1,500 - $1,800/mo</span>
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">Oct 1st</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-stack-lg">
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Night owl</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Social</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Vegetarian</span>
+</div>
+<div class="mt-auto mb-stack-md bg-surface-variant/10 rounded-lg p-3 flex items-start gap-2 border border-outline-variant/10">
+<span class="material-symbols-outlined text-electric-cyan text-[16px] mt-0.5" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<p class="font-body-md text-[13px] text-primary-fixed-dim italic leading-tight">✦ You both work remotely · Both love plants</p>
+</div>
+<button class="w-full bg-petrol hover:bg-petrol/90 text-on-primary font-label-md text-label-md py-3 rounded-xl transition-colors shadow-sm flex justify-center items-center gap-2 group-hover:bg-electric-cyan group-hover:text-onyx duration-300">
+                        Message
+                        <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest rounded-[24px] border border-outline-variant/20 overflow-hidden flex flex-col hover:border-electric-cyan/50 transition-colors duration-300 relative group">
+<div class="absolute top-4 right-4 z-10 w-12 h-12 rounded-full bg-surface-container-lowest/80 backdrop-blur-sm border border-outline-variant/20 flex items-center justify-center">
+<svg class="w-10 h-10 -rotate-90" viewbox="0 0 36 36">
+<circle class="stroke-outline-variant/30" cx="18" cy="18" fill="none" r="16" stroke-width="3"></circle>
+<circle class="stroke-electric-cyan comp-ring" cx="18" cy="18" fill="none" r="16" stroke-width="3" style="--target-offset: 25; stroke-dasharray: 100;"></circle>
+</svg>
+<span class="absolute text-[10px] font-bold text-electric-cyan">75%</span>
+</div>
+<div class="h-48 relative">
+<div class="bg-cover bg-center w-full h-full" data-alt="A portrait of a student or young professional in their early 20s, styled in modern minimalist clothing, in a bright, modern interior setting. The lighting is soft and natural, emphasizing a clean, approachable, and premium aesthetic. The palette focuses on deep blacks, crisp whites, and subtle cool blues to match a modern corporate vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC38PmdO1aVHO-wbwa-ubVhqCmcto6LmwqIFFB98-8EbkmGHDmQzr6FLgLPRikezwN9jba3dp8tvMqmbTdl97_-rXX7E8BCD0Q194H72qT-QDndghwWEo4TbX2gmghLZRPBmOgPf01kjBxLYNWN8SwCQ4bNdrDXKV_8DLiMdahGxcVguFtf1r1eUOu_8cB5by4M8V_UfMW-c9KekTprQLcR7ZZ-ryY56cCVVqCsP1AlZBEhtWiJGyJpiQ')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface-container-lowest to-transparent"></div>
+<div class="absolute bottom-4 left-6 right-6">
+<div class="flex items-center gap-2 mb-1">
+<h2 class="font-title-md text-title-md text-on-primary">Sam Taylor, 24</h2>
+</div>
+<div class="flex items-center gap-2 text-primary-fixed-dim font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">location_on</span>
+                            North End
+                        </div>
+</div>
+</div>
+<div class="p-6 flex-1 flex flex-col">
+<div class="flex flex-wrap gap-2 mb-stack-md">
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">$900 - $1,100/mo</span>
+<span class="px-3 py-1 rounded-full bg-surface-variant/20 text-on-primary font-label-md text-[12px] border border-outline-variant/20">Flexible</span>
+</div>
+<div class="flex flex-wrap gap-2 mb-stack-lg">
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Student</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">Quiet</span>
+<span class="px-3 py-1 rounded-md bg-petrol/20 text-electric-cyan font-label-md text-[12px]">No pets</span>
+</div>
+<div class="mt-auto mb-stack-md bg-surface-variant/10 rounded-lg p-3 flex items-start gap-2 border border-outline-variant/10">
+<span class="material-symbols-outlined text-electric-cyan text-[16px] mt-0.5" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<p class="font-body-md text-[13px] text-primary-fixed-dim italic leading-tight">✦ Both value a tidy kitchen · Both early risers</p>
+</div>
+<button class="w-full bg-petrol hover:bg-petrol/90 text-on-primary font-label-md text-label-md py-3 rounded-xl transition-colors shadow-sm flex justify-center items-center gap-2 group-hover:bg-electric-cyan group-hover:text-onyx duration-300">
+                        Message
+                        <span class="material-symbols-outlined text-[18px]">send</span>
+</button>
+</div>
+</article>
+</div>
+</main>
+<!-- BottomNavBar (Hidden on Desktop, Fixed bottom on Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-safe h-20 bg-surface dark:bg-surface-container z-50 rounded-t-xl border-t border-sand-border dark:border-outline-variant shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-primary-fixed-dim font-bold hover:bg-surface-container-low transition-colors scale-95 transition-transform duration-200 w-full h-full" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">search</span>
+<span class="font-label-md text-[10px] mt-1">Find flatmates</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">chat_bubble</span>
+<span class="font-label-md text-[10px] mt-1">Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline hover:bg-surface-container-low transition-colors w-full h-full" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+<script>
+        // Simple scroll effect for top nav
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('topNav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-md');
+                nav.classList.replace('bg-surface/80', 'bg-surface/95');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.replace('bg-surface/95', 'bg-surface/80');
+            }
+        });
+    </script>
+</body></html>

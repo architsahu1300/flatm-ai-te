@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e4e2df",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-primary-container": "#d3f1ff",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "primary-container": "#0e7490",
+                    "sand-light": "#F7F5F2",
+                    "onyx": "#1D262B",
+                    "on-surface": "#1b1c1a",
+                    "surface-dim": "#dbdad7",
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#636362",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary-container": "#6c6b66",
+                    "inverse-primary": "#81d1f0",
+                    "secondary": "#5e5e5d",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "on-primary-fixed-variant": "#004d62",
+                    "surface-tint": "#006781",
+                    "secondary-fixed": "#e4e2e1",
+                    "surface": "#fbf9f6",
+                    "tertiary": "#54534e",
+                    "on-tertiary": "#ffffff",
+                    "petrol": "#0E7490",
+                    "on-tertiary-container": "#f0ece6",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "surface-container-high": "#eae8e5",
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "outline": "#6f787d",
+                    "on-primary-fixed": "#001f29",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "surface-variant": "#e4e2df",
+                    "electric-cyan": "#22D3EE",
+                    "on-primary": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#005a71",
+                    "outline-variant": "#bec8cd",
+                    "on-error": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "on-background": "#1b1c1a",
+                    "inverse-on-surface": "#f2f0ed",
+                    "primary-fixed": "#b9eaff",
+                    "deep-void": "#0B1114",
+                    "surface-bright": "#fbf9f6",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-low": "#f5f3f0",
+                    "inverse-surface": "#30312f",
+                    "on-secondary-fixed": "#1b1c1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-xs": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "80px",
+                    "stack-md": "16px",
+                    "stack-xl": "48px",
+                    "margin-mobile": "20px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Inter"
+                    ],
+                    "label-md": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "display-lg-mobile": [
+                            "Inter"
+                    ],
+                    "title-md": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "56px",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-md": [
+                            "14px",
+                            {
+                                    "lineHeight": "20px",
+                                    "fontWeight": "500"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "40px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "24px",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "display-lg-mobile": [
+                            "28px",
+                            {
+                                    "lineHeight": "36px",
+                                    "letterSpacing": "-0.01em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "title-md": [
+                            "20px",
+                            {
+                                    "lineHeight": "28px",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Force dark mode overrides since we set class="dark" on html but need the specific Petrol Dark palette */
+        .dark body {
+            background-color: #0B1114; /* deep-void */
+            color: #ffffff;
+        }
+        .dark .bg-surface-container-lowest {
+            background-color: #1D262B; /* onyx */
+        }
+        .dark .bg-surface-container {
+            background-color: #1D262B;
+        }
+        .dark .text-on-surface {
+            color: #ffffff;
+        }
+        .dark .text-secondary {
+            color: #c7c6c5;
+        }
+        .dark .border-sand-border {
+            border-color: #3f484c; /* on-surface-variant */
+        }
+        .shadow-whisper {
+            box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
+        }
+        .shadow-soft-pop {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .dark .shadow-whisper, .dark .shadow-soft-pop {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body class="font-body-md text-body-md antialiased bg-deep-void text-on-primary">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-64 flex-shrink-0 bg-onyx border-r border-on-surface-variant flex flex-col h-full z-20">
+<div class="p-gutter flex items-center h-20 border-b border-on-surface-variant">
+<span class="font-display-lg text-display-lg text-primary-fixed-dim tracking-tight text-[24px]">Homley Admin</span>
+</div>
+<nav class="flex-1 overflow-y-auto py-stack-md px-stack-sm flex flex-col gap-stack-xs">
+<!-- Active Nav Item -->
+<a class="flex items-center gap-stack-sm px-4 py-3 rounded-lg bg-primary-container text-on-primary-container group transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md font-bold">Overview</span>
+</a>
+<!-- Inactive Nav Items -->
+<a class="flex items-center gap-stack-sm px-4 py-3 rounded-lg text-secondary-fixed-dim hover:bg-surface-variant hover:text-on-surface-variant transition-colors group" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-md text-label-md">Users</span>
+</a>
+<a class="flex items-center gap-stack-sm px-4 py-3 rounded-lg text-secondary-fixed-dim hover:bg-surface-variant hover:text-on-surface-variant transition-colors group" href="#">
+<span class="material-symbols-outlined">home_work</span>
+<span class="font-label-md text-label-md">Listings</span>
+</a>
+<a class="flex items-center gap-stack-sm px-4 py-3 rounded-lg text-secondary-fixed-dim hover:bg-surface-variant hover:text-on-surface-variant transition-colors group" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-md text-label-md">Reports</span>
+</a>
+<a class="flex items-center gap-stack-sm px-4 py-3 rounded-lg text-secondary-fixed-dim hover:bg-surface-variant hover:text-on-surface-variant transition-colors group" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="p-gutter border-t border-on-surface-variant">
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A small, circular avatar portrait of a professional individual against a neutral dark grey background. The lighting is soft and corporate. The style is modern, sleek, and high-quality, fitting a premium dashboard interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9LasdTZAYomEUDhVKAMTfDBECPtgug4LCppCzPvb6oRGlUS1hoHubHPEaB5jnzB0v4GvxIfpmYExEkXdpQclQlqS75eRb5RQIztAJ_3rC5GN4Cksc-hqt0N3xLB30p7hx-oheyC0i9iKfMKIcubW1rURLlB85-pLs2QLYPAzwvtmo1tJSd7bDugP4nl3aRoLNsaWowQuIeFHvNVqm2OFT9inIpKdOM9Onp1g3pZIcEQfUi-yG1Rjg5Q"/>
+</div>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-tertiary">Admin User</span>
+<span class="text-xs text-secondary-fixed-dim">admin@homley.com</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col h-full overflow-hidden bg-deep-void">
+<!-- Top App Bar equivalent for dashboard -->
+<header class="h-20 px-margin-desktop flex items-center justify-between border-b border-on-surface-variant bg-onyx/80 backdrop-blur-sm z-10 flex-shrink-0">
+<h1 class="font-headline-lg text-headline-lg text-on-tertiary">Dashboard Overview</h1>
+<div class="flex items-center gap-stack-md">
+<!-- Global Search -->
+<div class="relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary-fixed-dim text-[20px]">search</span>
+<input class="w-full pl-10 pr-12 py-2 bg-deep-void border border-on-surface-variant rounded-lg text-on-tertiary placeholder-secondary-fixed-dim focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body-md text-body-md transition-all" placeholder="Search..." type="text"/>
+<div class="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-onyx border border-on-surface-variant text-[10px] text-secondary-fixed-dim font-mono">⌘K</div>
+</div>
+<button class="w-10 h-10 rounded-lg flex items-center justify-center text-secondary-fixed-dim hover:bg-surface-variant hover:text-on-surface-variant transition-colors relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-margin-desktop space-y-stack-xl">
+<!-- KPI Tiles Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-gutter">
+<!-- Tile 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg shadow-whisper border border-on-surface-variant relative overflow-hidden group hover:shadow-soft-pop transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-md relative z-10">
+<span class="font-label-md text-label-md text-secondary-fixed-dim">Total Users</span>
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[20px]">group</span>
+</div>
+</div>
+<div class="flex items-end gap-stack-sm relative z-10">
+<span class="font-display-lg text-display-lg text-on-tertiary">24.5k</span>
+<span class="font-label-md text-label-md text-electric-cyan flex items-center mb-2">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 12%
+                            </span>
+</div>
+</div>
+<!-- Tile 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg shadow-whisper border border-on-surface-variant relative overflow-hidden group hover:shadow-soft-pop transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-md relative z-10">
+<span class="font-label-md text-label-md text-secondary-fixed-dim">Active Listings</span>
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[20px]">home_work</span>
+</div>
+</div>
+<div class="flex items-end gap-stack-sm relative z-10">
+<span class="font-display-lg text-display-lg text-on-tertiary">8,432</span>
+<span class="font-label-md text-label-md text-electric-cyan flex items-center mb-2">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 4.3%
+                            </span>
+</div>
+</div>
+<!-- Tile 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg shadow-whisper border border-on-surface-variant relative overflow-hidden group hover:shadow-soft-pop transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-md relative z-10">
+<span class="font-label-md text-label-md text-secondary-fixed-dim">Conversion Rate</span>
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[20px]">insights</span>
+</div>
+</div>
+<div class="flex items-end gap-stack-sm relative z-10">
+<span class="font-display-lg text-display-lg text-on-tertiary">3.2%</span>
+<span class="font-label-md text-label-md text-error flex items-center mb-2">
+<span class="material-symbols-outlined text-[16px]">arrow_downward</span> 0.8%
+                            </span>
+</div>
+</div>
+<!-- Tile 4 -->
+<div class="bg-surface-container-lowest rounded-xl p-stack-lg shadow-whisper border border-on-surface-variant relative overflow-hidden group hover:shadow-soft-pop transition-shadow duration-300">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110"></div>
+<div class="flex justify-between items-start mb-stack-md relative z-10">
+<span class="font-label-md text-label-md text-secondary-fixed-dim">Revenue</span>
+<div class="w-8 h-8 rounded-lg bg-primary-container/20 flex items-center justify-center text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[20px]">payments</span>
+</div>
+</div>
+<div class="flex items-end gap-stack-sm relative z-10">
+<span class="font-display-lg text-display-lg text-on-tertiary">$142k</span>
+<span class="font-label-md text-label-md text-electric-cyan flex items-center mb-2">
+<span class="material-symbols-outlined text-[16px]">arrow_upward</span> 18%
+                            </span>
+</div>
+</div>
+</div>
+<!-- Main Content Area: Charts & Lists -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<!-- Funnel Chart Card (Takes 2 columns) -->
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl shadow-whisper border border-on-surface-variant flex flex-col">
+<div class="p-stack-lg border-b border-on-surface-variant flex justify-between items-center">
+<h2 class="font-title-md text-title-md text-on-tertiary">User Journey Funnel</h2>
+<button class="text-secondary-fixed-dim hover:text-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</div>
+<div class="p-stack-lg flex-1 flex flex-col justify-center gap-stack-md">
+<!-- Funnel Visualization using HTML/CSS -->
+<div class="w-full flex flex-col items-center gap-2">
+<!-- Stage 1 -->
+<div class="w-full relative h-12 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/20 rounded-md" style="width: 100%; margin: 0 auto;"></div>
+<div class="relative z-10 flex justify-between w-full px-4">
+<span class="font-label-md text-label-md text-on-tertiary">Site Visits</span>
+<span class="font-label-md text-label-md text-primary-fixed-dim">100,000</span>
+</div>
+</div>
+<!-- Stage 2 -->
+<div class="w-full relative h-12 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/30 rounded-md" style="width: 80%; margin: 0 auto;"></div>
+<div class="relative z-10 flex justify-between w-[80%] px-4">
+<span class="font-label-md text-label-md text-on-tertiary">Searches</span>
+<span class="font-label-md text-label-md text-primary-fixed-dim">80,000</span>
+</div>
+</div>
+<!-- Stage 3 -->
+<div class="w-full relative h-12 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/50 rounded-md" style="width: 50%; margin: 0 auto;"></div>
+<div class="relative z-10 flex justify-between w-[50%] px-4">
+<span class="font-label-md text-label-md text-on-tertiary">Sign Ups</span>
+<span class="font-label-md text-label-md text-primary-fixed-dim">50,000</span>
+</div>
+</div>
+<!-- Stage 4 -->
+<div class="w-full relative h-12 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary/70 rounded-md" style="width: 25%; margin: 0 auto;"></div>
+<div class="relative z-10 flex justify-between w-[25%] px-4">
+<span class="font-label-md text-label-md text-on-tertiary">Leads Generated</span>
+<span class="font-label-md text-label-md text-primary-fixed-dim">25,000</span>
+</div>
+</div>
+<!-- Stage 5 -->
+<div class="w-full relative h-12 flex items-center justify-center">
+<div class="absolute inset-0 bg-primary rounded-md" style="width: 10%; margin: 0 auto;"></div>
+<div class="relative z-10 flex justify-center w-[10%] px-2">
+<span class="font-label-md text-label-md text-on-primary">10k</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activity Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-whisper border border-on-surface-variant flex flex-col">
+<div class="p-stack-lg border-b border-on-surface-variant">
+<h2 class="font-title-md text-title-md text-on-tertiary">Recent Activity</h2>
+</div>
+<div class="p-stack-lg flex-1 overflow-y-auto space-y-stack-md">
+<!-- Activity Item 1 -->
+<div class="flex gap-stack-sm items-start">
+<div class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 mt-1 text-primary-fixed-dim">
+<span class="material-symbols-outlined text-[16px]">person_add</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-tertiary">New user registered: <span class="font-bold">Sarah Jenkins</span></p>
+<span class="text-sm text-secondary-fixed-dim">2 mins ago</span>
+</div>
+</div>
+<!-- Activity Item 2 -->
+<div class="flex gap-stack-sm items-start">
+<div class="w-8 h-8 rounded-full bg-electric-cyan/20 flex items-center justify-center flex-shrink-0 mt-1 text-electric-cyan">
+<span class="material-symbols-outlined text-[16px]">home</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-tertiary">New property listed in <span class="font-bold">Sydney, CBD</span></p>
+<span class="text-sm text-secondary-fixed-dim">15 mins ago</span>
+</div>
+</div>
+<!-- Activity Item 3 -->
+<div class="flex gap-stack-sm items-start">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center flex-shrink-0 mt-1 text-secondary-fixed-dim">
+<span class="material-symbols-outlined text-[16px]">support_agent</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-tertiary">Support ticket #4421 closed by <span class="font-bold">Admin User</span></p>
+<span class="text-sm text-secondary-fixed-dim">1 hour ago</span>
+</div>
+</div>
+<!-- Activity Item 4 -->
+<div class="flex gap-stack-sm items-start">
+<div class="w-8 h-8 rounded-full bg-error/20 flex items-center justify-center flex-shrink-0 mt-1 text-error">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+</div>
+<div>
+<p class="font-body-md text-body-md text-on-tertiary">System alert: High API latency detected.</p>
+<span class="text-sm text-secondary-fixed-dim">3 hours ago</span>
+</div>
+</div>
+</div>
+<div class="p-stack-sm border-t border-on-surface-variant flex justify-center">
+<button class="font-label-md text-label-md text-primary-fixed-dim hover:text-white transition-colors py-2">View all activity</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

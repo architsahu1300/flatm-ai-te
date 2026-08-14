@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Search Results</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "background": "#0b1114",
+                        "secondary": "#94a3b8",
+                        "surface-bright": "#151e24",
+                        "tertiary-fixed-dim": "#1e293b",
+                        "secondary-container": "#1e293b",
+                        "surface": "#151e24",
+                        "on-primary-fixed-variant": "#22d3ee",
+                        "surface-container-lowest": "#151e24",
+                        "surface-dim": "#151e24",
+                        "tertiary-container": "#1e293b",
+                        "on-secondary-fixed-variant": "#e5e9ec",
+                        "surface-variant": "#1e293b",
+                        "tertiary-fixed": "#1e293b",
+                        "inverse-primary": "#22d3ee",
+                        "error": "#ef4444",
+                        "outline-variant": "#1e293b",
+                        "surface-container": "#151e24",
+                        "on-tertiary-fixed": "#e5e9ec",
+                        "inverse-on-surface": "#e5e9ec",
+                        "on-primary-fixed": "#0b1114",
+                        "inverse-surface": "#e5e9ec",
+                        "surface-container-low": "#151e24",
+                        "on-primary": "#0b1114",
+                        "on-error": "#0b1114",
+                        "on-tertiary-container": "#e5e9ec",
+                        "surface-container-highest": "#1e293b",
+                        "outline": "#475569",
+                        "surface-tint": "#22d3ee",
+                        "error-container": "#7f1d1d",
+                        "on-tertiary": "#0b1114",
+                        "surface-container-high": "#151e24",
+                        "primary-fixed": "#22d3ee",
+                        "on-primary-container": "#0b1114",
+                        "on-secondary-container": "#e5e9ec",
+                        "primary-fixed-dim": "#06b6d4",
+                        "on-secondary": "#0b1114",
+                        "tertiary": "#e5e9ec",
+                        "on-surface-variant": "#e5e9ec",
+                        "on-tertiary-fixed-variant": "#e5e9ec",
+                        "primary": "#22d3ee",
+                        "on-background": "#e5e9ec",
+                        "on-error-container": "#fca5a5",
+                        "on-surface": "#e5e9ec",
+                        "secondary-fixed": "#1e293b",
+                        "primary-container": "#0891b2",
+                        "on-secondary-fixed": "#e5e9ec",
+                        "secondary-fixed-dim": "#1e293b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "stack-xl": "48px",
+                        "margin-mobile": "20px",
+                        "stack-xs": "4px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "price-display": ["Inter"],
+                        "label-md": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "price-display": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .match-ring-success { stroke: #34d399; }
+        .match-ring-caution { stroke: #fbbf24; }
+        .match-ring-warning { stroke: #ef4444; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary-fixed docked full-width top-0 sticky border-b border-tertiary-fixed dark:border-tertiary-container shadow-sm z-50">
+<div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+<div class="flex items-center gap-4">
+<button class="hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<div class="font-display-lg text-display-lg-mobile text-primary dark:text-primary-fixed tracking-tight">Homley</div>
+</div>
+<nav class="hidden md:flex gap-8 h-full">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 flex items-center h-full hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Explore</a>
+<a class="text-secondary font-body-md flex items-center h-full hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Saved</a>
+<a class="text-secondary font-body-md flex items-center h-full hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-[18px]">auto_awesome</span> AI Chat
+                 </a>
+<a class="text-secondary font-body-md flex items-center h-full hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform" href="#">Matches</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<button class="hidden md:flex hover:text-primary transition-colors duration-200 cursor-pointer active:scale-95 transition-transform flex items-center justify-center p-2 rounded-full hover:bg-surface-variant">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-container-max mx-auto px-gutter py-stack-lg flex flex-col gap-stack-xl">
+<!-- Search Intent Header -->
+<section class="flex flex-col gap-stack-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Search Results</h1>
+<p class="font-body-lg text-body-lg text-secondary mt-1">Found 12 properties matching your criteria</p>
+</div>
+<!-- Signature Chips Container -->
+<div class="flex flex-wrap gap-3">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+<span class="font-body-md text-body-md text-on-background">Near</span>
+<span class="font-label-md text-label-md text-primary">BKC</span>
+<button class="ml-1 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10">
+<span class="material-symbols-outlined text-[16px] text-primary">payments</span>
+<span class="font-body-md text-body-md text-on-background">Budget</span>
+<span class="font-label-md text-label-md text-primary">&lt; ₹25k</span>
+<button class="ml-1 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10">
+<span class="material-symbols-outlined text-[16px] text-primary">volume_off</span>
+<span class="font-body-md text-body-md text-on-background">Vibe</span>
+<span class="font-label-md text-label-md text-primary">Quiet</span>
+<button class="ml-1 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/5 border border-primary/10">
+<span class="material-symbols-outlined text-[16px] text-primary">chair</span>
+<span class="font-body-md text-body-md text-on-background">Type</span>
+<span class="font-label-md text-label-md text-primary">Furnished Room</span>
+<button class="ml-1 text-secondary hover:text-primary transition-colors"><span class="material-symbols-outlined text-[16px]">close</span></button>
+</div>
+</div>
+</section>
+<!-- Grid of Property Matches -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-stack-lg">
+<!-- Property Card 1 -->
+<article class="flex flex-col bg-surface-container-lowest rounded-[16px] border border-tertiary-fixed shadow-[0px_2px_12px_rgba(45,54,46,0.04)] hover:shadow-[0px_8px_24px_rgba(45,54,46,0.08)] transition-shadow duration-300 overflow-hidden cursor-pointer group">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A bright, sunlit modern bedroom with warm wood flooring and minimalistic white furniture. A large window lets in soft morning light, creating a calm and quiet atmosphere. The bed has fresh white linens. The style is warm minimalist, suitable for a young professional looking for a peaceful retreat in a bustling city." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBffxZR8z2EXwvwZ-vuhZl-W39zQETUdyOE4daBHyUhccxNow604IWMtu65AkpL9BbJLIlKJ9kNcqD5uW9CMABdw8IofN_RhPaWNgQ-u4hN2ncvIcVaRVkLjKAoU2VykEcuPtdB2HfGuVSrm7RakVl3XSBq8lXSAZymLqs1a2q8149BRMadN-FqMhe4iR3ncK8xSsrzXgBiW13Wo7VTuDTtjO__okh2xD2LcCug0bU8mz5xPCGE7zG2lg"/>
+<div class="absolute inset-0 shadow-[inset_0px_60px_40px_-20px_rgba(0,0,0,0.4)] pointer-events-none"></div>
+<!-- Match Score Ring -->
+<div class="absolute top-4 right-4 bg-surface-container-lowest rounded-full p-1 shadow-sm flex items-center justify-center w-12 h-12">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-tertiary-fixed-dim" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="match-ring-success" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="92, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-md text-label-md text-on-surface font-bold tabular-nums">92%</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4 flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Serene Studio near Kurla Station</h2>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">1.2km from BKC, Kurla West</p>
+</div>
+<div class="font-price-display text-price-display text-primary tabular-nums">₹22k</div>
+</div>
+<hr class="border-tertiary-fixed"/>
+<div class="flex flex-col gap-2">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-wider">The Truth</h3>
+<ul class="flex flex-col gap-1.5">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#34d399] mt-0.5">check</span>
+<span class="font-body-md text-body-md text-on-surface">Very quiet residential lane</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#34d399] mt-0.5">check</span>
+<span class="font-body-md text-body-md text-on-surface">Fully furnished with desk</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#fbbf24] mt-0.5">warning</span>
+<span class="font-body-md text-body-md text-on-surface">5 min walk to main road</span>
+</li>
+</ul>
+</div>
+</div>
+</article>
+<!-- Property Card 2 -->
+<article class="flex flex-col bg-surface-container-lowest rounded-[16px] border border-tertiary-fixed shadow-[0px_2px_12px_rgba(45,54,46,0.04)] hover:shadow-[0px_8px_24px_rgba(45,54,46,0.08)] transition-shadow duration-300 overflow-hidden cursor-pointer group">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cozy, well-lit living space with a comfortable reading nook. The room features a plush armchair, a small bookshelf, and warm ambient lighting from a floor lamp. The color palette includes soft earth tones and muted greens, reflecting a warm minimalist aesthetic perfect for a peaceful evening after work." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyDFMiPPQ70qetQjy9R4FyVd_lWEWIkf12Nfhq-TdU2SYEi7uGWcZd0kzqnSO0ji44jkzGvYjPk2kBwLNQfEf-8HD0z3fUfws3G1uxioYBwtSWVc5R19u5k9-J4zsnXv7sXgfutB_hyY429kwdTxGeAhu9LB6ecNs5Wbxm2kZaN0i7ZW4JOHdpFrcGfgdKVXdzlLFYMuUOUNeVhAYwZSGmQyFwMzTGWQUx73iho9t-Xhf4wASFNl_J4Q"/>
+<div class="absolute inset-0 shadow-[inset_0px_60px_40px_-20px_rgba(0,0,0,0.4)] pointer-events-none"></div>
+<!-- Match Score Ring -->
+<div class="absolute top-4 right-4 bg-surface-container-lowest rounded-full p-1 shadow-sm flex items-center justify-center w-12 h-12">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-tertiary-fixed-dim" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="match-ring-success" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="88, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-md text-label-md text-on-surface font-bold tabular-nums">88%</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4 flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Cozy Room in Bandra East</h2>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">0.8km from BKC, Kalanagar</p>
+</div>
+<div class="font-price-display text-price-display text-primary tabular-nums">₹24k</div>
+</div>
+<hr class="border-tertiary-fixed"/>
+<div class="flex flex-col gap-2">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-wider">The Truth</h3>
+<ul class="flex flex-col gap-1.5">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#34d399] mt-0.5">check</span>
+<span class="font-body-md text-body-md text-on-surface">Extremely close to BKC</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#34d399] mt-0.5">check</span>
+<span class="font-body-md text-body-md text-on-surface">Quiet society, park view</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#ef4444] mt-0.5">warning</span>
+<span class="font-body-md text-body-md text-on-surface">Slightly smaller room size</span>
+</li>
+</ul>
+</div>
+</div>
+</article>
+<!-- Property Card 3 -->
+<article class="flex flex-col bg-surface-container-lowest rounded-[16px] border border-tertiary-fixed shadow-[0px_2px_12px_rgba(45,54,46,0.04)] hover:shadow-[0px_8px_24px_rgba(45,54,46,0.08)] transition-shadow duration-300 overflow-hidden cursor-pointer group">
+<div class="relative h-64 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern, compact studio apartment with high-end finishes. The space features clever storage solutions, a small but functional kitchenette, and a comfortable murphy bed. The lighting is bright and clean, enhancing the sense of space. The overall aesthetic is contemporary urban, designed for efficiency and style in a metropolitan setting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCs_gs-tRnrUi7zq9T3m0-h97fjnRgWEe492AwX9PYLYgURWcQOaQrmXfyOLd93zzHU5WVz2UiVL99AENwQN5JeKkhb5JlqXD3CGGBYWnc8B82i2RNNszbmrrLDych_B4ExldomaBmLWszWbzvWLLvAV_1eoP1os3G_cAu3HRb7S6EWpZnItucxzx4pq4ysEQi46GSoaFTIG8G9IfR6vRc0bNPUE2_Eom_zcufTxWswLmngjIOF3rYhkA"/>
+<div class="absolute inset-0 shadow-[inset_0px_60px_40px_-20px_rgba(0,0,0,0.4)] pointer-events-none"></div>
+<!-- Match Score Ring -->
+<div class="absolute top-4 right-4 bg-surface-container-lowest rounded-full p-1 shadow-sm flex items-center justify-center w-12 h-12">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36">
+<path class="text-tertiary-fixed-dim" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="match-ring-caution" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="75, 100" stroke-width="3"></path>
+</svg>
+<span class="absolute font-label-md text-label-md text-on-surface font-bold tabular-nums">75%</span>
+</div>
+</div>
+<div class="p-4 flex flex-col gap-4 flex-grow">
+<div class="flex justify-between items-start">
+<div>
+<h2 class="font-title-md text-title-md text-on-surface line-clamp-1">Modern Flat in Vakola</h2>
+<p class="font-body-md text-body-md text-secondary line-clamp-1">2.5km from BKC, Santacruz East</p>
+</div>
+<div class="font-price-display text-price-display text-primary tabular-nums">₹19k</div>
+</div>
+<hr class="border-tertiary-fixed"/>
+<div class="flex flex-col gap-2">
+<h3 class="font-label-md text-label-md text-secondary uppercase tracking-wider">The Truth</h3>
+<ul class="flex flex-col gap-1.5">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#34d399] mt-0.5">check</span>
+<span class="font-body-md text-body-md text-on-surface">Well within budget</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#fbbf24] mt-0.5">warning</span>
+<span class="font-body-md text-body-md text-on-surface">Occasional airplane noise</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] text-[#fbbf24] mt-0.5">warning</span>
+<span class="font-body-md text-body-md text-on-surface">Requires an auto to reach BKC</span>
+</li>
+</ul>
+</div>
+</div>
+</article>
+</section>
+</main>
+</body></html>

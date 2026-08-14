@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Notifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-primary-container": "#d3f1ff",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-container": "#0e7490",
+                        "sand-light": "#F7F5F2",
+                        "onyx": "#1D262B",
+                        "on-surface": "#1b1c1a",
+                        "surface-dim": "#dbdad7",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#636362",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary-container": "#6c6b66",
+                        "inverse-primary": "#81d1f0",
+                        "secondary": "#5e5e5d",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "on-primary-fixed-variant": "#004d62",
+                        "surface-tint": "#006781",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface": "#fbf9f6",
+                        "tertiary": "#54534e",
+                        "on-tertiary": "#ffffff",
+                        "petrol": "#0E7490",
+                        "on-tertiary-container": "#f0ece6",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "outline": "#6f787d",
+                        "on-primary-fixed": "#001f29",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-variant": "#e4e2df",
+                        "electric-cyan": "#22D3EE",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#005a71",
+                        "outline-variant": "#bec8cd",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1b1c1a",
+                        "inverse-on-surface": "#f2f0ed",
+                        "primary-fixed": "#b9eaff",
+                        "deep-void": "#0B1114",
+                        "surface-bright": "#fbf9f6",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-low": "#f5f3f0",
+                        "inverse-surface": "#30312f",
+                        "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "margin-desktop": "80px",
+                        "stack-md": "16px",
+                        "stack-xl": "48px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-surface/80 backdrop-blur-sm border-b border-outline-variant dark:border-on-tertiary-fixed-variant shadow-sm hidden md:block">
+<div class="flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto">
+<div class="flex items-center gap-stack-lg">
+<a class="font-display-lg text-display-lg text-primary dark:text-on-primary-fixed tracking-tight" href="#">Homley</a>
+<div class="flex gap-stack-md ml-stack-xl">
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors active:scale-95 duration-200" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-on-primary-fixed transition-colors active:scale-95 duration-200" href="#">Find flatmates</a>
+</div>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="font-body-md text-body-md text-primary dark:text-on-primary-fixed hover:text-primary transition-colors active:scale-95 duration-200">Sign in</button>
+<button class="font-body-md text-body-md bg-primary text-on-primary px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors active:scale-95 duration-200 shadow-[0_4px_4px_rgba(0,0,0,0.04)]">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex justify-center py-stack-xl px-margin-mobile md:px-margin-desktop mb-24 md:mb-0">
+<!-- Notifications Panel -->
+<div class="w-full max-w-2xl bg-surface-container-lowest rounded-xl border border-sand-border shadow-[0_24px_24px_rgba(0,0,0,0.08)] overflow-hidden">
+<!-- Panel Header -->
+<div class="flex justify-between items-center p-stack-lg border-b border-sand-border">
+<h1 class="font-title-md text-title-md text-on-surface">Notifications</h1>
+<button class="font-label-md text-label-md text-secondary hover:text-primary transition-colors">Mark all as read</button>
+</div>
+<!-- Notifications List -->
+<div class="flex flex-col">
+<!-- Row 1: New Match (Unread) -->
+<div class="flex items-start p-stack-lg gap-stack-md border-b border-sand-border hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest relative">
+<div class="absolute left-stack-sm top-stack-lg w-2 h-2 rounded-full bg-petrol"></div>
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center ml-stack-md">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-stack-xs">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">New Match</h3>
+<span class="font-label-md text-label-md text-secondary text-xs">2m ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">We found a new property matching your coastal preferences in Brighton.</p>
+</div>
+</div>
+<!-- Row 2: Message Request (Unread) -->
+<div class="flex items-start p-stack-lg gap-stack-md border-b border-sand-border hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest relative">
+<div class="absolute left-stack-sm top-stack-lg w-2 h-2 rounded-full bg-petrol"></div>
+<div class="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden ml-stack-md border border-sand-border">
+<img class="w-full h-full object-cover" data-alt="A professional headshot of a friendly real estate agent with warm lighting, set against a subtle, slightly blurred coastal office background. The overall tone is approachable and premium." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNpk9R7u20s7nutOFKldE-PIzQbBI2gt1Y5yawI9_eTUB7U51P9vrrtEidCFthMyhahnARzZoFR3FcwoYEK-5BRczF_-_aUXHw0dnlshkQOEiKpFSrY7AErakC6OwkuqyYyNjXO3XtoEgBotxMoNV2h9npJ72WyhXtOqnkQASsitYRZj3J3qRxKU64mHoGQAGtuFX9ECNz8ZZH33SbvcpTw-reFEc8NrCh0T5wsTfP00UFBwxLSs9VEg"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-stack-xs">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Message Request</h3>
+<span class="font-label-md text-label-md text-secondary text-xs">1h ago</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Sarah Jenkins wants to connect regarding your flatmate listing.</p>
+</div>
+</div>
+<!-- Row 3: Listing Status Update (Read) -->
+<div class="flex items-start p-stack-lg gap-stack-md border-b border-sand-border hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest pl-stack-lg">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">real_estate_agent</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-stack-xs">
+<h3 class="font-body-md text-body-md text-on-surface">Listing Status Update</h3>
+<span class="font-label-md text-label-md text-secondary text-xs">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Your saved property 'Ocean View Terrace' is now under offer.</p>
+</div>
+</div>
+<!-- Row 4: Agreement Signed (Read) -->
+<div class="flex items-start p-stack-lg gap-stack-md hover:bg-surface-container-low transition-colors cursor-pointer bg-surface-container-lowest pl-stack-lg">
+<div class="flex-shrink-0 w-12 h-12 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined">edit_document</span>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-baseline mb-stack-xs">
+<h3 class="font-body-md text-body-md text-on-surface">Agreement Signed</h3>
+<span class="font-label-md text-label-md text-secondary text-xs">Oct 12</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">All parties have signed the lease agreement for 14 Seaview Road.</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface dark:bg-surface-container-highest border-t border-outline-variant dark:border-on-tertiary-fixed-variant shadow-lg md:hidden">
+<div class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">search</span>
+<span class="font-label-md text-label-md text-[10px]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label-md text-label-md text-[10px]">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">auto_awesome</span>
+<span class="font-label-md text-label-md text-[10px]">Ask AI</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-bold hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-label-md text-label-md text-[10px]">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container dark:hover:bg-tertiary-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-md text-label-md text-[10px]">Profile</span>
+</a>
+</div>
+</nav>
+</body></html>

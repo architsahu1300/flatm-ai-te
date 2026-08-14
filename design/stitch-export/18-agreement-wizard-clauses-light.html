@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Rental Agreement Wizard - Step 4: Clauses</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter", "sans-serif"],
+                        "title-md": ["Inter", "sans-serif"],
+                        "body-lg": ["Inter", "sans-serif"],
+                        "label-md": ["Inter", "sans-serif"],
+                        "headline-lg": ["Inter", "sans-serif"],
+                        "display-lg-mobile": ["Inter", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #F7F5F2; /* sand-light */
+        }
+    </style>
+</head>
+<body class="text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 fixed top-0 w-full z-50 border-b border-sand-border dark:border-outline-variant shadow-sm h-20">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-between h-full">
+<div class="font-display-lg text-display-lg font-bold text-petrol dark:text-electric-cyan">Homley</div>
+<!-- Contextual Nav for Wizard: Suppress full global nav, show exit/save -->
+<div class="hidden md:flex items-center space-x-8">
+<button class="font-label-md text-label-md text-secondary hover:text-petrol transition-colors scale-95 active:opacity-80 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">save</span>
+                   Save Draft
+               </button>
+<button class="font-label-md text-label-md text-secondary hover:text-petrol transition-colors scale-95 active:opacity-80 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+                   Exit Wizard
+               </button>
+</div>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="flex-grow pt-[100px] pb-margin-desktop px-margin-desktop max-w-container-max mx-auto w-full flex flex-col gap-stack-xl">
+<!-- Header & Timeline -->
+<header class="flex flex-col gap-stack-lg items-center text-center">
+<div class="flex flex-col gap-stack-sm">
+<span class="font-label-md text-label-md text-petrol uppercase tracking-wider">Step 4 of 6</span>
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Agreement Clauses</h1>
+<p class="font-body-lg text-body-lg text-secondary max-w-2xl mx-auto">Review standard terms and consider AI-suggested additions tailored to Mumbai rentals.</p>
+</div>
+<!-- Status Timeline -->
+<div class="flex items-center justify-center gap-4 w-full max-w-xl mx-auto mt-stack-sm">
+<div class="flex flex-col items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-petrol text-on-primary flex items-center justify-center font-label-md text-label-md ring-4 ring-primary-container/20">
+<span class="material-symbols-outlined text-[18px]">edit_document</span>
+</div>
+<span class="font-label-md text-label-md text-petrol font-semibold">Draft</span>
+</div>
+<div class="flex-grow h-[2px] bg-sand-border"></div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">gavel</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">Finalized</span>
+</div>
+<div class="flex-grow h-[2px] bg-sand-border"></div>
+<div class="flex flex-col items-center gap-2 opacity-50">
+<div class="w-8 h-8 rounded-full bg-surface-container-high text-secondary flex items-center justify-center font-label-md text-label-md">
+<span class="material-symbols-outlined text-[18px]">draw</span>
+</div>
+<span class="font-label-md text-label-md text-secondary">Signed</span>
+</div>
+</div>
+</header>
+<!-- Two Column Layout: Document & AI Panel -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+<!-- Left Column: The Document Canvas -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-[16px] shadow-[0_4px_24px_rgba(0,0,0,0.04)] border border-sand-border p-[40px] flex flex-col gap-stack-lg">
+<div class="border-b border-sand-border pb-stack-md flex justify-between items-end">
+<h2 class="font-title-md text-title-md text-on-surface">Standard Clauses</h2>
+<button class="font-label-md text-label-md text-petrol hover:text-primary transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Custom Clause
+                    </button>
+</div>
+<div class="flex flex-col gap-stack-md">
+<!-- Clause 1 -->
+<div class="group relative flex gap-4 p-4 hover:bg-surface-container-low rounded-lg transition-colors border border-transparent hover:border-sand-border">
+<div class="font-label-md text-label-md text-secondary mt-1">1.</div>
+<div class="flex-grow flex flex-col gap-2">
+<h3 class="font-label-md text-label-md font-semibold text-on-surface">Term of Tenancy</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">The tenancy shall be for a period of 11 months, commencing on 01 October 2023 and ending on 31 August 2024.</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-start gap-2">
+<button class="text-secondary hover:text-petrol p-1" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Clause 2 -->
+<div class="group relative flex gap-4 p-4 hover:bg-surface-container-low rounded-lg transition-colors border border-transparent hover:border-sand-border">
+<div class="font-label-md text-label-md text-secondary mt-1">2.</div>
+<div class="flex-grow flex flex-col gap-2">
+<h3 class="font-label-md text-label-md font-semibold text-on-surface">Rent &amp; Deposit</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">The monthly rent is agreed at ₹45,000, payable on or before the 5th of every month. A refundable security deposit of ₹1,500,000 has been paid.</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-start gap-2">
+<button class="text-secondary hover:text-petrol p-1" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Clause 3 -->
+<div class="group relative flex gap-4 p-4 hover:bg-surface-container-low rounded-lg transition-colors border border-transparent hover:border-sand-border">
+<div class="font-label-md text-label-md text-secondary mt-1">3.</div>
+<div class="flex-grow flex flex-col gap-2">
+<h3 class="font-label-md text-label-md font-semibold text-on-surface">Maintenance Charges</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Society maintenance charges are included in the monthly rent. Any extraordinary levies by the society will be borne by the Owner.</p>
+</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity flex items-start gap-2">
+<button class="text-secondary hover:text-petrol p-1" title="Edit">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Suggestions Panel -->
+<aside class="lg:col-span-4 flex flex-col gap-stack-md sticky top-[100px]">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-petrol" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="font-title-md text-title-md text-on-surface">AI Suggests</h3>
+</div>
+<!-- Disclaimer -->
+<div class="bg-surface-container-low border border-sand-border rounded-lg p-3 flex items-start gap-2 text-secondary">
+<span class="material-symbols-outlined text-[18px] mt-0.5">info</span>
+<span class="font-label-md text-label-md text-xs">✦ AI suggestion — not legal advice. Please review carefully before adding.</span>
+</div>
+<!-- Suggestion Card 1 -->
+<div class="bg-primary-container/5 border border-primary-container/20 rounded-[12px] p-4 flex flex-col gap-stack-sm shadow-sm transition-transform hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md font-semibold text-petrol">Pet Clause</h4>
+<span class="bg-surface-container-lowest text-petrol font-label-md text-[10px] uppercase px-2 py-1 rounded-full border border-sand-border">Common in Mumbai</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">"The tenant is permitted to keep one domestic pet (dog/cat). The tenant is responsible for any damage caused by the pet and must adhere to society guidelines regarding pets."</p>
+<div class="flex gap-2 mt-2">
+<button class="flex-1 bg-petrol text-on-primary font-label-md text-label-md py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-1 shadow-[0_4px_12px_rgba(14,116,144,0.15)]">
+<span class="material-symbols-outlined text-[18px]">add</span> Accept
+                        </button>
+<button class="px-3 bg-surface-container-lowest border border-sand-border text-secondary hover:text-error hover:border-error/50 rounded-lg transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+<!-- Suggestion Card 2 -->
+<div class="bg-primary-container/5 border border-primary-container/20 rounded-[12px] p-4 flex flex-col gap-stack-sm shadow-sm transition-transform hover:-translate-y-1">
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-label-md font-semibold text-petrol">Lock-in Period</h4>
+<span class="bg-surface-container-lowest text-petrol font-label-md text-[10px] uppercase px-2 py-1 rounded-full border border-sand-border">Recommended</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant text-sm">"Both parties agree to a lock-in period of 6 months. If the tenant vacates before this period, they are liable to pay rent for the remaining lock-in months."</p>
+<div class="flex gap-2 mt-2">
+<button class="flex-1 bg-petrol text-on-primary font-label-md text-label-md py-2 rounded-lg hover:opacity-90 transition-opacity flex items-center justify-center gap-1 shadow-[0_4px_12px_rgba(14,116,144,0.15)]">
+<span class="material-symbols-outlined text-[18px]">add</span> Accept
+                        </button>
+<button class="px-3 bg-surface-container-lowest border border-sand-border text-secondary hover:text-error hover:border-error/50 rounded-lg transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+</div>
+</aside>
+</div>
+<!-- Footer Actions -->
+<div class="flex justify-between items-center mt-stack-xl pt-stack-lg border-t border-sand-border">
+<button class="font-label-md text-label-md text-secondary hover:text-on-surface transition-colors py-3 px-6 rounded-[8px] border border-transparent hover:border-sand-border flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">arrow_back</span>
+                Back: Property Details
+            </button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary py-3 px-8 rounded-[8px] hover:opacity-90 transition-opacity shadow-[0_4px_12px_rgba(14,116,144,0.2)] flex items-center gap-2 scale-95 active:scale-90 duration-200">
+                Continue to Review
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Agreements</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#151E24", // Adjusted for dark theme prompt
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-primary-container": "#d3f1ff",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "primary-container": "#0e7490",
+                    "sand-light": "#F7F5F2",
+                    "onyx": "#1D262B",
+                    "on-surface": "#F7F5F2", // Adjusted for dark theme
+                    "surface-dim": "#151E24", // Adjusted for dark theme
+                    "error": "#ba1a1a",
+                    "on-secondary-container": "#636362",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary-container": "#6c6b66",
+                    "inverse-primary": "#81d1f0",
+                    "secondary": "#A3B8CC", // Adjusted for dark theme
+                    "on-tertiary-fixed-variant": "#484742",
+                    "on-primary-fixed-variant": "#004d62",
+                    "surface-tint": "#006781",
+                    "secondary-fixed": "#e4e2e1",
+                    "surface": "#151E24", // Adjusted for dark theme prompt
+                    "tertiary": "#54534e",
+                    "on-tertiary": "#ffffff",
+                    "petrol": "#0E7490",
+                    "on-tertiary-container": "#f0ece6",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "surface-container-high": "#1E2A32", // Adjusted for dark theme
+                    "error-container": "#ffdad6",
+                    "secondary-container": "#1E2A32", // Adjusted for dark theme
+                    "primary-fixed-dim": "#81d1f0",
+                    "outline": "#4B5563", // Adjusted for dark theme
+                    "on-primary-fixed": "#001f29",
+                    "on-error-container": "#93000a",
+                    "background": "#0B1114", // Adjusted for dark theme prompt
+                    "on-secondary-fixed-variant": "#464746",
+                    "surface-variant": "#151E24", // Adjusted for dark theme
+                    "electric-cyan": "#22D3EE",
+                    "on-primary": "#0B1114", // Adjusted for dark theme
+                    "surface-container": "#151E24", // Adjusted for dark theme
+                    "on-surface-variant": "#A3B8CC", // Adjusted for dark theme
+                    "surface-container-lowest": "#0B1114", // Adjusted for dark theme
+                    "primary": "#22D3EE", // Adjusted for dark theme prompt (accent)
+                    "outline-variant": "#374151", // Adjusted for dark theme
+                    "on-error": "#ffffff",
+                    "on-secondary": "#0B1114", // Adjusted for dark theme
+                    "on-background": "#F7F5F2", // Adjusted for dark theme
+                    "inverse-on-surface": "#151E24", // Adjusted for dark theme
+                    "primary-fixed": "#b9eaff",
+                    "deep-void": "#0B1114",
+                    "surface-bright": "#1E2A32", // Adjusted for dark theme
+                    "sand-border": "#374151", // Adjusted for dark theme
+                    "surface-container-low": "#151E24", // Adjusted for dark theme
+                    "inverse-surface": "#F7F5F2", // Adjusted for dark theme
+                    "on-secondary-fixed": "#1b1c1b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-xs": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "margin-desktop": "80px",
+                    "stack-md": "16px",
+                    "stack-xl": "48px",
+                    "margin-mobile": "20px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter", "sans-serif"],
+                    "label-md": ["Inter", "sans-serif"],
+                    "headline-lg": ["Inter", "sans-serif"],
+                    "body-lg": ["Inter", "sans-serif"],
+                    "body-md": ["Inter", "sans-serif"],
+                    "display-lg-mobile": ["Inter", "sans-serif"],
+                    "title-md": ["Inter", "sans-serif"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0B1114;
+            color: #F7F5F2;
+        }
+        /* Tabular numerals utility */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen antialiased">
+<!-- Top Navigation (Web) -->
+<header class="hidden md:flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto bg-surface/80 backdrop-blur-sm border-b border-outline-variant shadow-sm sticky top-0 w-full z-50">
+<div class="flex items-center gap-stack-lg">
+<span class="font-display-lg text-display-lg text-primary tracking-tight">Homley</span>
+<nav class="flex gap-stack-lg ml-stack-xl">
+<a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="#">Browse homes</a>
+<a class="text-secondary hover:text-primary transition-colors font-body-md text-body-md" href="#">Find flatmates</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-body-md text-body-md active:scale-95 duration-200" href="#">Agreements</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-md">
+<button class="font-label-md text-label-md text-on-background hover:text-primary transition-colors">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-white px-6 py-2 rounded-lg hover:bg-opacity-90 transition-colors shadow-sm">Get started</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-xl pb-32 md:pb-stack-xl grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Page Header -->
+<div class="col-span-1 lg:col-span-12 mb-stack-md flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md">
+<div>
+<h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg">Lease Agreements</h1>
+<p class="font-body-md text-body-md text-secondary mt-stack-xs">Manage your active contracts and signature requests.</p>
+</div>
+<button class="font-label-md text-label-md bg-petrol text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-opacity-90 transition-transform active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[20px]">add</span>
+                New Agreement
+            </button>
+</div>
+<!-- Agreements List (Left Column on Desktop) -->
+<div class="col-span-1 lg:col-span-4 flex flex-col gap-stack-md">
+<!-- Search/Filter -->
+<div class="relative bg-surface rounded-xl border border-sand-border shadow-sm flex items-center px-4 py-2 hover:shadow-lg transition-shadow">
+<span class="material-symbols-outlined text-secondary mr-2">search</span>
+<input class="bg-transparent border-none outline-none w-full font-body-md text-body-md text-on-background placeholder:text-secondary focus:ring-0 p-0" placeholder="Search agreements..." type="text"/>
+</div>
+<!-- Agreement Card 1 (Active) -->
+<div class="bg-surface-container-high rounded-xl p-stack-md border border-primary shadow-lg cursor-pointer transform transition-transform hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-stack-xs">
+<span class="font-label-md text-label-md bg-surface-container-lowest text-primary px-2 py-1 rounded-full flex items-center gap-1 border border-primary/30">
+<span class="material-symbols-outlined text-[14px]">edit_document</span> Draft
+                    </span>
+<span class="font-label-md text-label-md text-secondary tabular-nums">Oct 24, 2023</span>
+</div>
+<h3 class="font-title-md text-title-md mt-stack-sm">142 Oceanview Terrace</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">Apt 4B • 12 Month Lease</p>
+<div class="mt-stack-md pt-stack-sm border-t border-outline-variant flex justify-between items-center">
+<div class="flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-surface-container-high object-cover" data-alt="A portrait of a professional individual in a modern studio apartment setting, dark cinematic lighting, cool blue accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDe9Xf0uxf7SF7B8rlFsn5EeJEFWR7jDrJ4nie9mKIsd5uugWKrkpoT4AsFCA7un8L4nsTPDMdgd41AMJOxPkT_rWNSc2ApOfYdxRdpDQWu0xy9C0CBSeydnrjzDdGcBQhYUywduCto2jOFvVKpxPY_GXhGvKQflABDE7-md2PlRY4kWVnVx7a5gspye4nO7DQU24yDK5IJlw3CidwvCyL6TBhdzB8Or2E8YSaZ6Q5TNlUSNxyAWVOakg"/>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-high bg-surface-container-lowest flex items-center justify-center font-label-md text-label-md text-secondary">
+                            +1
+                        </div>
+</div>
+<div class="font-body-md text-body-md font-semibold text-primary tabular-nums">$3,200/mo</div>
+</div>
+</div>
+<!-- Agreement Card 2 -->
+<div class="bg-surface rounded-xl p-stack-md border border-sand-border shadow-sm cursor-pointer transform transition-transform hover:scale-[1.02]">
+<div class="flex justify-between items-start mb-stack-xs">
+<span class="font-label-md text-label-md bg-surface-container-lowest text-secondary px-2 py-1 rounded-full flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check_circle</span> Active
+                    </span>
+<span class="font-label-md text-label-md text-secondary tabular-nums">Sep 01, 2023</span>
+</div>
+<h3 class="font-title-md text-title-md mt-stack-sm text-on-surface-variant">88 Pine Street, Unit 2</h3>
+<p class="font-body-md text-body-md text-secondary mt-1">6 Month Lease</p>
+</div>
+</div>
+<!-- Agreement Detail Canvas (Right Column on Desktop) -->
+<div class="col-span-1 lg:col-span-8 bg-surface rounded-xl border border-sand-border shadow-sm overflow-hidden flex flex-col">
+<!-- Detail Header -->
+<div class="p-stack-lg border-b border-outline-variant bg-surface-container-high relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 pointer-events-none" data-alt="Abstract architectural blueprint lines superimposed over a dark moody texture, cyan glow accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBV3Wq357ZxB7ChrU9RsweS6Fj2gKUNaB2khTW6U0Jk8Wkyd43B60k7UJubP_mTNWwEwH-cjUn0UujLLLFRGYyF7EbSeUCXdjaKlTMqmTJfVv8MFFp7R0laOmUzrqXip8G7x9NAu_V4y3nXjTJki-ZB4LmkTjl1ZQ0yIfhZ82Y0dY558hCWF9ElIPiAWLKw-HnqIj0OIRV7DgU0ngDwSfSkNWh8i45vvyr7tNaD7t5-mbBbjzF1433P0A')"></div>
+<div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-stack-md">
+<div>
+<div class="flex items-center gap-stack-sm mb-stack-xs">
+<span class="font-label-md text-label-md bg-surface text-primary px-3 py-1 rounded-full border border-primary/30 uppercase tracking-wider">Requires Signature</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg">142 Oceanview Terrace, Apt 4B</h2>
+<p class="font-body-lg text-body-lg text-secondary mt-1">Residential Tenancy Agreement</p>
+</div>
+<div class="flex gap-stack-sm w-full md:w-auto">
+<button class="flex-1 md:flex-none font-label-md text-label-md border border-sand-border px-4 py-2 rounded-lg hover:bg-surface-container transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">download</span> PDF
+                        </button>
+<button class="flex-1 md:flex-none font-label-md text-label-md bg-primary text-on-primary px-6 py-2 rounded-lg hover:opacity-90 transition-colors shadow-sm font-semibold">
+                            Review &amp; Sign
+                        </button>
+</div>
+</div>
+</div>
+<div class="p-stack-lg flex-1 grid grid-cols-1 md:grid-cols-2 gap-stack-xl">
+<!-- Left Details -->
+<div class="flex flex-col gap-stack-lg">
+<!-- Key Terms -->
+<div>
+<h3 class="font-title-md text-title-md mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">key</span> Key Terms
+                        </h3>
+<div class="bg-surface-container rounded-lg p-stack-md border border-sand-border grid grid-cols-2 gap-stack-md">
+<div>
+<p class="font-label-md text-label-md text-secondary">Monthly Rent</p>
+<p class="font-body-lg text-body-lg font-semibold tabular-nums">$3,200</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Security Deposit</p>
+<p class="font-body-lg text-body-lg font-semibold tabular-nums">$3,200</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">Start Date</p>
+<p class="font-body-lg text-body-lg tabular-nums">Nov 01, 2023</p>
+</div>
+<div>
+<p class="font-label-md text-label-md text-secondary">End Date</p>
+<p class="font-body-lg text-body-lg tabular-nums">Oct 31, 2024</p>
+</div>
+</div>
+</div>
+<!-- Parties -->
+<div>
+<h3 class="font-title-md text-title-md mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">group</span> Parties Involved
+                        </h3>
+<div class="flex flex-col gap-stack-sm">
+<!-- Party 1 -->
+<div class="flex items-center justify-between p-stack-sm rounded-lg border border-sand-border bg-surface-container-low hover:bg-surface-container transition-colors">
+<div class="flex items-center gap-stack-sm">
+<div class="w-10 h-10 rounded-full bg-surface-bright flex items-center justify-center font-title-md text-title-md text-primary border border-primary/20">
+                                        E
+                                    </div>
+<div>
+<p class="font-body-md text-body-md font-medium">Elena Rodriguez</p>
+<p class="font-label-md text-label-md text-secondary">Landlord</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-green-500" title="Signed">check_circle</span>
+</div>
+<!-- Party 2 -->
+<div class="flex items-center justify-between p-stack-sm rounded-lg border border-primary/50 bg-surface-container shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+<div class="flex items-center gap-stack-sm">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of a young professional in a dark modern setting, cyan rim lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChsRo1nB1dCvIeqtAnP_04lOWraK6tqsOJP4NwG0YPudYju0LtOi89lQbGcNRMHG04om-U-ivqNmG-_UhVFuSV0tkqLadk6zMEShWG9Tsu7G4YrckFCRTvxbbFhEH-PSMm01DQKZsVfHEO3mgAtd2VBoa6fp1PiqjjQtOaQJe976OX-SNMQ59TRV87tMFrQEm3u0Czd2JVgj1Brc49Yhxp2eo61_w1xFK1Ua5mlMZJEJRdTZ2Tq6mjtg"/>
+<div>
+<p class="font-body-md text-body-md font-medium text-primary">Marcus Chen (You)</p>
+<p class="font-label-md text-label-md text-secondary">Tenant</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-secondary animate-pulse" title="Pending Signature">history_edu</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Timeline -->
+<div class="flex flex-col gap-stack-lg">
+<div>
+<h3 class="font-title-md text-title-md mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">timeline</span> Signature Timeline
+                        </h3>
+<div class="relative pl-6 border-l-2 border-outline-variant space-y-stack-md mt-stack-md">
+<!-- Timeline Item 1 -->
+<div class="relative">
+<div class="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-surface"></div>
+<p class="font-body-md text-body-md text-on-background">Agreement Drafted</p>
+<p class="font-label-md text-label-md text-secondary tabular-nums">Oct 24, 10:30 AM</p>
+</div>
+<!-- Timeline Item 2 -->
+<div class="relative">
+<div class="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-primary ring-4 ring-surface"></div>
+<p class="font-body-md text-body-md text-on-background">Sent for Signatures</p>
+<p class="font-label-md text-label-md text-secondary tabular-nums">Oct 24, 11:15 AM</p>
+</div>
+<!-- Timeline Item 3 -->
+<div class="relative">
+<div class="absolute -left-[35px] top-1 w-4 h-4 rounded-full bg-green-500 ring-4 ring-surface"></div>
+<p class="font-body-md text-body-md text-on-background">Signed by Elena Rodriguez</p>
+<p class="font-label-md text-label-md text-secondary tabular-nums">Oct 25, 09:42 AM</p>
+</div>
+<!-- Timeline Item 4 (Pending) -->
+<div class="relative">
+<div class="absolute -left-[35px] top-1 w-4 h-4 rounded-full border-2 border-primary bg-surface ring-4 ring-surface"></div>
+<p class="font-body-md text-body-md text-primary font-medium">Awaiting Your Signature</p>
+<p class="font-label-md text-label-md text-secondary">Action required</p>
+</div>
+</div>
+</div>
+<!-- Version History -->
+<div class="mt-auto pt-stack-lg border-t border-outline-variant">
+<h3 class="font-title-md text-title-md mb-stack-sm flex items-center gap-2 text-secondary">
+<span class="material-symbols-outlined text-[20px]">history</span> Version History
+                        </h3>
+<div class="bg-surface-container-lowest rounded-lg p-3 border border-sand-border flex justify-between items-center hover:bg-surface-container transition-colors cursor-pointer">
+<div>
+<p class="font-body-md text-body-md text-on-background">v1.2 (Current)</p>
+<p class="font-label-md text-label-md text-secondary tabular-nums">Oct 24 • Edited by Elena R.</p>
+</div>
+<span class="material-symbols-outlined text-secondary">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 bg-surface border-t border-outline-variant shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">search</span>
+<span class="font-label-md text-label-md mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+<span class="font-label-md text-label-md mt-1">Saved</span>
+</a>
+<!-- Using Ask AI as active for mapping 'Agreements' loosely to messages/tasks in this context, or Profile. We'll map to Messages based on context of contracts/communication -->
+<a class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container active:scale-90 transition-transform duration-150 p-2 rounded-lg relative" href="#">
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full animate-ping opacity-75"></div>
+<div class="absolute -top-1 -right-1 w-3 h-3 bg-primary rounded-full"></div>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-label-md text-label-md mt-1">Messages</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container active:scale-90 transition-transform duration-150 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

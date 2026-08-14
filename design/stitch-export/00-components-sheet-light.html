@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - UI Components Sheet</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#fcf9f7",
+                      "on-surface-variant": "#444843",
+                      "tertiary-fixed": "#e6e2dd",
+                      "on-primary-container": "#7f897e",
+                      "on-tertiary-container": "#898682",
+                      "on-secondary-fixed-variant": "#464746",
+                      "primary-fixed-dim": "#bfc9bd",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#f3f0ee",
+                      "surface-container-low": "#f6f3f1",
+                      "inverse-surface": "#30302f",
+                      "error-container": "#ffdad6",
+                      "surface-container": "#f0edeb",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary": "#5e5e5d",
+                      "secondary-fixed": "#e4e2e1",
+                      "error": "#ba1a1a",
+                      "success-tint": "#576158",
+                      "on-primary": "#ffffff",
+                      "surface-dim": "#dcd9d8",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-high": "#eae8e6",
+                      "on-primary-fixed": "#151e16",
+                      "on-secondary": "#ffffff",
+                      "on-surface": "#1b1c1b",
+                      "secondary-container": "#e1dfde",
+                      "surface-bright": "#fcf9f7",
+                      "inverse-primary": "#bfc9bd",
+                      "on-tertiary-fixed": "#1c1c19",
+                      "primary-fixed": "#dbe5d8",
+                      "surface-variant": "#e5e2e0",
+                      "primary": "#020703",
+                      "tertiary": "#070705",
+                      "surface-container-highest": "#e5e2e0",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "outline": "#747873",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-primary-fixed-variant": "#404940",
+                      "primary-container": "#182119",
+                      "tertiary-container": "#201f1c",
+                      "on-secondary-container": "#636362",
+                      "surface-tint": "#576157",
+                      "background": "#fcf9f7",
+                      "outline-variant": "#c4c8c1",
+                      "on-background": "#1b1c1b",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed-dim": "#c9c6c1",
+                      "on-tertiary-fixed-variant": "#484743",
+                      
+                      // Custom Theme overrides based on prompt
+                      "petrol-sand-bg-light": "#F7F5F2",
+                      "petrol-sand-card-light": "#FFFFFF",
+                      "petrol-sand-border-light": "#DFDCD6",
+                      "petrol-sand-text-light": "#1D262B",
+                      "petrol-sand-accent-light": "#0E7490",
+                      
+                      "petrol-sand-bg-dark": "#0B1114",
+                      "petrol-sand-card-dark": "#151E24",
+                      "petrol-sand-border-dark": "#2B3842",
+                      "petrol-sand-text-dark": "#E5E9EC",
+                      "petrol-sand-accent-dark": "#22D3EE"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "stack-sm": "8px",
+                      "margin-mobile": "20px",
+                      "gutter": "24px",
+                      "stack-xl": "48px",
+                      "margin-desktop": "80px",
+                      "container-max": "1280px",
+                      "stack-xs": "4px"
+              },
+              "fontFamily": {
+                      "title-md": ["Inter"],
+                      "body-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "price-display": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "price-display": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        
+        /* Petrol & Sand Light Theme Overrides */
+        .theme-petrol-sand {
+            --bg-color: theme('colors.petrol-sand-bg-light');
+            --card-color: theme('colors.petrol-sand-card-light');
+            --border-color: theme('colors.petrol-sand-border-light');
+            --text-primary: theme('colors.petrol-sand-text-light');
+            --accent-color: theme('colors.petrol-sand-accent-light');
+            --text-on-accent: #ffffff;
+            --text-secondary: #5e6b73;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+        }
+
+        /* Petrol & Sand Dark Theme Overrides */
+        .dark .theme-petrol-sand {
+            --bg-color: theme('colors.petrol-sand-bg-dark');
+            --card-color: theme('colors.petrol-sand-card-dark');
+            --border-color: theme('colors.petrol-sand-border-dark');
+            --text-primary: theme('colors.petrol-sand-text-dark');
+            --accent-color: theme('colors.petrol-sand-accent-dark');
+            --text-on-accent: #042f3c; /* Dark text for bright accent */
+            --text-secondary: #94a3b8;
+        }
+
+        body {
+            background-color: var(--bg-color, theme('colors.surface'));
+            color: var(--text-primary, theme('colors.on-surface'));
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Utility classes for theme vars to make tailwind easier */
+        .bg-theme-bg { background-color: var(--bg-color); }
+        .bg-theme-card { background-color: var(--card-color); }
+        .border-theme-border { border-color: var(--border-color); }
+        .text-theme-primary { color: var(--text-primary); }
+        .text-theme-secondary { color: var(--text-secondary); }
+        .text-theme-accent { color: var(--accent-color); }
+        .bg-theme-accent { background-color: var(--accent-color); }
+        .text-theme-on-accent { color: var(--text-on-accent); }
+        
+        /* Glass/Blur effects */
+        .backdrop-blur-nav {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+    </style>
+</head>
+<body class="antialiased tabular-nums font-body-md theme-petrol-sand">
+<div class="fixed top-4 right-4 z-50 flex gap-2">
+<button class="px-4 py-2 bg-theme-card border border-theme-border rounded-xl shadow-sm flex items-center gap-2" id="themeToggleBtn">
+<span class="material-symbols-outlined text-theme-primary" style="font-size: 20px;">dark_mode</span>
+<span class="text-theme-primary font-label-md text-label-md">Toggle Theme</span>
+</button>
+</div>
+<!-- Main Container - Mobile Optimized Width -->
+<div class="max-w-md mx-auto w-full min-h-screen pb-32">
+<!-- Header -->
+<header class="pt-12 px-margin-mobile pb-stack-lg sticky top-0 z-40 bg-theme-bg/90 backdrop-blur-nav border-b border-theme-border">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-theme-primary mb-stack-xs tracking-tight">Homley Components</h1>
+<p class="font-body-md text-body-md text-theme-secondary">Petrol & Sand Color Scheme</p>
+</header>
+<div class="px-margin-mobile py-stack-lg flex flex-col gap-stack-xl">
+<!-- SECTION: Typography -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-title-md text-title-md text-theme-primary border-b border-theme-border pb-2">Typography</h2>
+<div class="bg-theme-card border border-theme-border rounded-xl p-stack-md shadow-[0px_8px_24px_rgba(45,54,46,0.04)] flex flex-col gap-stack-md">
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Display Large (Desktop)</div>
+<div class="font-display-lg text-display-lg text-theme-primary">Beautiful spaces.</div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Headline Large (Mobile)</div>
+<div class="font-headline-lg-mobile text-headline-lg-mobile text-theme-primary">Find your home.</div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Price Display</div>
+<div class="font-price-display text-price-display text-theme-primary">$3,450<span class="text-theme-secondary font-body-md">/mo</span></div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Title Medium</div>
+<div class="font-title-md text-title-md text-theme-primary">Sunny Loft in Brooklyn</div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Body Large</div>
+<div class="font-body-lg text-body-lg text-theme-secondary">Experience city living at its finest with expansive views and natural light.</div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Body Medium</div>
+<div class="font-body-md text-body-md text-theme-secondary">Available starting October 1st. Utilities not included.</div>
+</div>
+<div>
+<div class="text-[10px] text-theme-secondary uppercase tracking-wider mb-1">Label Medium</div>
+<div class="font-label-md text-label-md text-theme-primary">APPLY NOW</div>
+</div>
+</div>
+</section>
+<!-- SECTION: Buttons -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-title-md text-title-md text-theme-primary border-b border-theme-border pb-2">Buttons</h2>
+<div class="grid grid-cols-5 gap-y-stack-md gap-x-2 items-center text-center">
+<div class="text-[10px] text-theme-secondary uppercase font-semibold">Type</div>
+<div class="text-[10px] text-theme-secondary uppercase font-semibold">Default</div>
+<div class="text-[10px] text-theme-secondary uppercase font-semibold">Hover</div>
+<div class="text-[10px] text-theme-secondary uppercase font-semibold">Busy</div>
+<div class="text-[10px] text-theme-secondary uppercase font-semibold">Disabled</div>
+<!-- Primary -->
+<div class="text-xs text-theme-secondary">Primary</div>
+<div>
+<button class="w-full bg-[#182119] text-[#ffffff] font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center transition-transform active:scale-95 shadow-sm dark:bg-theme-accent dark:text-theme-on-accent">
+                            Action
+                        </button>
+</div>
+<div>
+<button class="w-full bg-[#30302f] text-[#ffffff] font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center shadow-sm dark:bg-[#164e63] dark:text-theme-on-accent">
+                            Action
+                        </button>
+</div>
+<div>
+<button class="w-full bg-[#182119] text-[#ffffff] font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center opacity-90 dark:bg-theme-accent dark:text-theme-on-accent">
+<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+</button>
+</div>
+<div>
+<button class="w-full bg-theme-border text-theme-secondary font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center opacity-50 cursor-not-allowed">
+                            Action
+                        </button>
+</div>
+<!-- Outline -->
+<div class="text-xs text-theme-secondary">Outline</div>
+<div>
+<button class="w-full bg-transparent border border-theme-border text-theme-primary font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center transition-transform active:scale-95">
+                            Action
+                        </button>
+</div>
+<div>
+<button class="w-full bg-theme-card border border-theme-primary text-theme-primary font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center">
+                            Action
+                        </button>
+</div>
+<div>
+<button class="w-full bg-transparent border border-theme-border text-theme-primary font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center">
+<span class="material-symbols-outlined animate-spin text-sm">progress_activity</span>
+</button>
+</div>
+<div>
+<button class="w-full bg-transparent border border-theme-border text-theme-secondary font-label-md text-label-md rounded-xl py-3 px-2 flex items-center justify-center opacity-50 cursor-not-allowed">
+                            Action
+                        </button>
+</div>
+</div>
+</section>
+<!-- SECTION: Forms -->
+<section class="flex flex-col gap-stack-md">
+<h2 class="font-title-md text-title-md text-theme-primary border-b border-theme-border pb-2">Forms & Inputs</h2>
+<div class="bg-theme-card border border-theme-border rounded-xl p-stack-md flex flex-col gap-stack-lg shadow-[0px_8px_24px_rgba(45,54,46,0.04)]">
+<!-- Search Input -->
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-theme-secondary">search</span>
+<input class="w-full bg-theme-bg border border-theme-border rounded-xl py-3 pl-10 pr-4 font-body-md text-theme-primary placeholder-theme-secondary focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent transition-all shadow-sm" placeholder="Search neighborhoods, cities..." type="text"/>
+</div>
+<!-- Standard Text Input -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-theme-primary ml-1">Email Address</label>
+<input class="w-full bg-theme-bg border border-theme-border rounded-xl py-3 px-4 font-body-md text-theme-primary placeholder-theme-secondary focus:outline-none focus:border-theme-accent focus:ring-1 focus:ring-theme-accent transition-all shadow-sm" placeholder="you@example.com" type="email"/>
+</div>
+<!-- AI Input Area -->
+<div class="flex flex-col gap-1 relative border border-theme-border rounded-xl bg-theme-bg p-2 focus-within:border-theme-accent focus-within:ring-1 focus-within:ring-theme-accent transition-all shadow-sm">
+<textarea class="w-full bg-transparent border-none resize-none font-body-md text-theme-primary placeholder-theme-secondary focus:ring-0 p-2 min-h-[80px]" placeholder="Describe your dream home... e.g., 'A sunny 2 bedroom near a park with exposed brick.'"></textarea>
+<div class="flex justify-between items-center px-2 pb-1">
+<div class="flex gap-2">
+<span class="material-symbols-outlined text-theme-accent text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="text-xs text-theme-secondary font-label-md">AI Search</span>
+</div>
+<button class="bg-theme-primary text-theme-bg rounded-full p-2 hover:bg-theme-secondary transition-colors">
+<span class="material-symbols-outlined text-sm">arrow_upward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- BottomNavBar (Shared Component JSON integration) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 border-t border-theme-border bg-theme-bg/90 backdrop-blur-nav shadow-[0px_-2px_12px_rgba(45,54,46,0.04)] rounded-t-xl md:hidden">
+<!-- Explore (Inactive) -->
+<div class="flex flex-col items-center justify-center text-theme-secondary hover:bg-theme-card/20 transition-all cursor-pointer w-16">
+<span class="material-symbols-outlined mb-1">explore</span>
+<span class="font-label-md text-[10px]">Explore</span>
+</div>
+<!-- Saved (Inactive) -->
+<div class="flex flex-col items-center justify-center text-theme-secondary hover:bg-theme-card/20 transition-all cursor-pointer w-16">
+<span class="material-symbols-outlined mb-1">favorite</span>
+<span class="font-label-md text-[10px]">Saved</span>
+</div>
+<!-- AI Chat (Active/Center Button) -->
+<div class="flex flex-col items-center justify-center text-theme-primary font-semibold cursor-pointer w-16 scale-110 -translate-y-4">
+<div class="bg-theme-accent text-theme-on-accent rounded-full p-4 shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<span class="font-label-md text-[10px] mt-1 opacity-0 absolute -bottom-4">AI Chat</span> <!-- Hidden label for styling match -->
+</div>
+<!-- Matches (Inactive) -->
+<div class="flex flex-col items-center justify-center text-theme-secondary hover:bg-theme-card/20 transition-all cursor-pointer w-16">
+<span class="material-symbols-outlined mb-1">handshake</span>
+<span class="font-label-md text-[10px]">Matches</span>
+</div>
+<!-- Profile (Active - Since this is a component sheet, I'll make Profile active to show the state, though AI chat is central) -->
+<div class="flex flex-col items-center justify-center text-theme-accent font-semibold hover:bg-theme-card/20 transition-all cursor-pointer w-16">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px]">Profile</span>
+</div>
+</nav>
+<script>
+        const toggleBtn = document.getElementById('themeToggleBtn');
+        const htmlElement = document.documentElement;
+
+        toggleBtn.addEventListener('click', () => {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                htmlElement.classList.add('light');
+                toggleBtn.querySelector('.material-symbols-outlined').textContent = 'dark_mode';
+            } else {
+                htmlElement.classList.remove('light');
+                htmlElement.classList.add('dark');
+                toggleBtn.querySelector('.material-symbols-outlined').textContent = 'light_mode';
+            }
+        });
+    </script>
+</body></html>

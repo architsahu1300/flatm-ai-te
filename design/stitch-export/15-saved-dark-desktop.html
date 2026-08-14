@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Saved Items</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "primary-fixed-dim": "#81d1f0",
+                      "on-surface": "#1b1c1a",
+                      "sand-border": "#DFDCD6",
+                      "electric-cyan": "#22D3EE",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary": "#5e5e5d",
+                      "on-secondary-fixed-variant": "#464746",
+                      "on-surface-variant": "#3f484c",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#fbf9f6",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "onyx": "#1D262B",
+                      "surface-tint": "#006781",
+                      "on-background": "#1b1c1a",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1",
+                      "on-primary-fixed-variant": "#004d62",
+                      "on-secondary-container": "#636362",
+                      "on-error-container": "#93000a",
+                      "background": "#fbf9f6",
+                      "on-primary-fixed": "#001f29",
+                      "surface-container-high": "#eae8e5",
+                      "error-container": "#ffdad6",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#d3f1ff",
+                      "outline-variant": "#bec8cd",
+                      "outline": "#6f787d",
+                      "inverse-primary": "#81d1f0",
+                      "petrol": "#0E7490",
+                      "inverse-surface": "#30312f",
+                      "surface-variant": "#e4e2df",
+                      "deep-void": "#0B1114",
+                      "on-tertiary-container": "#f0ece6",
+                      "surface-container-low": "#f5f3f0",
+                      "surface-container-highest": "#e4e2df",
+                      "tertiary-container": "#6c6b66",
+                      "primary-container": "#0e7490",
+                      "secondary-container": "#e1dfde",
+                      "sand-light": "#F7F5F2",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "surface-dim": "#dbdad7",
+                      "surface-container": "#efeeeb",
+                      "tertiary-fixed": "#e5e2dc",
+                      "tertiary": "#54534e",
+                      "primary": "#005a71",
+                      "on-tertiary": "#ffffff",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "primary-fixed": "#b9eaff",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "80px",
+                      "stack-sm": "8px",
+                      "stack-xl": "48px",
+                      "stack-xs": "4px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "margin-mobile": "20px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-onyx text-on-surface min-h-screen antialiased flex flex-col">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-onyx/80 backdrop-blur-md border-b border-outline-variant shadow-sm hidden md:block">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-between h-20">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-display-lg font-bold text-electric-cyan" href="#">Homley</a>
+<div class="hidden lg:flex items-center gap-6">
+<a class="font-body-md text-body-md text-secondary-fixed-dim hover:text-electric-cyan transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-secondary-fixed-dim hover:text-electric-cyan transition-colors" href="#">Find flatmates</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-secondary-fixed-dim hover:text-electric-cyan transition-colors scale-95 active:opacity-80">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary px-4 py-2 rounded-lg hover:bg-primary-container transition-colors scale-95 active:opacity-80">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow pt-24 md:pt-32 pb-24 md:pb-12 max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full">
+<header class="mb-stack-lg md:mb-stack-xl flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile md:font-display-lg md:text-display-lg text-electric-cyan mb-2">Saved Items</h1>
+<p class="font-body-md text-body-md text-secondary-fixed-dim">Your curated list of properties and flatmates.</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-surface-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-dim transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 0;">filter_list</span>
+                    Filter
+                </button>
+<div class="bg-surface-variant text-on-surface-variant px-4 py-2 rounded-lg font-label-md text-label-md flex items-center gap-2">
+<span class="tabular-nums font-semibold">12</span> Saved
+                </div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- Card 1 -->
+<article class="bg-deep-void rounded-[16px] overflow-hidden border border-outline-variant shadow-lg group hover:border-petrol transition-colors">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A modern, high-end apartment living room with large floor-to-ceiling windows overlooking a city skyline at dusk. The interior is decorated in a sophisticated style with dark wood, minimal furniture, and ambient warm lighting contrasting with the cool city lights outside. Shot in high resolution, professional architectural photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGCDQWjqYs_p_ZVGaZ1o_fvsq1dw0artsxAQQzddz_8mQelFP0Pdk-yGGhfEHMrMPys6pyxhBNfWafjfjhPkjHy9cmGL7FR0h5x5gpkaKKQ11XanTiIXXUlPCFHlFC8ehsugBtKYe2hehrhWyHbSyWbYfSof07kL5TX95S2hg6ERby2X0y7hJ7QFPcqm7q5tJrkz9SMuOFbEQihE33v-aTy_Huj61-52p54oVf0uNCb-eEIUZWjx33cQ"/>
+<div class="absolute top-4 right-4 bg-deep-void/60 backdrop-blur-sm p-2 rounded-full cursor-pointer hover:bg-petrol text-electric-cyan transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="bg-surface-variant/80 backdrop-blur-sm text-on-surface-variant px-2 py-1 rounded text-xs font-semibold">Apartment</span>
+<span class="bg-petrol/80 backdrop-blur-sm text-on-primary px-2 py-1 rounded text-xs font-semibold">Match 95%</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-inverse-on-surface">Bandra West Sea View</h3>
+<span class="font-title-md text-title-md text-electric-cyan tabular-nums">₹85k</span>
+</div>
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-4 line-clamp-2">Stunning 2BHK with unrestricted views of the Arabian Sea. Fully furnished with modern amenities and access to a rooftop pool.</p>
+<div class="flex items-center gap-4 text-sm text-secondary-fixed-dim mb-6">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">bed</span> <span class="tabular-nums">2</span> Beds</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">bathtub</span> <span class="tabular-nums">2</span> Baths</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">square_foot</span> <span class="tabular-nums">1200</span> sqft</div>
+</div>
+<button class="w-full bg-petrol text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-primary-container transition-colors shadow-sm">Contact Agent</button>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-deep-void rounded-[16px] overflow-hidden border border-outline-variant shadow-lg group hover:border-petrol transition-colors">
+<div class="relative h-48 w-full overflow-hidden">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cozy, well-lit studio apartment designed with a minimalist aesthetic. Light wood floors, white walls, and a comfortable reading nook by a large window showing a green courtyard. Professional interior design photography, high key lighting, crisp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJrdUE-ozb6HOVq_5GmQswq0GRWV3WtiihdHoyvOaW2B4GhwkETIYFD4dHIXhcsB8QnRPaEXA5wfFY2TW0w-xRd4IGJMGOeCmpdCeSWvbf_7RQ9xq4Nyauertw_03PFPHTDCfRVd30UbpwyQ5Hu1uG9My7nvOgHoYqqq_1fCmxCoto48AVXniFZkY0sV6Ow6Ulf4dErOLKOmhYzbtzWUgCFNPnFnQJbEnMMA6Bur2N8N6E6QAulKLsaw"/>
+<div class="absolute top-4 right-4 bg-deep-void/60 backdrop-blur-sm p-2 rounded-full cursor-pointer hover:bg-petrol text-electric-cyan transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+<div class="absolute bottom-4 left-4 flex gap-2">
+<span class="bg-surface-variant/80 backdrop-blur-sm text-on-surface-variant px-2 py-1 rounded text-xs font-semibold">Studio</span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<h3 class="font-title-md text-title-md text-inverse-on-surface">Juhu Cozy Studio</h3>
+<span class="font-title-md text-title-md text-electric-cyan tabular-nums">₹45k</span>
+</div>
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-4 line-clamp-2">Perfect for singles or young professionals. Located in a quiet lane just minutes away from the beach. Semi-furnished.</p>
+<div class="flex items-center gap-4 text-sm text-secondary-fixed-dim mb-6">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">bed</span> <span class="tabular-nums">1</span> Bed</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">bathtub</span> <span class="tabular-nums">1</span> Bath</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">square_foot</span> <span class="tabular-nums">500</span> sqft</div>
+</div>
+<button class="w-full bg-petrol text-on-primary font-label-md text-label-md py-3 rounded-lg hover:bg-primary-container transition-colors shadow-sm">Contact Agent</button>
+</div>
+</article>
+<!-- Card 3: Flatmate Profile -->
+<article class="bg-deep-void rounded-[16px] overflow-hidden border border-outline-variant shadow-lg flex flex-col group hover:border-petrol transition-colors">
+<div class="p-6 flex-grow flex flex-col">
+<div class="flex justify-between items-start mb-4">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full overflow-hidden bg-surface-variant flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A portrait of a smiling young professional woman with dark hair, wearing a casual stylish jacket, set against a blurred urban cafe background. Soft, flattering lighting, high-quality professional headshot." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA04sxhd2v6Qu7daqmkllkPd1EoH3d-CtimuAizEoQSfrhsDK-bS9KwbI-a9RO3v0e6AoCkZXc6ipMjBRcZyo6N0ZEb2siYxHC50bapmJLpFT8i7f74zpQn9mclqFlQRWWJDyMJsuA05H6m5tlQ2RO9ze25T4sUGFnirGmp1Nzn0yjaMYpX-gmvHqmspcjQulwqTlm0JtZ3UfHLAnk80mLdWTYMcluNY4J9ofeuleEf2ICPjGmdFU6hbg"/>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-inverse-on-surface">Priya S.</h3>
+<p class="text-sm text-electric-cyan">Looking in Andheri West</p>
+</div>
+</div>
+<div class="bg-deep-void/60 p-2 rounded-full cursor-pointer hover:bg-petrol text-electric-cyan transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-secondary-fixed-dim mb-4 flex-grow">"Looking for a chill flatmate to share a 2BHK. I work in tech, love weekend hikes, and prefer a quiet, clean home."</p>
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full text-xs">Non-smoker</span>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full text-xs">Pet friendly</span>
+<span class="bg-surface-variant text-on-surface-variant px-3 py-1 rounded-full text-xs">Budget: ~₹30k</span>
+</div>
+<button class="w-full border border-sand-border text-inverse-on-surface font-label-md text-label-md py-3 rounded-lg hover:bg-surface-variant transition-colors shadow-sm">Message Priya</button>
+</div>
+</article>
+</div>
+</main>
+<!-- SideNavBar (Mobile Bottom Nav) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-onyx bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)] shadow-lg md:hidden">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">explore</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-label-md mt-1 text-[10px] font-semibold">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">auto_awesome</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">AI Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Profile</span>
+</a>
+</nav>
+</body></html>

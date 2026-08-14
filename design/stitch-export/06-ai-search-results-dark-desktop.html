@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - AI Search Results</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary": "#ffffff",
+                    "sand-border": "#DFDCD6",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#efeeeb",
+                    "primary": "#005a71",
+                    "on-surface": "#1b1c1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "on-surface-variant": "#3f484c",
+                    "surface-container-highest": "#e4e2df",
+                    "petrol": "#0E7490",
+                    "primary-fixed": "#b9eaff",
+                    "error-container": "#ffdad6",
+                    "background": "#fbf9f6",
+                    "on-secondary-fixed-variant": "#464746",
+                    "inverse-primary": "#81d1f0",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "on-tertiary-container": "#f0ece6",
+                    "on-error-container": "#93000a",
+                    "surface-tint": "#006781",
+                    "surface-container-high": "#eae8e5",
+                    "outline": "#6f787d",
+                    "inverse-surface": "#30312f",
+                    "tertiary": "#54534e",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "on-primary": "#ffffff",
+                    "tertiary-container": "#6c6b66",
+                    "deep-void": "#0B1114",
+                    "surface-dim": "#dbdad7",
+                    "on-primary-container": "#d3f1ff",
+                    "on-primary-fixed-variant": "#004d62",
+                    "sand-light": "#F7F5F2",
+                    "on-tertiary": "#ffffff",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary-container": "#e1dfde",
+                    "primary-fixed-dim": "#81d1f0",
+                    "surface-container-low": "#f5f3f0",
+                    "electric-cyan": "#22D3EE",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#e5e2dc",
+                    "error": "#ba1a1a",
+                    "secondary": "#5e5e5d",
+                    "onyx": "#1D262B",
+                    "surface-variant": "#e4e2df",
+                    "on-primary-fixed": "#001f29",
+                    "on-secondary-container": "#636362",
+                    "primary-container": "#0e7490",
+                    "outline-variant": "#bec8cd",
+                    "surface-bright": "#fbf9f6",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "20px",
+                    "stack-xl": "48px",
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "margin-desktop": "80px",
+                    "stack-xs": "4px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "title-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+</head>
+<body class="bg-deep-void text-inverse-on-surface min-h-screen font-body-md overflow-x-hidden antialiased flex flex-col">
+<!-- Top Navigation Area -->
+<header class="fixed top-0 w-full z-50 bg-onyx/80 backdrop-blur-md border-b border-outline-variant transition-all duration-300 shadow-none">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Logo -->
+<a class="flex items-center gap-2" href="#">
+<span class="material-symbols-outlined filled text-electric-cyan text-[24px]">real_estate_agent</span>
+<span class="font-title-md text-title-md font-bold text-inverse-on-surface tracking-tight">Homley</span>
+</a>
+<!-- Compact Search Box (AI Search) -->
+<div class="hidden md:flex flex-1 max-w-2xl mx-gutter relative group shadow-[0_24px_48px_-12px_rgba(34,211,238,0.08)]">
+<div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-electric-cyan text-[20px]">auto_awesome</span>
+</div>
+<input class="w-full bg-surface-dim/10 border border-outline-variant/30 text-inverse-on-surface font-body-md text-body-md rounded-full py-2.5 pl-12 pr-12 focus:outline-none focus:ring-2 focus:ring-electric-cyan/50 focus:bg-onyx transition-all placeholder:text-outline-variant truncate" placeholder="Describe your ideal home..." type="text" value="Sunny 1BR in coastal areas, &lt;40min to CBD, quiet"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center group-hover:text-electric-cyan text-outline-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+<!-- Desktop Nav -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-body-md text-body-md font-bold text-electric-cyan border-b-2 border-electric-cyan py-1 hover:text-primary-fixed-dim transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Find flatmates</a>
+<div class="flex items-center gap-4 ml-4 pl-4 border-l border-outline-variant/30">
+<button class="font-label-md text-label-md text-inverse-on-surface hover:text-electric-cyan transition-colors">Sign in</button>
+<button class="bg-petrol text-white px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-primary-container transition-colors shadow-sm active:scale-95 duration-150">Get started</button>
+</div>
+</nav>
+<!-- Mobile Menu Toggle -->
+<button class="md:hidden text-inverse-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 pt-[104px] pb-[120px] px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto w-full relative">
+<!-- Header & Intent Chips -->
+<div class="mb-stack-xl">
+<h1 class="font-headline-lg text-headline-lg text-inverse-on-surface mb-stack-sm flex items-center gap-3">
+<span class="material-symbols-outlined text-electric-cyan text-[32px] filled">bolt</span>
+                AI Top Matches
+            </h1>
+<p class="font-body-lg text-body-lg text-outline-variant mb-stack-md">We found 8 highly compatible homes based on your complex search criteria.</p>
+<div class="flex flex-wrap gap-stack-sm">
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-onyx border border-outline-variant/20 rounded-full font-label-md text-label-md text-inverse-on-surface">
+<span class="material-symbols-outlined text-[16px] text-electric-cyan">wb_sunny</span>
+                    High Natural Light
+                </div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-onyx border border-outline-variant/20 rounded-full font-label-md text-label-md text-inverse-on-surface">
+<span class="material-symbols-outlined text-[16px] text-electric-cyan">train</span>
+                    &lt;40m Commute
+                </div>
+<div class="flex items-center gap-1.5 px-3 py-1.5 bg-onyx border border-outline-variant/20 rounded-full font-label-md text-label-md text-inverse-on-surface">
+<span class="material-symbols-outlined text-[16px] text-electric-cyan">volume_off</span>
+                    Quiet Neighborhood
+                </div>
+<button class="flex items-center gap-1.5 px-3 py-1.5 bg-transparent border border-dashed border-outline-variant/50 rounded-full font-label-md text-label-md text-outline-variant hover:text-electric-cyan hover:border-electric-cyan transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                    Refine intent
+                </button>
+</div>
+</div>
+<!-- Ranked Match List -->
+<div class="flex flex-col gap-stack-lg max-w-4xl mx-auto lg:mx-0">
+<!-- Match Card 1 -->
+<article class="bg-onyx/80 backdrop-blur-sm border border-outline-variant/20 rounded-2xl overflow-hidden shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] hover:border-electric-cyan/30 transition-all duration-300 group flex flex-col md:flex-row">
+<!-- Photo Left -->
+<div class="md:w-[320px] h-[240px] md:h-auto relative overflow-hidden shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A modern, sun-drenched living room in a coastal apartment. Bright light streams through large floor-to-ceiling windows, illuminating light hardwood floors and minimalist furniture. The color palette features neutral whites, soft greys, and subtle hints of ocean blue. The overall mood is serene, airy, and contemporary." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxdHr65s-hQa-L3jdC5ppvwH8-JRjx7J4csnkqmtGEzMhpYHuWQ__b5pESxD6KcwQcUsWHtitV9MQqqEUEmv6u9Q0g-a9kyK8tGIHp1hWppUNJkdFFYf-6qAfcoa8QqBc8XXt63bleDj3RqUqkE1b66d2dXQNlcRxEucRP9z138hfGZHsmj-iYyxG_bbMRx6Oh5lH1Lw5ocr4YC4k16K93IZRwrXJrM4HlkFHDQO2u70MyoMK9WyQ1-w"/>
+<div class="absolute top-4 left-4 bg-deep-void/70 backdrop-blur-md px-3 py-1 rounded-full border border-electric-cyan/30 flex items-center gap-2">
+<div class="relative w-6 h-6 flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full rotate-[-90deg]" viewbox="0 0 36 36">
+<path class="text-surface-dim/20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="text-electric-cyan" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="98, 100" stroke-width="3"></path>
+</svg>
+<span class="font-label-md text-[10px] font-bold text-electric-cyan z-10">98%</span>
+</div>
+<span class="font-label-md text-label-md text-inverse-on-surface">Match</span>
+</div>
+<button class="absolute top-4 right-4 text-white drop-shadow-md hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[24px]">favorite_border</span>
+</button>
+<div class="absolute bottom-4 left-4 right-4 flex gap-2">
+<div class="bg-black/50 backdrop-blur-sm px-2 py-1 rounded-md text-white font-label-md text-[12px] flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span> 12
+                        </div>
+</div>
+</div>
+<!-- Details Right -->
+<div class="p-stack-lg flex flex-col flex-1">
+<div class="flex justify-between items-start mb-stack-xs">
+<div>
+<h2 class="font-title-md text-title-md text-inverse-on-surface group-hover:text-electric-cyan transition-colors">Coastal Haven Apartment</h2>
+<p class="font-body-md text-body-md text-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Bondi Junction, NSW
+                            </p>
+</div>
+<div class="text-right">
+<span class="font-title-md text-title-md font-bold text-electric-cyan">$850<span class="text-outline-variant text-[14px] font-normal">/wk</span></span>
+</div>
+</div>
+<!-- AI Insights -->
+<div class="mt-stack-md pt-stack-md border-t border-outline-variant/10 space-y-3 flex-1">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 bg-electric-cyan/20 p-1 rounded-full text-electric-cyan">
+<span class="material-symbols-outlined text-[14px] filled">check_circle</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-inverse-on-surface">Perfect sunlight &amp; commute</p>
+<p class="font-body-md text-[13px] text-outline-variant mt-0.5">South-east facing with large windows. 32 min transit to CBD via train.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="mt-0.5 bg-tertiary/30 p-1 rounded-full text-outline-variant">
+<span class="material-symbols-outlined text-[14px]">info</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-inverse-on-surface">Street facing unit</p>
+<p class="font-body-md text-[13px] text-outline-variant mt-0.5">Meets quiet requirement mostly, but faces a secondary road. Double glazing installed.</p>
+</div>
+</div>
+</div>
+<!-- Action Footer -->
+<div class="mt-stack-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 text-outline-variant text-[12px] bg-surface-dim/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">bed</span> 1
+                            </div>
+<div class="flex items-center gap-1 text-outline-variant text-[12px] bg-surface-dim/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">shower</span> 1
+                            </div>
+<div class="flex items-center gap-1 text-outline-variant text-[12px] bg-surface-dim/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">directions_car</span> 1
+                            </div>
+</div>
+<button class="bg-surface-dim/10 hover:bg-petrol text-electric-cyan hover:text-white px-4 py-2 rounded-lg font-label-md text-label-md transition-colors border border-electric-cyan/30 hover:border-transparent active:scale-95 duration-150">
+                            View details
+                        </button>
+</div>
+</div>
+</article>
+<!-- Match Card 2 -->
+<article class="bg-onyx/80 backdrop-blur-sm border border-outline-variant/20 rounded-2xl overflow-hidden shadow-[0_4px_24px_-8px_rgba(0,0,0,0.5)] hover:border-electric-cyan/30 transition-all duration-300 group flex flex-col md:flex-row opacity-90">
+<div class="md:w-[320px] h-[240px] md:h-auto relative overflow-hidden shrink-0">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A bright, modern bedroom in a coastal home with large bay windows. The room is decorated in crisp white and navy blue tones. Morning sunlight illuminates the space, highlighting clean architectural lines and a tranquil, relaxing atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3k-sFsJa6eb87OAKCX-qP2MDhpou4NCfZX_SP9ESLj0FAdAHhgwfQxRzuVqGC5MjPqFbolaMWzqMNcHBMJN5BgjFweo00IVJ8pn3sDyESlFGMJO8Xhta2gBNBA-6O6JlCgLzi9ciRZ3w2XJ0CXFPY8B_V_MLQr6Gk326h2TS_SFME12p25d2LXAuSml5rBWRK0jPSvOjbGEIFcuwyu2F1c24Uzh5bUSos3PdBvu8S8Uj157D__4jtKw"/>
+<div class="absolute top-4 left-4 bg-deep-void/70 backdrop-blur-md px-3 py-1 rounded-full border border-electric-cyan/30 flex items-center gap-2">
+<div class="relative w-6 h-6 flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full rotate-[-90deg]" viewbox="0 0 36 36">
+<path class="text-surface-dim/20" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="3"></path>
+<path class="text-electric-cyan" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="92, 100" stroke-width="3"></path>
+</svg>
+<span class="font-label-md text-[10px] font-bold text-electric-cyan z-10">92%</span>
+</div>
+<span class="font-label-md text-label-md text-inverse-on-surface">Match</span>
+</div>
+<button class="absolute top-4 right-4 text-white drop-shadow-md hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[24px]">favorite_border</span>
+</button>
+</div>
+<div class="p-stack-lg flex flex-col flex-1">
+<div class="flex justify-between items-start mb-stack-xs">
+<div>
+<h2 class="font-title-md text-title-md text-inverse-on-surface group-hover:text-electric-cyan transition-colors">Seaview Terrace Flat</h2>
+<p class="font-body-md text-body-md text-outline-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">location_on</span> Coogee, NSW
+                            </p>
+</div>
+<div class="text-right">
+<span class="font-title-md text-title-md font-bold text-electric-cyan">$790<span class="text-outline-variant text-[14px] font-normal">/wk</span></span>
+</div>
+</div>
+<div class="mt-stack-md pt-stack-md border-t border-outline-variant/10 space-y-3 flex-1">
+<div class="flex items-start gap-3">
+<div class="mt-0.5 bg-electric-cyan/20 p-1 rounded-full text-electric-cyan">
+<span class="material-symbols-outlined text-[14px] filled">check_circle</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-inverse-on-surface">Extremely quiet location</p>
+<p class="font-body-md text-[13px] text-outline-variant mt-0.5">Situated on a cul-de-sac backing onto a reserve.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="mt-0.5 bg-error/20 p-1 rounded-full text-error">
+<span class="material-symbols-outlined text-[14px]">warning</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-error-container">Commute slightly over target</p>
+<p class="font-body-md text-[13px] text-outline-variant mt-0.5">Estimated 45 mins to CBD, relying on bus transfer.</p>
+</div>
+</div>
+</div>
+<div class="mt-stack-lg flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1 text-outline-variant text-[12px] bg-surface-dim/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">bed</span> 1
+                            </div>
+<div class="flex items-center gap-1 text-outline-variant text-[12px] bg-surface-dim/10 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[14px]">shower</span> 1
+                            </div>
+</div>
+<button class="bg-surface-dim/10 hover:bg-petrol text-electric-cyan hover:text-white px-4 py-2 rounded-lg font-label-md text-label-md transition-colors border border-electric-cyan/30 hover:border-transparent active:scale-95 duration-150">
+                            View details
+                        </button>
+</div>
+</div>
+</article>
+</div>
+</main>
+<!-- Bottom AI Refinement Bar (Fixed) -->
+<div class="fixed bottom-0 w-full z-40 bg-onyx/90 backdrop-blur-xl border-t border-outline-variant/30 py-4 px-margin-mobile md:px-margin-desktop shadow-[0_-8px_32px_rgba(0,0,0,0.4)]">
+<div class="max-w-container-max mx-auto flex items-center gap-4">
+<span class="material-symbols-outlined text-electric-cyan text-[28px] hidden md:block">auto_awesome</span>
+<div class="flex-1 relative">
+<input class="w-full bg-deep-void border border-outline-variant/50 text-inverse-on-surface font-body-md rounded-lg py-3 pl-4 pr-12 focus:outline-none focus:border-electric-cyan/70 focus:ring-1 focus:ring-electric-cyan/50 transition-all placeholder:text-outline-variant/70" placeholder="Refine these results (e.g., 'Only show ones with a balcony')" type="text"/>
+<button class="absolute inset-y-0 right-2 flex items-center justify-center w-10 text-electric-cyan hover:text-primary-fixed transition-colors">
+<span class="material-symbols-outlined filled">send</span>
+</button>
+</div>
+<div class="hidden md:flex gap-2">
+<button class="px-3 py-2 bg-surface-dim/10 hover:bg-surface-dim/20 text-inverse-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30">
+                    Sort by Match
+                </button>
+<button class="px-3 py-2 bg-surface-dim/10 hover:bg-surface-dim/20 text-inverse-on-surface rounded-lg font-label-md text-label-md transition-colors border border-outline-variant/30 flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">map</span> Map View
+                </button>
+</div>
+</div>
+</div>
+</body></html>

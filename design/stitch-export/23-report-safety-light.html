@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Report &amp; Safety</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-primary-container": "#d3f1ff",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-container": "#0e7490",
+                        "sand-light": "#F7F5F2",
+                        "onyx": "#1D262B",
+                        "on-surface": "#1b1c1a",
+                        "surface-dim": "#dbdad7",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#636362",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary-container": "#6c6b66",
+                        "inverse-primary": "#81d1f0",
+                        "secondary": "#5e5e5d",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "on-primary-fixed-variant": "#004d62",
+                        "surface-tint": "#006781",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface": "#fbf9f6",
+                        "tertiary": "#54534e",
+                        "on-tertiary": "#ffffff",
+                        "petrol": "#0E7490",
+                        "on-tertiary-container": "#f0ece6",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "outline": "#6f787d",
+                        "on-primary-fixed": "#001f29",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-variant": "#e4e2df",
+                        "electric-cyan": "#22D3EE",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#005a71",
+                        "outline-variant": "#bec8cd",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1b1c1a",
+                        "inverse-on-surface": "#f2f0ed",
+                        "primary-fixed": "#b9eaff",
+                        "deep-void": "#0B1114",
+                        "surface-bright": "#fbf9f6",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-low": "#f5f3f0",
+                        "inverse-surface": "#30312f",
+                        "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "margin-desktop": "80px",
+                        "stack-md": "16px",
+                        "stack-xl": "48px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        /* Hide scrollbar for clean mobile look in this preview */
+        ::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex items-center justify-center bg-surface-variant p-4">
+<!-- Mobile Device Container -->
+<div class="relative w-[375px] h-[812px] bg-background rounded-[40px] shadow-2xl overflow-hidden flex flex-col mx-auto ring-8 ring-onyx border-[12px] border-deep-void">
+<!-- Status Bar Mockup -->
+<div class="h-12 w-full flex justify-between items-center px-6 pt-2 text-xs font-medium text-on-surface z-50">
+<span>9:41</span>
+<div class="flex gap-1.5 items-center">
+<span class="material-symbols-outlined text-[16px]">signal_cellular_4_bar</span>
+<span class="material-symbols-outlined text-[16px]">wifi</span>
+<span class="material-symbols-outlined text-[16px]">battery_full</span>
+</div>
+</div>
+<!-- 
+            SCENARIO 1: Scam Warning Interstitial 
+            (Default view for this prototype, others hidden behind overlays)
+        -->
+<main class="flex-1 flex flex-col p-6 overflow-y-auto no-scrollbar relative">
+<div class="flex-1 flex flex-col items-center justify-center text-center space-y-stack-lg mt-8">
+<!-- Warning Icon -->
+<div class="w-24 h-24 rounded-full bg-error-container text-error flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-[48px]" style="font-variation-settings: 'FILL' 1;">gpp_maybe</span>
+</div>
+<div class="space-y-stack-sm">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Stay Safe on Homley</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">We've detected unusual activity from this listing. Please exercise caution.</p>
+</div>
+<div class="bg-surface-container rounded-xl p-4 w-full text-left mt-6 border border-sand-border shadow-sm">
+<h3 class="font-title-md text-title-md text-on-surface mb-2 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">lightbulb</span>
+                        Safety Tips
+                    </h3>
+<ul class="space-y-3 font-body-md text-body-md text-secondary">
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] mt-0.5">close</span>
+                            Never wire money or pay outside the Homley app.
+                        </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] mt-0.5">visibility</span>
+                            Always view the property in person before signing a lease.
+                        </li>
+<li class="flex items-start gap-2">
+<span class="material-symbols-outlined text-[18px] mt-0.5">shield</span>
+                            Report suspicious behavior immediately.
+                        </li>
+</ul>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="mt-auto space-y-stack-md pt-8">
+<button class="w-full bg-surface-container-lowest text-error font-label-md text-label-md py-4 rounded-xl border border-error/30 hover:bg-error-container active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2" onclick="toggleModal('report-modal')">
+<span class="material-symbols-outlined text-[20px]">flag</span>
+                    Report this listing
+                </button>
+<button class="w-full bg-surface text-secondary font-label-md text-label-md py-4 rounded-xl border border-sand-border hover:bg-surface-container active:scale-95 transition-all shadow-sm" onclick="toggleModal('block-dialog')">
+                    Block User
+                </button>
+<button class="w-full bg-petrol text-white font-label-md text-label-md py-4 rounded-xl active:scale-95 transition-all shadow-md">
+                    Return to Browse homes
+                </button>
+</div>
+</main>
+<!-- 
+            MODAL 1: Report Listing Overlay 
+        -->
+<div class="absolute inset-0 z-[100] hidden" id="report-modal">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-onyx/40 backdrop-blur-sm" onclick="toggleModal('report-modal')"></div>
+<!-- Modal Content -->
+<div class="absolute bottom-0 left-0 w-full bg-surface rounded-t-[24px] shadow-2xl transform transition-transform translate-y-0 h-[85%] flex flex-col">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center py-3">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
+</div>
+<div class="px-6 pb-6 flex-1 overflow-y-auto no-scrollbar">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-title-md text-title-md text-on-surface">Report Listing</h2>
+<button class="text-on-surface-variant p-2 rounded-full hover:bg-surface-container transition-colors" onclick="toggleModal('report-modal')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mb-6">
+                        Help us understand what's wrong with this listing. Your report is confidential.
+                    </p>
+<!-- Reason Chips -->
+<div class="mb-6">
+<label class="font-label-md text-label-md text-on-surface block mb-3">Reason for reporting</label>
+<div class="flex flex-wrap gap-2">
+<!-- Chip 1 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="report_reason" type="radio"/>
+<div class="px-4 py-2 rounded-xl border border-sand-border bg-surface-container-lowest font-body-md text-body-md text-secondary peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary-container transition-colors shadow-sm">
+                                    It's a scam or spam
+                                </div>
+</label>
+<!-- Chip 2 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="report_reason" type="radio"/>
+<div class="px-4 py-2 rounded-xl border border-sand-border bg-surface-container-lowest font-body-md text-body-md text-secondary peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary-container transition-colors shadow-sm">
+                                    Fake photos/details
+                                </div>
+</label>
+<!-- Chip 3 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="report_reason" type="radio"/>
+<div class="px-4 py-2 rounded-xl border border-sand-border bg-surface-container-lowest font-body-md text-body-md text-secondary peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary-container transition-colors shadow-sm">
+                                    Harassment or abusive
+                                </div>
+</label>
+<!-- Chip 4 -->
+<label class="cursor-pointer">
+<input class="peer sr-only" name="report_reason" type="radio"/>
+<div class="px-4 py-2 rounded-xl border border-sand-border bg-surface-container-lowest font-body-md text-body-md text-secondary peer-checked:bg-primary-container peer-checked:text-on-primary-container peer-checked:border-primary-container transition-colors shadow-sm">
+                                    Property unavailable
+                                </div>
+</label>
+</div>
+</div>
+<!-- Details Field -->
+<div class="mb-8">
+<label class="font-label-md text-label-md text-on-surface block mb-2" for="report_details">Additional details (optional)</label>
+<textarea class="w-full rounded-xl border border-sand-border bg-surface-container-lowest p-4 font-body-md text-body-md text-on-surface placeholder:text-outline focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow shadow-sm resize-none" id="report_details" placeholder="Please provide more context to help us investigate..." rows="4"></textarea>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-error text-white font-label-md text-label-md py-4 rounded-xl active:scale-95 transition-all shadow-md mt-auto" onclick="toggleModal('report-modal')">
+                        Submit Report
+                    </button>
+</div>
+</div>
+</div>
+<!-- 
+            DIALOG 2: Block User Confirmation 
+        -->
+<div class="absolute inset-0 z-[110] hidden flex items-center justify-center p-6" id="block-dialog">
+<!-- Backdrop -->
+<div class="absolute inset-0 bg-onyx/60 backdrop-blur-md" onclick="toggleModal('block-dialog')"></div>
+<!-- Dialog Box -->
+<div class="relative w-full bg-surface-container-lowest rounded-[24px] p-6 shadow-2xl flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-variant flex items-center justify-center mb-4 text-on-surface-variant">
+<span class="material-symbols-outlined text-[32px]">block</span>
+</div>
+<h3 class="font-title-md text-title-md text-on-surface mb-2">Block this user?</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mb-8">
+                    They won't be able to message you or see your profile. They will not be notified that you blocked them.
+                </p>
+<div class="flex flex-col w-full gap-3">
+<button class="w-full bg-error text-white font-label-md text-label-md py-3.5 rounded-xl active:scale-95 transition-all shadow-sm" onclick="toggleModal('block-dialog')">
+                        Block
+                    </button>
+<button class="w-full bg-surface text-secondary font-label-md text-label-md py-3.5 rounded-xl border border-sand-border hover:bg-surface-container active:scale-95 transition-all" onclick="toggleModal('block-dialog')">
+                        Cancel
+                    </button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Shell (Suppressed contextually, but included structurally as per guidelines, hidden in this view as it's a safety interstitial) -->
+<nav class="hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-end px-margin-mobile pb-4 h-16 border-t border-outline-variant bg-surface shadow-lg rounded-t-xl">
+<!-- Elements omitted for clarity as this is a transactional/safety screen where nav should be suppressed -->
+</nav>
+</div>
+<script>
+        function toggleModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal.classList.contains('hidden')) {
+                modal.classList.remove('hidden');
+                // Simple animation hook could go here
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+    </script>
+</body></html>

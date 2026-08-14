@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "primary-fixed-dim": "#81d1f0",
+                      "on-surface": "#1b1c1a",
+                      "sand-border": "#DFDCD6",
+                      "electric-cyan": "#22D3EE",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary": "#5e5e5d",
+                      "on-secondary-fixed-variant": "#464746",
+                      "on-surface-variant": "#3f484c",
+                      "on-error": "#ffffff",
+                      "surface-bright": "#fbf9f6",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "onyx": "#1D262B",
+                      "surface-tint": "#006781",
+                      "on-background": "#1b1c1a",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1",
+                      "on-primary-fixed-variant": "#004d62",
+                      "on-secondary-container": "#636362",
+                      "on-error-container": "#93000a",
+                      "background": "#fbf9f6",
+                      "on-primary-fixed": "#001f29",
+                      "surface-container-high": "#eae8e5",
+                      "error-container": "#ffdad6",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#d3f1ff",
+                      "outline-variant": "#bec8cd",
+                      "outline": "#6f787d",
+                      "inverse-primary": "#81d1f0",
+                      "petrol": "#0E7490",
+                      "inverse-surface": "#30312f",
+                      "surface-variant": "#e4e2df",
+                      "deep-void": "#0B1114",
+                      "on-tertiary-container": "#f0ece6",
+                      "surface-container-low": "#f5f3f0",
+                      "surface-container-highest": "#e4e2df",
+                      "tertiary-container": "#6c6b66",
+                      "primary-container": "#0e7490",
+                      "secondary-container": "#e1dfde",
+                      "sand-light": "#F7F5F2",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "surface-dim": "#dbdad7",
+                      "surface-container": "#efeeeb",
+                      "tertiary-fixed": "#e5e2dc",
+                      "tertiary": "#54534e",
+                      "primary": "#005a71",
+                      "on-tertiary": "#ffffff",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "primary-fixed": "#b9eaff",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "surface-container-lowest": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "80px",
+                      "stack-sm": "8px",
+                      "stack-xl": "48px",
+                      "stack-xs": "4px",
+                      "gutter": "24px",
+                      "container-max": "1280px",
+                      "stack-md": "16px",
+                      "stack-lg": "24px",
+                      "margin-mobile": "20px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .hairline-border { border: 1px solid rgba(190, 200, 205, 0.1); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-deep-void text-on-surface font-body-md antialiased md:hidden pb-[90px]">
+<!-- Main Content -->
+<main class="px-margin-mobile pt-stack-xl pb-stack-lg space-y-stack-xl">
+<!-- Header -->
+<header class="flex justify-between items-center">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-electric-cyan">Profile</h1>
+<button class="w-10 h-10 rounded-full bg-onyx flex items-center justify-center hairline-border text-electric-cyan">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</header>
+<!-- User Info -->
+<section class="flex flex-col items-center space-y-stack-md">
+<div class="relative w-24 h-24 rounded-full overflow-hidden hairline-border bg-onyx shadow-sm">
+<img class="w-full h-full object-cover" data-alt="A sophisticated close-up portrait of a young professional in a modern, dimly lit premium setting. The lighting is cinematic with subtle cyan highlights reflecting off their features against a deep, dark background. They are wearing high-end minimalist clothing, projecting a confident, modern coastal aesthetic suitable for a luxury real estate app profile." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjmmSfYiJjE9Dw-c1eR3axeDuIsicVI2uaftbeADilniEQhsBQYQyJVrgFdLnnxWtheC8tIxcGhcrsQrEU_E95TNJfLP5QUoD6XcXAU2KPq8qwC8--8G-lbRIB7zuzThWIk2II1qt_HvfUf2pmRg4HOW-dS2c-RU91L76oDWZAzlfpILbAjmpNSJTnyCIsAeEMn8OZxhGVMjr2PDf_U6kWVbhXLj9P3P6uudJ4h_5KLRUlMAla-4cNZQ"/>
+</div>
+<div class="text-center">
+<h2 class="font-title-md text-title-md text-on-primary">Alex Morgan</h2>
+<p class="font-label-md text-label-md text-electric-cyan mt-1 tabular-nums">+91 98765 43210</p>
+</div>
+</section>
+<!-- Stats / Bento -->
+<section class="grid grid-cols-2 gap-stack-sm">
+<div class="bg-onyx rounded-xl p-4 hairline-border flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.4)] h-28">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Saved Homes</p>
+<p class="font-title-md text-title-md text-on-primary tabular-nums">24</p>
+</div>
+</div>
+<div class="bg-onyx rounded-xl p-4 hairline-border flex flex-col justify-between shadow-[0_4px_24px_rgba(0,0,0,0.4)] h-28">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">history</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface-variant">Recent Views</p>
+<p class="font-title-md text-title-md text-on-primary tabular-nums">142</p>
+</div>
+</div>
+</section>
+<!-- Premium Lifestyle Card -->
+<section class="bg-gradient-to-br from-petrol to-onyx rounded-2xl p-6 hairline-border shadow-[0_8px_32px_rgba(14,116,144,0.2)] relative overflow-hidden">
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-electric-cyan/10 rounded-full blur-2xl"></div>
+<div class="relative z-10 space-y-4">
+<div class="flex items-center space-x-2">
+<span class="material-symbols-outlined text-electric-cyan">verified</span>
+<h3 class="font-title-md text-title-md text-on-primary">Homley Plus</h3>
+</div>
+<p class="font-body-md text-body-md text-on-primary/80">Unlock premium AI search capabilities and get priority alerts for exclusive listings in Mumbai.</p>
+<button class="w-full py-3 bg-electric-cyan text-deep-void rounded-lg font-label-md text-label-md shadow-sm active:scale-95 transition-transform">
+                    Upgrade Now
+                </button>
+</div>
+</section>
+<!-- Settings List -->
+<section class="space-y-stack-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mb-2">Preferences</h3>
+<div class="bg-onyx rounded-xl hairline-border divide-y divide-outline-variant/10">
+<div class="p-4 flex justify-between items-center">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-electric-cyan">notifications</span>
+<span class="font-body-md text-body-md text-on-primary">Push Notifications</span>
+</div>
+<!-- Toggle -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-deep-void peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-petrol hairline-border"></div>
+</label>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-electric-cyan">dark_mode</span>
+<span class="font-body-md text-body-md text-on-primary">Dark Mode</span>
+</div>
+<!-- Toggle -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" disabled="" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-deep-void peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-petrol hairline-border opacity-50"></div>
+</label>
+</div>
+<div class="p-4 flex justify-between items-center">
+<div class="flex items-center space-x-3">
+<span class="material-symbols-outlined text-electric-cyan">location_on</span>
+<span class="font-body-md text-body-md text-on-primary">Location Services</span>
+</div>
+<!-- Toggle -->
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-deep-void peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-petrol hairline-border"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<section class="pt-stack-md">
+<button class="w-full py-4 text-error font-title-md text-title-md bg-error/10 rounded-xl hairline-border active:scale-95 transition-transform flex items-center justify-center space-x-2">
+<span class="material-symbols-outlined">logout</span>
+<span>Sign Out</span>
+</button>
+</section>
+</main>
+<!-- Bottom Nav Bar Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-onyx bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)] font-label-md text-label-md">
+<!-- Explore -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">explore</span>
+<span class="text-[10px] mt-1">Explore</span>
+</a>
+<!-- Saved -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">favorite</span>
+<span class="text-[10px] mt-1">Saved</span>
+</a>
+<!-- AI Search (Raised Center) -->
+<a class="relative flex flex-col items-center justify-center active:scale-90 transition-transform duration-200 w-16 h-14" href="#">
+<div class="absolute -top-6 w-14 h-14 bg-petrol rounded-full flex items-center justify-center shadow-[0_4px_16px_rgba(14,116,144,0.4)] border-4 border-deep-void">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<span class="text-[10px] mt-8 text-secondary dark:text-on-secondary-container">AI Search</span>
+</a>
+<!-- Inbox -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">mail</span>
+<span class="text-[10px] mt-1">Inbox</span>
+</a>
+<!-- Profile (Active) -->
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-200 w-16 h-14" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="text-[10px] mt-1 font-semibold">Profile</span>
+</a>
+</nav>
+</body></html>

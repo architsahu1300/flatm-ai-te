@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Homley Onboarding - Lifestyle</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from system prompt -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "sand-border": "#DFDCD6",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#efeeeb",
+                      "primary": "#005a71",
+                      "on-surface": "#1b1c1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-surface-variant": "#3f484c",
+                      "surface-container-highest": "#e4e2df",
+                      "petrol": "#0E7490",
+                      "primary-fixed": "#b9eaff",
+                      "error-container": "#ffdad6",
+                      "background": "#fbf9f6",
+                      "on-secondary-fixed-variant": "#464746",
+                      "inverse-primary": "#81d1f0",
+                      "on-background": "#1b1c1a",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#006781",
+                      "surface-container-high": "#eae8e5",
+                      "outline": "#6f787d",
+                      "inverse-surface": "#30312f",
+                      "tertiary": "#54534e",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#6c6b66",
+                      "deep-void": "#0B1114",
+                      "surface-dim": "#dbdad7",
+                      "on-primary-container": "#d3f1ff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary-container": "#e1dfde",
+                      "primary-fixed-dim": "#81d1f0",
+                      "surface-container-low": "#f5f3f0",
+                      "electric-cyan": "#22D3EE",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#e5e2dc",
+                      "error": "#ba1a1a",
+                      "secondary": "#5e5e5d",
+                      "onyx": "#1D262B",
+                      "surface-variant": "#e4e2df",
+                      "on-primary-fixed": "#001f29",
+                      "on-secondary-container": "#636362",
+                      "primary-container": "#0e7490",
+                      "outline-variant": "#bec8cd",
+                      "surface-bright": "#fbf9f6",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-mobile": "20px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-desktop": "80px",
+                      "stack-xs": "4px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        /* Custom styles for chip interactions */
+        .chip-selectable {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .chip-selectable:active {
+            transform: scale(0.98);
+        }
+        .chip-selected {
+            background-color: #0E7490 !important; /* Petrol */
+            color: #ffffff !important;
+            border-color: #0E7490 !important;
+        }
+        .chip-selected .material-symbols-outlined {
+            color: #ffffff !important;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md antialiased md:items-center md:justify-center overflow-x-hidden">
+<!-- Mobile App Container (Constrained width for 390x844 layout) -->
+<main class="w-full max-w-[390px] min-h-[844px] md:min-h-[800px] md:h-[800px] bg-surface flex flex-col relative md:rounded-[32px] md:shadow-2xl md:overflow-hidden md:border md:border-sand-border">
+<!-- Header / Progress Area -->
+<header class="px-margin-mobile pt-12 pb-6 flex flex-col gap-stack-lg z-10 bg-surface">
+<!-- Top Controls -->
+<div class="flex justify-between items-center w-full">
+<button aria-label="Go back" class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">arrow_back</span>
+</button>
+<button class="font-label-md text-label-md text-on-surface-variant hover:text-petrol transition-colors">
+                    Skip for now
+                </button>
+</div>
+<!-- Progress Segments -->
+<div class="w-full flex gap-2 items-center px-1">
+<div class="h-1 flex-1 bg-petrol rounded-full"></div>
+<div class="h-1 flex-1 bg-petrol rounded-full"></div>
+<div class="h-1 flex-1 bg-petrol rounded-full"></div>
+<div class="h-1 flex-1 bg-surface-container-highest rounded-full"></div>
+<div class="h-1 flex-1 bg-surface-container-highest rounded-full"></div>
+</div>
+<!-- Title Area -->
+<div class="flex flex-col gap-stack-sm pt-2">
+<p class="font-label-md text-label-md text-petrol uppercase tracking-wider">Step 3 of 5</p>
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface">Your Lifestyle</h1>
+<p class="font-body-md text-body-md text-on-surface-variant">Help us find flatmates that match your vibe. Select all that apply to you.</p>
+</div>
+</header>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto px-margin-mobile pb-32 flex flex-col gap-stack-xl hide-scrollbar">
+<!-- Section 1: Social Vibe -->
+<section class="flex flex-col gap-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol" style="font-variation-settings: 'FILL' 1;">groups</span>
+<h2 class="font-title-md text-title-md text-on-surface">Social Vibe</h2>
+</div>
+<div class="flex flex-wrap gap-stack-sm">
+<div class="chip-selectable border border-sand-border bg-surface-container-lowest rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">celebration</span>
+<span class="font-label-md text-label-md text-on-surface">Party lover</span>
+</div>
+<div class="chip-selectable border border-petrol bg-petrol rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm chip-selected" onclick="this.classList.toggle('chip-selected')">
+<span class="material-symbols-outlined text-white text-[20px]">coffee</span>
+<span class="font-label-md text-label-md text-white">Quiet nights in</span>
+</div>
+<div class="chip-selectable border border-sand-border bg-surface-container-lowest rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">restaurant</span>
+<span class="font-label-md text-label-md text-on-surface">Dinner parties</span>
+</div>
+<div class="chip-selectable border border-sand-border bg-surface-container-lowest rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">music_note</span>
+<span class="font-label-md text-label-md text-on-surface">Musician</span>
+</div>
+<div class="chip-selectable border border-petrol bg-petrol rounded-xl px-4 py-3 flex items-center gap-2 shadow-sm chip-selected" onclick="this.classList.toggle('chip-selected')">
+<span class="material-symbols-outlined text-white text-[20px]">sports_esports</span>
+<span class="font-label-md text-label-md text-white">Gamer</span>
+</div>
+</div>
+</section>
+<!-- Section 2: Cleanliness -->
+<section class="flex flex-col gap-stack-md">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-petrol" style="font-variation-settings: 'FILL' 1;">cleaning_services</span>
+<h2 class="font-title-md text-title-md text-on-surface">Cleanliness</h2>
+</div>
+<div class="grid grid-cols-1 gap-stack-sm">
+<!-- Option A -->
+<label class="relative flex cursor-pointer rounded-xl border border-sand-border bg-surface-container-lowest p-4 shadow-sm hover:border-petrol transition-colors focus-within:ring-2 focus-within:ring-petrol focus-within:border-transparent">
+<div class="flex items-start gap-4 w-full">
+<div class="flex h-6 items-center">
+<input class="h-5 w-5 border-outline text-petrol focus:ring-petrol bg-transparent" name="cleanliness" type="radio"/>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-[16px] text-on-surface font-semibold">Neat freak</span>
+<span class="font-body-md text-[14px] text-on-surface-variant mt-1">Everything has its place, always clean.</span>
+</div>
+</div>
+</label>
+<!-- Option B (Selected) -->
+<label class="relative flex cursor-pointer rounded-xl border border-petrol bg-primary-fixed/10 p-4 shadow-sm transition-colors focus-within:ring-2 focus-within:ring-petrol focus-within:border-transparent">
+<div class="flex items-start gap-4 w-full">
+<div class="flex h-6 items-center">
+<input checked="" class="h-5 w-5 border-petrol text-petrol focus:ring-petrol bg-transparent" name="cleanliness" type="radio"/>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-[16px] text-petrol font-semibold">Tidy but relaxed</span>
+<span class="font-body-md text-[14px] text-on-surface-variant mt-1">Generally clean, but lived-in is fine.</span>
+</div>
+</div>
+</label>
+<!-- Option C -->
+<label class="relative flex cursor-pointer rounded-xl border border-sand-border bg-surface-container-lowest p-4 shadow-sm hover:border-petrol transition-colors focus-within:ring-2 focus-within:ring-petrol focus-within:border-transparent">
+<div class="flex items-start gap-4 w-full">
+<div class="flex h-6 items-center">
+<input class="h-5 w-5 border-outline text-petrol focus:ring-petrol bg-transparent" name="cleanliness" type="radio"/>
+</div>
+<div class="flex flex-col">
+<span class="font-title-md text-[16px] text-on-surface font-semibold">Messy</span>
+<span class="font-body-md text-[14px] text-on-surface-variant mt-1">Organized chaos is my vibe.</span>
+</div>
+</div>
+</label>
+</div>
+</section>
+</div>
+<!-- Fixed Bottom Action Bar -->
+<div class="absolute bottom-0 w-full p-margin-mobile bg-gradient-to-t from-surface via-surface to-transparent pt-12 pb-8">
+<button class="w-full bg-petrol text-on-primary font-label-md text-label-md py-4 rounded-xl shadow-[0_4px_12px_rgba(14,116,144,0.25)] hover:bg-primary transition-all active:scale-95 flex items-center justify-center gap-2">
+                Continue
+                <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
+</button>
+</div>
+</main>
+<script>
+        // Simple script to handle chip toggling visually
+        document.querySelectorAll('.chip-selectable').forEach(chip => {
+            if(!chip.hasAttribute('onclick')){
+                 chip.addEventListener('click', function() {
+                    this.classList.toggle('chip-selected');
+                    
+                    // Toggle colors manually if class toggle isn't enough due to specific tailwind classes
+                    if(this.classList.contains('chip-selected')) {
+                        this.classList.remove('border-sand-border', 'bg-surface-container-lowest');
+                        this.classList.add('border-petrol', 'bg-petrol');
+                        this.querySelector('span.text-on-surface-variant').classList.replace('text-on-surface-variant', 'text-white');
+                        this.querySelector('span.text-on-surface').classList.replace('text-on-surface', 'text-white');
+                    } else {
+                        this.classList.add('border-sand-border', 'bg-surface-container-lowest');
+                        this.classList.remove('border-petrol', 'bg-petrol');
+                        this.querySelector('span.text-white:first-child').classList.replace('text-white', 'text-on-surface-variant');
+                        this.querySelector('span.text-white').classList.replace('text-white', 'text-on-surface');
+                    }
+                });
+            }
+        });
+    </script>
+</body></html>

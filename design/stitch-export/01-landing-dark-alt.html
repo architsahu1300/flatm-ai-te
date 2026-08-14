@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Premium Living</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary": "#ffffff",
+                      "sand-border": "#DFDCD6",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container": "#efeeeb",
+                      "primary": "#005a71",
+                      "on-surface": "#1b1c1a",
+                      "on-tertiary-fixed": "#1c1c18",
+                      "on-surface-variant": "#3f484c",
+                      "surface-container-highest": "#e4e2df",
+                      "petrol": "#0E7490",
+                      "primary-fixed": "#b9eaff",
+                      "error-container": "#ffdad6",
+                      "background": "#fbf9f6",
+                      "on-secondary-fixed-variant": "#464746",
+                      "inverse-primary": "#81d1f0",
+                      "on-background": "#1b1c1a",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#006781",
+                      "surface-container-high": "#eae8e5",
+                      "outline": "#6f787d",
+                      "inverse-surface": "#30312f",
+                      "tertiary": "#54534e",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-primary": "#ffffff",
+                      "tertiary-container": "#6c6b66",
+                      "deep-void": "#0B1114",
+                      "surface-dim": "#dbdad7",
+                      "on-primary-container": "#d3f1ff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary": "#ffffff",
+                      "inverse-on-surface": "#f2f0ed",
+                      "secondary-container": "#e1dfde",
+                      "primary-fixed-dim": "#81d1f0",
+                      "surface-container-low": "#f5f3f0",
+                      "electric-cyan": "#22D3EE",
+                      "on-error": "#ffffff",
+                      "tertiary-fixed": "#e5e2dc",
+                      "error": "#ba1a1a",
+                      "secondary": "#5e5e5d",
+                      "onyx": "#1D262B",
+                      "surface-variant": "#e4e2df",
+                      "on-primary-fixed": "#001f29",
+                      "on-secondary-container": "#636362",
+                      "primary-container": "#0e7490",
+                      "outline-variant": "#bec8cd",
+                      "surface-bright": "#fbf9f6",
+                      "surface": "#fbf9f6",
+                      "secondary-fixed": "#e4e2e1"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "24px",
+                      "margin-mobile": "20px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-desktop": "80px",
+                      "stack-xs": "4px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Inter"
+                      ],
+                      "title-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "56px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "14px",
+                              {
+                                      "lineHeight": "20px",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "title-md": [
+                              "20px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "36px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "24px",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "40px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "28px",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        body {
+            background-color: theme('colors.onyx'); /* Dark theme background */
+            color: theme('colors.inverse-on-surface');
+        }
+      </style>
+</head>
+<body class="antialiased min-h-screen pb-24 md:pb-0">
+<!-- TopNavBar (Web Only) -->
+<nav class="hidden md:flex justify-between items-center h-16 px-margin-desktop max-w-container-max mx-auto fixed top-0 w-full z-50 bg-surface-dim/80 backdrop-blur-md shadow-none border-b border-outline-variant">
+<div class="font-title-md text-title-md font-bold text-inverse-on-surface">Homley</div>
+<div class="flex gap-gutter">
+<a class="font-body-md text-body-md text-primary-fixed-dim font-bold border-b-2 border-primary hover:text-primary-fixed transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Find flatmates</a>
+</div>
+<div class="flex gap-stack-md">
+<button class="font-body-md text-body-md text-on-secondary-fixed-variant hover:text-primary-fixed transition-colors">Sign in</button>
+<button class="bg-petrol text-on-primary px-4 py-2 rounded-lg font-body-md text-body-md hover:opacity-90 transition-opacity">Get started</button>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-8 md:pt-24 flex flex-col gap-stack-xl">
+<!-- Hero Section -->
+<section class="flex flex-col items-center text-center gap-stack-lg pt-stack-xl">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-inverse-on-surface max-w-2xl">
+                Find Your Perfect Space. Effortlessly.
+            </h1>
+<p class="font-body-lg text-body-lg text-on-secondary-fixed-variant max-w-xl">
+                Experience premium living with our curated selection of homes and verified flatmates. AI-powered matching for a seamless transition.
+            </p>
+<!-- AI Search Box -->
+<div class="w-full max-w-xl relative mt-stack-sm rounded-xl shadow-[0_24px_48px_-12px_rgba(0,0,0,0.5)]">
+<input class="w-full bg-inverse-surface border-none rounded-xl py-4 pl-12 pr-4 font-body-md text-body-md text-inverse-on-surface focus:ring-2 focus:ring-primary-fixed focus:outline-none placeholder-outline-variant" placeholder="Where do you want to live?" type="text"/>
+<span class="material-symbols-outlined absolute left-4 top-4 text-outline-variant">search</span>
+<button class="absolute right-2 top-2 bg-petrol text-on-primary rounded-lg px-4 py-2 font-label-md text-label-md hover:bg-surface-tint transition-colors">Search</button>
+</div>
+<!-- Example Chips -->
+<div class="flex flex-wrap justify-center gap-stack-sm mt-stack-sm">
+<span class="bg-inverse-surface text-inverse-on-surface px-3 py-1.5 rounded-full font-label-md text-label-md border border-outline-variant cursor-pointer hover:bg-surface-dim transition-colors">London</span>
+<span class="bg-inverse-surface text-inverse-on-surface px-3 py-1.5 rounded-full font-label-md text-label-md border border-outline-variant cursor-pointer hover:bg-surface-dim transition-colors">Studio</span>
+<span class="bg-inverse-surface text-inverse-on-surface px-3 py-1.5 rounded-full font-label-md text-label-md border border-outline-variant cursor-pointer hover:bg-surface-dim transition-colors">Pet Friendly</span>
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="flex justify-center items-center gap-gutter flex-wrap py-stack-md border-y border-outline-variant/30 opacity-70">
+<span class="font-title-md text-title-md text-outline-variant font-bold">TRUSTED BY</span>
+<div class="flex gap-gutter">
+<span class="material-symbols-outlined text-outline-variant text-3xl">home_work</span>
+<span class="material-symbols-outlined text-outline-variant text-3xl">domain</span>
+<span class="material-symbols-outlined text-outline-variant text-3xl">apartment</span>
+</div>
+</section>
+<!-- Two-Card Split (Featured) -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-inverse-surface rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-shadow">
+<div class="bg-cover bg-center w-full h-64" data-alt="A modern, high-end living room interior with floor-to-ceiling windows overlooking a city skyline at dusk. The room is decorated in a sophisticated coastal style with neutral tones, warm wood accents, and minimalist furniture. Soft ambient lighting creates a cozy, inviting atmosphere. The overall mood is luxurious and serene." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDRbABq8N5D_Nn9w-hWnKrC3StIHqOwBfpnPf0xRw3STkkGLfa1qo7rLu-flb6hDNGMDCDhpX-6BR7efrO4R2_pIsU2ZwZkthnID-vi7NW_FVn8SzGwdy0lXUXLlE-COywLo3ZU7RDzKq0bFv6IRoLP_m_zgcPfJA-vONWZNZU544f37v77nEXEYihjDABkDGyjzFP1nqvX8tFZGJynYRvQFfz8id-L7eLV77xTQCQnXoUl019aRwG5tQ')"></div>
+<div class="p-stack-lg flex flex-col gap-stack-sm">
+<h3 class="font-title-md text-title-md text-inverse-on-surface">Curated Homes</h3>
+<p class="font-body-md text-body-md text-outline-variant">Discover properties verified for quality, comfort, and premium living standards.</p>
+<a class="text-electric-cyan font-label-md text-label-md mt-stack-xs flex items-center hover:opacity-80 transition-opacity" href="#">Explore <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span></a>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-inverse-surface rounded-xl overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.2)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-shadow">
+<div class="bg-cover bg-center w-full h-64" data-alt="Two young professionals, a man and a woman, chatting and laughing over coffee in a bright, modern, minimalist kitchen. Sunlight streams through a large window. They appear relaxed and friendly, embodying the concept of ideal flatmates. The aesthetic is clean, warm, and approachable." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBJ9okxt1EIOrdvsacJa2J53GEYda6xTSzJHMuIPNu_IzmcP3cyga2Kyn69CeKneoAasgouhJUIY8gZsSAIlXmxHk93c2DXyY_HE4g3Ol47ZiehYmGO5rRwHbUi9ikjmIrDxv0Zw9TotCddbB_l2oI4eGogn-OKdXdPXnZf7ivqsR7CMKizx7R8besXBKhE5OUG2SovfcnZMN_7d16U7xVa7DYcTqRazb0KBpm93lv8-RVrlvwpSvNpoQ')"></div>
+<div class="p-stack-lg flex flex-col gap-stack-sm">
+<h3 class="font-title-md text-title-md text-inverse-on-surface">Verified Flatmates</h3>
+<p class="font-body-md text-body-md text-outline-variant">Connect with like-minded individuals through our intelligent matching algorithm.</p>
+<a class="text-electric-cyan font-label-md text-label-md mt-stack-xs flex items-center hover:opacity-80 transition-opacity" href="#">Find a match <span class="material-symbols-outlined text-sm ml-1">arrow_forward</span></a>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl bg-surface-dim border-t border-outline-variant shadow-sm flex justify-around items-end pb-safe-bottom h-20 px-2">
+<button class="flex flex-col items-center justify-center text-primary-fixed-dim hover:bg-surface-container-highest transition-colors rounded-lg p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest transition-colors rounded-lg p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Saved</span>
+</button>
+<!-- Raised Center AI Button -->
+<div class="relative -top-6">
+<button class="bg-petrol text-on-primary rounded-full w-14 h-14 flex items-center justify-center shadow-[0_8px_16px_rgba(14,116,144,0.4)] active:scale-95 duration-150 border-4 border-onyx">
+<span class="material-symbols-outlined text-3xl">search</span>
+</button>
+</div>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest transition-colors rounded-lg p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">chat</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Inbox</span>
+</button>
+<button class="flex flex-col items-center justify-center text-outline hover:bg-surface-container-highest transition-colors rounded-lg p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md mt-1 text-[10px]">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Search - Empty State</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface-variant": "#3f484c",
+                        "secondary": "#5e5e5d",
+                        "tertiary-fixed": "#e5e2dc",
+                        "primary-container": "#0e7490",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-high": "#eae8e5",
+                        "surface-variant": "#e4e2df",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "primary-fixed": "#b9eaff",
+                        "background": "#0B1114", // deep-void for dark theme background
+                        "tertiary-container": "#6c6b66",
+                        "onyx": "#1D262B",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#006781",
+                        "sand-border": "#DFDCD6",
+                        "inverse-on-surface": "#f2f0ed",
+                        "inverse-surface": "#30312f",
+                        "on-background": "#fbf9f6", // adjusted for dark mode readability
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-error-container": "#93000a",
+                        "petrol": "#0E7490",
+                        "on-secondary-container": "#636362",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-primary-container": "#d3f1ff",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "outline": "#6f787d",
+                        "secondary-container": "#e1dfde",
+                        "on-primary-fixed": "#001f29",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#dbdad7",
+                        "on-surface": "#fbf9f6", // adjusted for dark mode
+                        "electric-cyan": "#22D3EE",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "secondary-fixed": "#e4e2e1",
+                        "inverse-primary": "#81d1f0",
+                        "surface-bright": "#fbf9f6",
+                        "outline-variant": "#3f484c", // darker outline for dark mode
+                        "tertiary": "#54534e",
+                        "surface-container-highest": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "error-container": "#ffdad6",
+                        "surface": "#151E24", // adjusted for card surface
+                        "primary": "#005a71",
+                        "surface-container": "#efeeeb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "container-max": "1280px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-mobile": "20px",
+                        "stack-xs": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-variant-numeric: tabular-nums;
+        }
+        .hairline-border {
+            border: 1px solid theme('colors.outline-variant');
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-body-md antialiased selection:bg-petrol selection:text-white">
+<!-- Top Navigation Anchor -->
+<header class="bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm fixed top-0 w-full z-50">
+<div class="flex justify-between items-center max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop h-16">
+<div class="font-display-lg text-headline-lg-mobile tracking-tight text-primary-fixed-dim">
+                Homley
+            </div>
+<nav class="hidden md:flex gap-8">
+<a class="text-on-surface-variant hover:text-petrol transition-colors font-body-md text-body-md" href="#">Browse homes</a>
+<a class="text-petrol font-semibold border-b-2 border-petrol pb-1 font-body-md text-body-md" href="#">Find flatmates</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:text-petrol transition-colors font-body-md text-body-md">Sign in</button>
+<button class="bg-petrol text-white px-4 py-2 rounded-lg font-body-md text-body-md hover:opacity-90 transition-opacity">Get started</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow flex flex-col items-center justify-center pt-[120px] pb-[80px] px-margin-mobile md:px-margin-desktop w-full max-w-container-max mx-auto">
+<!-- Empty State Card -->
+<div class="bg-surface rounded-xl hairline-border p-10 md:p-14 text-center max-w-2xl w-full flex flex-col items-center justify-center shadow-lg relative overflow-hidden">
+<!-- Subtle atmospheric glow behind the icon -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-electric-cyan/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="mb-8 p-4 rounded-full bg-onyx hairline-border inline-flex relative z-10">
+<span class="material-symbols-outlined text-[48px] text-electric-cyan" style="font-variation-settings: 'FILL' 0, 'wght' 200;">
+                    search_off
+                </span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface mb-4 relative z-10">
+                No close matches for this
+            </h1>
+<p class="font-body-lg text-body-lg text-outline mb-10 max-w-md mx-auto relative z-10">
+                We couldn't find exact matches for your specific criteria. Try expanding your search parameters below to see available options.
+            </p>
+<!-- Relaxers (One-tap widening buttons) -->
+<div class="flex flex-col gap-4 w-full max-w-md relative z-10">
+<button class="group flex items-center justify-between p-5 rounded-lg bg-onyx hairline-border hover:border-electric-cyan/50 hover:bg-onyx/80 transition-all duration-200 active:scale-95 text-left w-full">
+<div class="flex items-center gap-4">
+<div class="p-2 rounded-md bg-surface/50 text-outline group-hover:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined text-[20px]">
+                                payments
+                            </span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface group-hover:text-electric-cyan transition-colors">
+                                Raise budget to ₹30,000
+                            </div>
+<div class="font-body-md text-body-md text-outline mt-1">
+                                Shows <span class="text-on-surface font-medium">2 options</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-electric-cyan transition-colors">
+                        arrow_forward
+                    </span>
+</button>
+<button class="group flex items-center justify-between p-5 rounded-lg bg-onyx hairline-border hover:border-electric-cyan/50 hover:bg-onyx/80 transition-all duration-200 active:scale-95 text-left w-full">
+<div class="flex items-center gap-4">
+<div class="p-2 rounded-md bg-surface/50 text-outline group-hover:text-electric-cyan transition-colors">
+<span class="material-symbols-outlined text-[20px]">
+                                location_on
+                            </span>
+</div>
+<div>
+<div class="font-title-md text-title-md text-on-surface group-hover:text-electric-cyan transition-colors">
+                                Search all of Mumbai
+                            </div>
+<div class="font-body-md text-body-md text-outline mt-1">
+                                Shows <span class="text-on-surface font-medium">12 more</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-electric-cyan transition-colors">
+                        arrow_forward
+                    </span>
+</button>
+</div>
+<button class="mt-8 text-electric-cyan font-label-md text-label-md hover:underline decoration-electric-cyan/50 underline-offset-4 transition-all relative z-10">
+                Clear all filters and start over
+            </button>
+</div>
+</main>
+</body></html>

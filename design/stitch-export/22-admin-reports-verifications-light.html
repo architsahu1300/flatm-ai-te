@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley Admin - Reports &amp; Verifications</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "on-primary-container": "#d3f1ff",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-container": "#0e7490",
+                        "sand-light": "#F7F5F2",
+                        "onyx": "#1D262B",
+                        "on-surface": "#1b1c1a",
+                        "surface-dim": "#dbdad7",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#636362",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary-container": "#6c6b66",
+                        "inverse-primary": "#81d1f0",
+                        "secondary": "#5e5e5d",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "on-primary-fixed-variant": "#004d62",
+                        "surface-tint": "#006781",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface": "#fbf9f6",
+                        "tertiary": "#54534e",
+                        "on-tertiary": "#ffffff",
+                        "petrol": "#0E7490",
+                        "on-tertiary-container": "#f0ece6",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#e1dfde",
+                        "primary-fixed-dim": "#81d1f0",
+                        "outline": "#6f787d",
+                        "on-primary-fixed": "#001f29",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-secondary-fixed-variant": "#464746",
+                        "surface-variant": "#e4e2df",
+                        "electric-cyan": "#22D3EE",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#efeeeb",
+                        "on-surface-variant": "#3f484c",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#005a71",
+                        "outline-variant": "#bec8cd",
+                        "on-error": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#1b1c1a",
+                        "inverse-on-surface": "#f2f0ed",
+                        "primary-fixed": "#b9eaff",
+                        "deep-void": "#0B1114",
+                        "surface-bright": "#fbf9f6",
+                        "sand-border": "#DFDCD6",
+                        "surface-container-low": "#f5f3f0",
+                        "inverse-surface": "#30312f",
+                        "on-secondary-fixed": "#1b1c1b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "margin-desktop": "80px",
+                        "stack-md": "16px",
+                        "stack-xl": "48px",
+                        "margin-mobile": "20px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "title-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .whisper-shadow { box-shadow: 0 4px 4px -2px rgba(0, 0, 0, 0.04); }
+        .soft-pop-shadow { box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.08); }
+        
+        /* Custom scrollbar for tables */
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: transparent; }
+        .table-container::-webkit-scrollbar-thumb { background-color: #bec8cd; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col md:flex-row">
+<!-- Top Navigation (Web) -->
+<header class="hidden md:flex justify-between items-center h-20 px-margin-desktop max-w-container-max mx-auto bg-surface/80 dark:bg-surface/80 sticky top-0 w-full z-50 backdrop-blur-sm shadow-sm w-full absolute border-b border-outline-variant/30">
+<div class="flex items-center gap-stack-lg">
+<span class="font-display-lg text-display-lg text-primary tracking-tight">Homley Admin</span>
+<nav class="flex gap-gutter items-center ml-stack-lg">
+<a class="text-secondary font-label-md text-label-md hover:text-primary transition-colors" href="#">Users</a>
+<a class="text-secondary font-label-md text-label-md hover:text-primary transition-colors" href="#">Listings</a>
+<a class="text-primary border-b-2 border-primary pb-1 font-label-md text-label-md" href="#">Reports &amp; Verifications</a>
+</nav>
+</div>
+<div class="flex items-center gap-stack-md">
+<div class="relative w-64 soft-pop-shadow rounded-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-secondary" style="font-variation-settings: 'FILL' 0;">search</span>
+<input class="w-full bg-surface-container-lowest border border-sand-border rounded-full pl-10 pr-12 py-2 font-body-md text-body-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Search admin..." type="text"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 bg-surface-container text-secondary px-1.5 py-0.5 rounded text-xs font-mono">/</span>
+</div>
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-title-md text-title-md font-bold">
+                A
+            </div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-xl flex flex-col gap-stack-xl pt-24 md:pt-stack-xl">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-stack-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg md:text-headline-lg text-on-background">Trust &amp; Safety Queue</h1>
+<p class="font-body-md text-body-md text-secondary mt-stack-xs">Manage reported content and verify user identities.</p>
+</div>
+<div class="flex gap-stack-sm w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+<button class="whitespace-nowrap px-4 py-2 bg-petrol text-on-primary rounded-lg font-label-md text-label-md whisper-shadow active:scale-95 transition-transform">
+                    View All Reports (12)
+                </button>
+<button class="whitespace-nowrap px-4 py-2 bg-surface-container-lowest border border-sand-border text-on-surface rounded-lg font-label-md text-label-md hover:bg-surface-container transition-colors active:scale-95 transition-transform">
+                    Pending Verifications (5)
+                </button>
+</div>
+</div>
+<!-- Metric Cards -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+<div class="bg-surface-container-lowest rounded-xl p-stack-md whisper-shadow border border-sand-border/50">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-secondary">Open Reports</span>
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">flag</span>
+</div>
+<div class="mt-stack-sm flex items-end gap-2">
+<span class="font-display-lg text-display-lg-mobile text-on-background">12</span>
+<span class="font-label-md text-label-md text-error mb-1">+3 today</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md whisper-shadow border border-sand-border/50">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-secondary">Pending Verifications</span>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+</div>
+<div class="mt-stack-sm flex items-end gap-2">
+<span class="font-display-lg text-display-lg-mobile text-on-background">5</span>
+<span class="font-label-md text-label-md text-secondary mb-1">Normal load</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md whisper-shadow border border-sand-border/50">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-secondary">Suspended 24h</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">block</span>
+</div>
+<div class="mt-stack-sm flex items-end gap-2">
+<span class="font-display-lg text-display-lg-mobile text-on-background">2</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md whisper-shadow border border-sand-border/50">
+<div class="flex justify-between items-start">
+<span class="font-label-md text-label-md text-secondary">Avg Resolution</span>
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">timer</span>
+</div>
+<div class="mt-stack-sm flex items-end gap-2">
+<span class="font-display-lg text-display-lg-mobile text-on-background">4h</span>
+<span class="font-label-md text-label-md text-primary mb-1">-1h</span>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout for Queues -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-gutter">
+<!-- Report Review Queue (Takes up 2 columns on extra large) -->
+<div class="xl:col-span-2 bg-surface-container-lowest rounded-xl whisper-shadow border border-sand-border/50 flex flex-col overflow-hidden">
+<div class="p-stack-md border-b border-sand-border/50 flex justify-between items-center bg-surface-bright">
+<h2 class="font-title-md text-title-md text-on-background flex items-center gap-2">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 0;">gavel</span>
+                        Report Review Queue
+                    </h2>
+<button class="p-2 hover:bg-surface-container rounded-full transition-colors">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 0;">filter_list</span>
+</button>
+</div>
+<div class="table-container overflow-x-auto w-full">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead>
+<tr class="border-b border-sand-border/50 bg-surface-container-low/50">
+<th class="p-stack-md font-label-md text-label-md text-secondary font-medium">Entity</th>
+<th class="p-stack-md font-label-md text-label-md text-secondary font-medium">Reporter</th>
+<th class="p-stack-md font-label-md text-label-md text-secondary font-medium">Reason</th>
+<th class="p-stack-md font-label-md text-label-md text-secondary font-medium">Details</th>
+<th class="p-stack-md font-label-md text-label-md text-secondary font-medium text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-surface">
+<!-- Row 1 -->
+<tr class="border-b border-sand-border/20 hover:bg-surface-container-low/30 transition-colors group">
+<td class="p-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A modern coastal apartment living room, bright light mode style, sophisticated petrol and sand colors, professional real estate photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTg0M_vIg1iKTO2axk9YY-eUOV0lDdvnQAA_c-eYrRSY8tOdtJBvTM0T4Un9b2nAEA0yjkZkhErWXnx3agwIuv2gjWIoL_SeF_4dE8t3yffxuIWk_1YfQE9gB7dh9z92dzzr82_aso34ttX4NdshVs6hhGWxDJbKS0djkeaZCkNM-YHG0sZ0NbFm9_zer6NLBd9Hc1g53tGIqF0d_jcaOaHKS9X0j5E_U9OT6IozhTEiXOKhNeLMzvWQ"/>
+</div>
+<div>
+<div class="font-medium text-on-background">Listing #4920</div>
+<div class="text-sm text-secondary">Sunny Bondi Apartment</div>
+</div>
+</div>
+</td>
+<td class="p-stack-md">
+<div class="text-on-background">User_883</div>
+<div class="text-sm text-secondary">2 hours ago</div>
+</td>
+<td class="p-stack-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-error-container text-on-error-container font-label-md text-xs">
+                                        Scam / Fake
+                                    </span>
+</td>
+<td class="p-stack-md max-w-[200px] truncate text-sm text-secondary">
+                                    "Host asked for deposit outside platform via wire transfer."
+                                </td>
+<td class="p-stack-md text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1.5 border border-sand-border rounded text-secondary hover:bg-surface-container hover:text-on-background transition-colors font-label-md text-sm">
+                                            Review
+                                        </button>
+<button class="px-3 py-1.5 bg-error text-on-error rounded hover:bg-error/90 transition-colors font-label-md text-sm shadow-sm">
+                                            Suspend
+                                        </button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="border-b border-sand-border/20 hover:bg-surface-container-low/30 transition-colors group">
+<td class="p-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center shrink-0 text-on-surface font-title-md">
+                                            M
+                                        </div>
+<div>
+<div class="font-medium text-on-background">User #1109</div>
+<div class="text-sm text-secondary">Mark D.</div>
+</div>
+</div>
+</td>
+<td class="p-stack-md">
+<div class="text-on-background">User_442</div>
+<div class="text-sm text-secondary">5 hours ago</div>
+</td>
+<td class="p-stack-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-surface-container-high text-on-surface font-label-md text-xs border border-outline-variant/30">
+                                        Harassment
+                                    </span>
+</td>
+<td class="p-stack-md max-w-[200px] truncate text-sm text-secondary">
+                                    "Inappropriate messages sent via chat regarding listing #332."
+                                </td>
+<td class="p-stack-md text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1.5 border border-sand-border rounded text-secondary hover:bg-surface-container hover:text-on-background transition-colors font-label-md text-sm">
+                                            View Chat
+                                        </button>
+<button class="px-3 py-1.5 bg-error text-on-error rounded hover:bg-error/90 transition-colors font-label-md text-sm shadow-sm">
+                                            Remove
+                                        </button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="p-stack-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg overflow-hidden shrink-0">
+<img class="w-full h-full object-cover" data-alt="A poorly lit room, blurry photo, unprofessional listing image, light mode UI context." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO0nLnKC142xhIMfUWT1xfdZAzog5prSZnDQE2vgZnSTJkG7YTHeiz2itFu1qB8pKidm7bFbmz7YqB703bIpOrVA8GaVx319VmiFJHjuFLmtfDWDBijVUeoDGK55oOnqb5nGnqUiyYbOtGFvXOGbSrYKXIk0_X01xKYV6KRTUCPkzqsveW7DagYGsWcpK7IhNCKr_fJY25EvpKkXcVQLoZIW1UaGKKz_yq3tx0sdc2ygsEQjm_Qvt2Lw"/>
+</div>
+<div>
+<div class="font-medium text-on-background">Listing #5012</div>
+<div class="text-sm text-secondary">Cozy room in CBD</div>
+</div>
+</div>
+</td>
+<td class="p-stack-md">
+<div class="text-on-background">System</div>
+<div class="text-sm text-secondary">1 day ago</div>
+</td>
+<td class="p-stack-md">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-secondary-container text-on-secondary-container font-label-md text-xs">
+                                        Low Quality
+                                    </span>
+</td>
+<td class="p-stack-md max-w-[200px] truncate text-sm text-secondary">
+                                    "Automated flag: Images too blurry, description under 50 words."
+                                </td>
+<td class="p-stack-md text-right">
+<div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="px-3 py-1.5 border border-sand-border rounded text-secondary hover:bg-surface-container hover:text-on-background transition-colors font-label-md text-sm">
+                                            Edit Listing
+                                        </button>
+<button class="px-3 py-1.5 border border-sand-border rounded text-on-surface hover:bg-surface-container transition-colors font-label-md text-sm">
+                                            Warn User
+                                        </button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Verification Approval Queue -->
+<div class="xl:col-span-1 bg-surface-container-lowest rounded-xl whisper-shadow border border-sand-border/50 flex flex-col h-full">
+<div class="p-stack-md border-b border-sand-border/50 bg-surface-bright rounded-t-xl flex justify-between items-center">
+<h2 class="font-title-md text-title-md text-on-background flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 0;">badge</span>
+                        ID Verification
+                    </h2>
+<span class="bg-primary-container text-on-primary-container text-xs px-2 py-0.5 rounded-full font-medium">5 Pending</span>
+</div>
+<div class="p-stack-md flex-1 overflow-y-auto flex flex-col gap-stack-md">
+<!-- Verification Item 1 -->
+<div class="border border-sand-border rounded-lg p-stack-sm hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-tertiary-container text-on-tertiary-container flex items-center justify-center font-label-md">S</div>
+<div>
+<div class="font-label-md text-label-md text-on-background">Sarah Jenkins</div>
+<div class="text-xs text-secondary">Passport • Uploaded 1h ago</div>
+</div>
+</div>
+</div>
+<div class="h-24 bg-surface-container rounded mb-3 overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A stylized placeholder for a passport document, blurred for privacy, light mode UI element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBixdPKzl9K6VgUR3HSXt0MmFGY5ucUV0P7OZ3pIAY2mYr6f_oFy23P6DmCc5iflKllTaQvwMYCEfP17FkcjEF1PygudZGCaSodUbwPXRlgGnJn3ixKv3Bvy3Zm5dwIzdjtqCZNKHBZA-IMOOkLbxGxEO-vHu2kxc65TvHpY3xVYt55M9nz6UAZ413C3ZerX1-Evz6cV4rOxbcElR-9y3wxekUZUTg82uxLffN-b2q5xOe1HucrcfCGnQ"/>
+<div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white shadow-sm">visibility</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-1.5 bg-surface-container hover:bg-surface-container-high text-error rounded font-label-md text-sm transition-colors border border-transparent hover:border-error/20">Reject</button>
+<button class="flex-1 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded font-label-md text-sm transition-colors border border-transparent hover:border-primary/30">Approve</button>
+</div>
+</div>
+<!-- Verification Item 2 -->
+<div class="border border-sand-border rounded-lg p-stack-sm hover:border-primary/50 transition-colors cursor-pointer group">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-dim flex items-center justify-center font-label-md text-on-surface">J</div>
+<div>
+<div class="font-label-md text-label-md text-on-background">James Cooper</div>
+<div class="text-xs text-secondary">Driver's License • Uploaded 3h ago</div>
+</div>
+</div>
+</div>
+<div class="h-24 bg-surface-container rounded mb-3 overflow-hidden relative">
+<img class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A stylized placeholder for a driver's license document, blurred for privacy, light mode UI element." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVYidf2-iZMIANxjfn2wzeI9RSsMy2PpEESkUAniFIbm3xIJn4QtmSOHqpJOyNuEHsY7Rm05gIPsg_hp1BCV5LML7R6N0bXPVHADiBjWYP_1IOzEUEU0c0ZOi_uAAdb9jqc7DktZ9-s-ohjr9OFaqIOJQfKDOzo00DdHm_41CnzQUdJ0GzSJt_PTGiCbFyqqcepl6ZOJtXFvGnVFXXNCgUssuzoXKU2cK2jQo9GJx6ncewtnNP2KpkGw"/>
+<div class="absolute inset-0 flex items-center justify-center bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-white shadow-sm">visibility</span>
+</div>
+</div>
+<div class="flex gap-2">
+<button class="flex-1 py-1.5 bg-surface-container hover:bg-surface-container-high text-error rounded font-label-md text-sm transition-colors border border-transparent hover:border-error/20">Reject</button>
+<button class="flex-1 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary rounded font-label-md text-sm transition-colors border border-transparent hover:border-primary/30">Approve</button>
+</div>
+</div>
+</div>
+<div class="p-stack-md border-t border-sand-border/50 bg-surface-bright rounded-b-xl text-center">
+<button class="text-primary font-label-md text-sm hover:underline">View All Pending (5)</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation (Mobile) - Suppressed for Admin Dashboard intent per rules, as this is a complex desktop-first task tool, but retaining basic shell if forced by responsive rules. Admin usually doesn't need consumer bottom nav. Leaving hidden. -->
+</body></html>

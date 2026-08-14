@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Flatmate Profile Detail</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-deep-void text-on-error font-body-md antialiased min-h-screen pb-32">
+<!-- TopNavBar (Shared Component) -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 border-b border-sand-border dark:border-outline-variant shadow-sm hidden md:block">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-between h-20">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-display-lg font-bold text-petrol dark:text-electric-cyan" href="#">Homley</a>
+<div class="hidden lg:flex gap-6">
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-petrol hover:text-petrol dark:hover:text-electric-cyan transition-colors" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-petrol dark:text-electric-cyan font-semibold border-b-2 border-petrol pb-1" href="#">Find flatmates</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-petrol hover:text-petrol dark:hover:text-electric-cyan transition-colors scale-95 active:opacity-80 transition-all">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-error px-4 py-2 rounded-lg hover:bg-opacity-90 scale-95 active:opacity-80 transition-all">Get started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop pt-24 md:pt-32 space-y-stack-xl">
+<!-- Profile Header -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<div class="col-span-1 md:col-span-4 relative rounded-xl overflow-hidden aspect-square border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A professional portrait of a young adult looking approachable and friendly, lit with dramatic rim lighting against a very dark background. The image should convey a premium, modern aesthetic suited for a high-end real estate app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxNNLib3HYydp2Bk_fdhKUrlGlGa8U62ym2sGWudLzSe2qaJydHMdnPdrZxC_j-FwB2_zt4fec3b7bTwfhuIohR-i-LIAIdOd3NxQnv7TFpvXuNpbyES3dSF0OrKWlVsJyEqo6UMl5dDJmReb4QzGLaBBduSXL-vS27RbiMhB8PPGMLCnfz98ytQB4h6dltzjYwqjAfJIbprMSceqxdwgKfk13dEW3Ezem2XoG_LqTE1huBldmPpUwUQ"/>
+</div>
+<div class="col-span-1 md:col-span-8 flex flex-col justify-end space-y-stack-md py-4">
+<div class="flex justify-between items-start">
+<div>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-on-error tabular-nums">Alex Mercer, 28</h1>
+<p class="font-title-md text-title-md text-electric-cyan flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined" data-icon="work" data-weight="fill" style="font-variation-settings: 'FILL' 1;">work</span>
+                            Senior UX Designer at TechCorp
+                        </p>
+</div>
+<button class="p-3 bg-surface-container-lowest/10 rounded-full border border-outline-variant hover:bg-surface-container-lowest/20 transition-colors">
+<span class="material-symbols-outlined text-on-error" data-icon="favorite_border">favorite_border</span>
+</button>
+</div>
+<!-- Shared Traits Strip -->
+<div class="flex flex-wrap gap-3 mt-4">
+<div class="px-3 py-1.5 rounded-full border border-electric-cyan/30 bg-electric-cyan/10 text-electric-cyan font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
+                        Matches 90% of your preferences
+                    </div>
+<div class="px-3 py-1.5 rounded-full border border-outline-variant bg-surface-container-lowest/5 text-secondary-fixed-dim font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="pets">pets</span>
+                        Dog lover
+                    </div>
+<div class="px-3 py-1.5 rounded-full border border-outline-variant bg-surface-container-lowest/5 text-secondary-fixed-dim font-label-md text-label-md flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="cleaning_services">cleaning_services</span>
+                        Clean freak
+                    </div>
+</div>
+<p class="font-body-lg text-body-lg text-secondary-fixed-dim max-w-2xl mt-4">
+                    Looking for a quiet, clean place with a dedicated home office space. I usually work from home 3 days a week. In my free time, I enjoy cooking, hiking, and exploring local coffee shops. I have a very well-behaved Golden Retriever named Max.
+                </p>
+<div class="flex gap-4 mt-6">
+<button class="bg-electric-cyan text-deep-void font-label-md text-label-md px-6 py-3 rounded-lg hover:opacity-90 transition-opacity font-semibold">Message Alex</button>
+<button class="border border-outline-variant text-on-error font-label-md text-label-md px-6 py-3 rounded-lg hover:bg-surface-container-lowest/10 transition-colors">Request Introduction</button>
+</div>
+</div>
+</section>
+<!-- Facts Grid (Bento Style) -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-gutter">
+<!-- Budget -->
+<div class="col-span-1 p-6 rounded-xl border border-outline-variant bg-onyx flex flex-col justify-between">
+<span class="material-symbols-outlined text-electric-cyan text-3xl mb-4" data-icon="payments">payments</span>
+<div>
+<h3 class="font-label-md text-label-md text-secondary-fixed-dim mb-1">Monthly Budget</h3>
+<p class="font-headline-lg text-headline-lg text-on-error tabular-nums">$1,500 - $2,000</p>
+</div>
+</div>
+<!-- Move In -->
+<div class="col-span-1 p-6 rounded-xl border border-outline-variant bg-onyx flex flex-col justify-between">
+<span class="material-symbols-outlined text-electric-cyan text-3xl mb-4" data-icon="calendar_month">calendar_month</span>
+<div>
+<h3 class="font-label-md text-label-md text-secondary-fixed-dim mb-1">Move-in Date</h3>
+<p class="font-headline-lg text-headline-lg text-on-error tabular-nums">Oct 1st - 15th</p>
+</div>
+</div>
+<!-- Location -->
+<div class="col-span-1 p-6 rounded-xl border border-outline-variant bg-onyx flex flex-col justify-between">
+<span class="material-symbols-outlined text-electric-cyan text-3xl mb-4" data-icon="location_on">location_on</span>
+<div>
+<h3 class="font-label-md text-label-md text-secondary-fixed-dim mb-1">Preferred Areas</h3>
+<p class="font-title-md text-title-md text-on-error">Downtown, Westside</p>
+</div>
+</div>
+</section>
+</main>
+<!-- SideNavBar (Bottom Navigation for Mobile) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-onyx shadow-lg docked full-width bottom-0 bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)] md:hidden border-t border-outline-variant/30">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-[10px] mt-1">AI Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-200 p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

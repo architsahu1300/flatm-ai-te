@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Why this match?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#1c1c18",
+                      "primary-fixed-dim": "#81d1f0",
+                      "on-surface-variant": "#3f484c",
+                      "secondary": "#5e5e5d",
+                      "tertiary-fixed": "#e5e2dc",
+                      "primary-container": "#0e7490",
+                      "surface-container-low": "#f5f3f0",
+                      "surface-container-high": "#eae8e5",
+                      "surface-variant": "#e4e2df",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "primary-fixed": "#b9eaff",
+                      "background": "#0B1114",
+                      "tertiary-container": "#6c6b66",
+                      "onyx": "#1D262B",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#006781",
+                      "sand-border": "#DFDCD6",
+                      "inverse-on-surface": "#f2f0ed",
+                      "inverse-surface": "#30312f",
+                      "on-background": "#1b1c1a",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-error-container": "#93000a",
+                      "petrol": "#0E7490",
+                      "on-secondary-container": "#636362",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "on-primary-container": "#d3f1ff",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "outline": "#6f787d",
+                      "secondary-container": "#e1dfde",
+                      "on-primary-fixed": "#001f29",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#464746",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#dbdad7",
+                      "on-surface": "#1b1c1a",
+                      "electric-cyan": "#22D3EE",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "secondary-fixed": "#e4e2e1",
+                      "inverse-primary": "#81d1f0",
+                      "surface-bright": "#fbf9f6",
+                      "outline-variant": "#bec8cd",
+                      "tertiary": "#54534e",
+                      "surface-container-highest": "#e4e2df",
+                      "deep-void": "#0B1114",
+                      "error-container": "#ffdad6",
+                      "surface": "#151E24",
+                      "primary": "#005a71",
+                      "surface-container": "#efeeeb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "80px",
+                      "container-max": "1280px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-mobile": "20px",
+                      "stack-xs": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "display-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "title-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+      },
+          },
+        }
+    </script>
+<style>
+        /* Custom styles for tabular numerals and dark theme overrides */
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+        body {
+            background-color: #0B1114; /* deep-void equivalent for this context */
+        }
+        .modal-overlay {
+            background-color: rgba(11, 17, 20, 0.8);
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="antialiased text-white font-body-md h-screen w-screen overflow-hidden">
+<!-- Top Navigation Bar (Matches JSON but dark theme adapted) -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md border-b border-outline-variant shadow-sm h-16 flex justify-between items-center max-w-container-max mx-auto px-margin-desktop">
+<div class="font-display-lg text-primary-fixed-dim tracking-tight">Homley</div>
+<div class="hidden md:flex gap-8">
+<a class="text-primary-fixed-dim font-semibold border-b-2 border-primary-fixed-dim pb-1 font-body-md text-body-md" href="#">Browse homes</a>
+<a class="text-outline hover:text-primary-fixed-dim transition-colors font-body-md text-body-md" href="#">Find flatmates</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-primary-fixed-dim hover:opacity-90 transition-opacity font-body-md text-body-md">Sign in</button>
+<button class="bg-petrol text-white px-4 py-2 rounded-lg hover:opacity-90 transition-opacity font-body-md text-body-md shadow-sm">Get started</button>
+</div>
+</nav>
+<!-- Background Search Results Mockup (Blurred via overlay) -->
+<div class="pt-24 px-margin-desktop max-w-container-max mx-auto grid grid-cols-3 gap-gutter opacity-30 pointer-events-none">
+<!-- Mock Card 1 -->
+<div class="bg-surface rounded-2xl h-80 flex flex-col overflow-hidden shadow-sm">
+<div class="h-48 bg-onyx w-full" data-alt="A modern apartment interior with large windows, bright natural light, minimalist furniture, and a neutral color palette. High-end real estate photography style, sophisticated coastal aesthetic with subtle warm lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBeNmi5dYZ6z1crCL2tofYMYeMu4sP6n-VgrK1SHeQ5WgKJ9dQZmLgW58ZCnt5HOOzP-rWMZ9RWIwA4PDZa6qiNBd55E4MDwXZEwY2Fr4lkbUkyvWzgz-jgNDpUMBwHSAhFQRmQQqVXfwPq37vrqHoGDACwjeu937-z1cbq7cBQAzXPqGfqDZrRJrhXmETsz_8Y68zC7tVQS2_jUxeVv6I2LE-QpLcJDs-41k5XnmtiXshVdt_y8zi8Zg')"></div>
+<div class="p-4 flex flex-col gap-2">
+<div class="h-6 w-3/4 bg-tertiary-container rounded"></div>
+<div class="h-4 w-1/2 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Mock Card 2 -->
+<div class="bg-surface rounded-2xl h-80 flex flex-col overflow-hidden shadow-sm">
+<div class="h-48 bg-onyx w-full" data-alt="A luxurious coastal home living room featuring warm wood tones, soft white linen sofas, and a view of the ocean. The lighting is bright and inviting, creating a high-quality, professional real estate visual consistent with a premium brand." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBbMThJ0mMx-svnTOw5q5Tw0pXUX8NfeQO1CFJo2ZeuKZvzG7maGWsCp4hgrhwNqhyh75e7K17m8zBNc_iWYu8iAgQeJVyXqFVsmqKzE4GuZq63FUX4zDtg1LecxV7ZKo-L62GiFZGtO24xPh-aV6MftmTRen-aySvYT7NSXOamwWTD_VNAp-hfpBeOaVaKC7IrJyii-t9dLQxaeSX1NVTsYKnu8gsCrxGGLRyMb-4qmZ2hXeltbSlE2A')"></div>
+<div class="p-4 flex flex-col gap-2">
+<div class="h-6 w-2/3 bg-tertiary-container rounded"></div>
+<div class="h-4 w-1/3 bg-surface-dim rounded"></div>
+</div>
+</div>
+<!-- Mock Card 3 -->
+<div class="bg-surface rounded-2xl h-80 flex flex-col overflow-hidden shadow-sm">
+<div class="h-48 bg-onyx w-full" data-alt="An elegant open-plan kitchen and dining area in a modern flat. Polished concrete floors, white cabinetry, and subtle organic accents. High-contrast lighting highlights the textures, fitting a sophisticated, modern real estate platform." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD8F-afMjOHVoclRc4FXho_6qjc-aC0PtvRrHurBkGeQ4v74EfDrv3zqqFxTtQlUcXCXziFH3-bBYlPSzd5r-Cq6ZoJHt9J7DTccgyuyTWSyP3eumwUuCBG_PRn27rtT_PPJSB_j8xI-DeLTg1PneDagNtWc_mBtqwJNXiPlXHBahHGQe0cB8eup0gZZlswL-hDWmdMb1UyNGunGODVg3jpMjgZJVFJVxPG1XIu8QcwMTjTkEL-fvByzA')"></div>
+<div class="p-4 flex flex-col gap-2">
+<div class="h-6 w-4/5 bg-tertiary-container rounded"></div>
+<div class="h-4 w-1/2 bg-surface-dim rounded"></div>
+</div>
+</div>
+</div>
+<!-- Modal Overlay -->
+<div class="fixed inset-0 z-[100] modal-overlay flex items-center justify-center px-4">
+<!-- Modal Content Container -->
+<div class="bg-[#151E24] rounded-2xl shadow-[0_24px_48px_rgba(0,0,0,0.4)] w-full max-w-[720px] max-h-[90vh] overflow-y-auto border border-outline-variant/30 flex flex-col">
+<!-- Modal Header -->
+<div class="px-8 py-6 border-b border-outline-variant/30 flex justify-between items-center sticky top-0 bg-[#151E24]/95 backdrop-blur z-10">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-white mb-1">Match Score Breakdown</h2>
+<p class="font-body-md text-body-md text-outline">Why this property is a 94% match for you.</p>
+</div>
+<button class="text-outline hover:text-white transition-colors p-2 rounded-full hover:bg-onyx flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">close</span>
+</button>
+</div>
+<!-- Modal Body -->
+<div class="px-8 py-6 flex flex-col gap-8">
+<!-- Overall Score Hero -->
+<div class="flex items-center gap-6">
+<div class="w-24 h-24 rounded-full border-4 border-electric-cyan flex items-center justify-center bg-electric-cyan/10">
+<span class="font-display-lg text-display-lg text-electric-cyan tabular-nums">94<span class="text-2xl text-electric-cyan/70">%</span></span>
+</div>
+<div>
+<h3 class="font-title-md text-title-md text-white mb-2">Excellent Match</h3>
+<p class="font-body-md text-body-md text-outline">This property strongly aligns with your stated preferences, particularly in budget and location. Some minor compromises on lifestyle amenities.</p>
+</div>
+</div>
+<!-- Breakdown Rows -->
+<div class="flex flex-col gap-6">
+<!-- Budget Row -->
+<div class="flex flex-col gap-2 group">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">payments</span>
+<span class="font-label-md text-label-md text-white">Budget Alignment</span>
+</div>
+<span class="font-label-md text-label-md text-electric-cyan tabular-nums">100%</span>
+</div>
+<div class="h-2 w-full bg-onyx rounded-full overflow-hidden">
+<div class="h-full bg-electric-cyan rounded-full transition-all duration-1000" style="width: 100%;"></div>
+</div>
+<p class="font-body-md text-sm text-outline mt-1 group-hover:text-white transition-colors">
+<span class="tabular-nums">₹12,000</span> is <span class="tabular-nums">₹13,000</span> under your <span class="tabular-nums">₹25,000</span> budget.
+                        </p>
+</div>
+<!-- Location Row -->
+<div class="flex flex-col gap-2 group">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-label-md text-label-md text-white">Location Relevance</span>
+</div>
+<span class="font-label-md text-label-md text-electric-cyan tabular-nums">95%</span>
+</div>
+<div class="h-2 w-full bg-onyx rounded-full overflow-hidden">
+<div class="h-full bg-electric-cyan rounded-full transition-all duration-1000" style="width: 95%;"></div>
+</div>
+<p class="font-body-md text-sm text-outline mt-1 group-hover:text-white transition-colors">
+<span class="tabular-nums">1.2km</span> from your workplace. <span class="tabular-nums">3</span> min walk to nearest transit hub.
+                        </p>
+</div>
+<!-- Quality Row -->
+<div class="flex flex-col gap-2 group">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-label-md text-label-md text-white">Property Quality</span>
+</div>
+<span class="font-label-md text-label-md text-primary-fixed-dim tabular-nums">90%</span>
+</div>
+<div class="h-2 w-full bg-onyx rounded-full overflow-hidden">
+<div class="h-full bg-primary-fixed-dim rounded-full transition-all duration-1000" style="width: 90%;"></div>
+</div>
+<p class="font-body-md text-sm text-outline mt-1 group-hover:text-white transition-colors">
+                            High-quality materials. Built in <span class="tabular-nums">2021</span>. Excellent maintenance record.
+                        </p>
+</div>
+<!-- Lifestyle Row -->
+<div class="flex flex-col gap-2 group">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline-variant" style="font-variation-settings: 'FILL' 1;">fitness_center</span>
+<span class="font-label-md text-label-md text-white">Lifestyle Fit</span>
+</div>
+<span class="font-label-md text-label-md text-outline-variant tabular-nums">75%</span>
+</div>
+<div class="h-2 w-full bg-onyx rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant rounded-full transition-all duration-1000" style="width: 75%;"></div>
+</div>
+<p class="font-body-md text-sm text-outline mt-1 group-hover:text-white transition-colors">
+                            Has gym and pool, but missing requested pet-friendly park nearby.
+                        </p>
+</div>
+<!-- Verification Row -->
+<div class="flex flex-col gap-2 group">
+<div class="flex justify-between items-end mb-1">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-electric-cyan" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-label-md text-white">Verification Level</span>
+</div>
+<span class="font-label-md text-label-md text-electric-cyan tabular-nums">100%</span>
+</div>
+<div class="h-2 w-full bg-onyx rounded-full overflow-hidden">
+<div class="h-full bg-electric-cyan rounded-full transition-all duration-1000" style="width: 100%;"></div>
+</div>
+<p class="font-body-md text-sm text-outline mt-1 group-hover:text-white transition-colors">
+                            Fully verified host. In-person inspection completed on <span class="tabular-nums">12 Oct 2023</span>.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Modal Footer -->
+<div class="px-8 py-4 bg-onyx/50 border-t border-outline-variant/30 mt-auto">
+<p class="font-label-md text-xs text-outline text-center">
+                    Match scores are generated by Homley AI based on your profile preferences and listing metadata. <a class="text-primary-fixed-dim hover:underline" href="#">Learn more</a>.
+                </p>
+</div>
+</div>
+</div>
+</body></html>

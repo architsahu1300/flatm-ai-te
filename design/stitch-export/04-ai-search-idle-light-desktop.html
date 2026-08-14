@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - AI Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "petrol": "#0E7490",
+                "on-primary-container": "#d3f1ff",
+                "surface-container-high": "#eae8e5",
+                "on-error": "#ffffff",
+                "surface-variant": "#e4e2df",
+                "on-tertiary": "#ffffff",
+                "on-error-container": "#93000a",
+                "deep-void": "#0B1114",
+                "on-primary-fixed": "#001f29",
+                "sand-border": "#DFDCD6",
+                "on-primary": "#ffffff",
+                "surface-container-low": "#f5f3f0",
+                "tertiary": "#54534e",
+                "tertiary-fixed": "#e5e2dc",
+                "on-primary-fixed-variant": "#004d62",
+                "error-container": "#ffdad6",
+                "surface-container-highest": "#e4e2df",
+                "primary-fixed": "#b9eaff",
+                "inverse-surface": "#30312f",
+                "on-surface": "#1b1c1a",
+                "surface-container-lowest": "#ffffff",
+                "surface-bright": "#fbf9f6",
+                "primary-fixed-dim": "#81d1f0",
+                "on-secondary": "#ffffff",
+                "tertiary-container": "#6c6b66",
+                "primary-container": "#0e7490",
+                "surface-container": "#efeeeb",
+                "error": "#ba1a1a",
+                "electric-cyan": "#22D3EE",
+                "outline": "#6f787d",
+                "secondary": "#5e5e5d",
+                "inverse-on-surface": "#f2f0ed",
+                "on-secondary-fixed-variant": "#464746",
+                "on-tertiary-container": "#f0ece6",
+                "on-background": "#1b1c1a",
+                "surface-tint": "#006781",
+                "inverse-primary": "#81d1f0",
+                "on-tertiary-fixed": "#1c1c18",
+                "on-secondary-fixed": "#1b1c1b",
+                "outline-variant": "#bec8cd",
+                "onyx": "#1D262B",
+                "on-secondary-container": "#636362",
+                "on-surface-variant": "#3f484c",
+                "surface-dim": "#dbdad7",
+                "primary": "#005a71",
+                "sand-light": "#F7F5F2",
+                "tertiary-fixed-dim": "#c9c6c0",
+                "secondary-fixed-dim": "#c7c6c5",
+                "secondary-container": "#e1dfde",
+                "on-tertiary-fixed-variant": "#484742",
+                "surface": "#fbf9f6",
+                "secondary-fixed": "#e4e2e1",
+                "background": "#fbf9f6"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "stack-sm": "8px",
+                "stack-xl": "48px",
+                "margin-desktop": "80px",
+                "stack-lg": "24px",
+                "gutter": "24px",
+                "container-max": "1280px",
+                "stack-md": "16px",
+                "margin-mobile": "20px",
+                "stack-xs": "4px"
+        },
+        "fontFamily": {
+                "headline-lg": [
+                        "Inter"
+                ],
+                "display-lg-mobile": [
+                        "Inter"
+                ],
+                "title-md": [
+                        "Inter"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "display-lg": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Inter"
+                ],
+                "body-lg": [
+                        "Inter"
+                ]
+        },
+        "fontSize": {
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "40px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "36px",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "title-md": [
+                        "20px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "24px",
+                                "fontWeight": "400"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "56px",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "label-md": [
+                        "14px",
+                        {
+                                "lineHeight": "20px",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "28px",
+                                "fontWeight": "400"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+</head>
+<body class="bg-sand-light text-on-background min-h-screen font-body-md tabular-nums">
+<!-- TopAppBar -->
+<header class="bg-sand-light flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16 docked full-width top-0 sticky shadow-sm z-50">
+<div class="flex items-center gap-4 cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-deep-void" data-icon="menu">menu</span>
+<span class="font-display-lg text-display-lg text-deep-void tracking-tight">Homley</span>
+</div>
+<div class="hidden md:flex flex-1 max-w-lg mx-8 relative">
+<div class="w-full bg-surface-container rounded-full px-4 py-2 flex items-center justify-between border border-sand-border focus-within:border-petrol focus-within:shadow-[0_2px_12px_rgba(45,54,46,0.04)] transition-all cursor-text" tabindex="0">
+<span class="text-secondary font-body-md text-sm truncate">What are you looking for?</span>
+<span class="flex items-center gap-1 text-outline font-label-md text-xs bg-surface-variant px-2 py-0.5 rounded-[10px]">
+<span>⌘</span><span>K</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-8 hidden md:flex">
+<nav class="flex gap-6">
+<a class="text-petrol font-bold border-b-2 border-petrol pb-1 hover:text-petrol transition-colors duration-200" href="#">Explore</a>
+<a class="text-secondary font-body-md hover:text-petrol transition-colors duration-200" href="#">Saved</a>
+<a class="text-secondary font-body-md hover:text-petrol transition-colors duration-200" href="#">Matches</a>
+</nav>
+<span class="material-symbols-outlined text-deep-void cursor-pointer active:scale-95 transition-transform" data-icon="search">search</span>
+</div>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="relative min-h-[819px] flex flex-col justify-center items-center px-gutter py-stack-xl overflow-hidden">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0 after:content-[''] after:absolute after:inset-0 after:bg-sand-light/80 after:backdrop-blur-sm">
+<div class="bg-cover bg-center w-full h-full" data-alt="A stunning, high-end modern apartment interior in Mumbai bathed in soft natural daylight. The spacious living room features minimalist furniture, earthy neutral tones, subtle warm wood accents, and large floor-to-ceiling windows overlooking a hazy skyline. The overall aesthetic is clean, sophisticated, and calming, emphasizing modern humanism and premium quality." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCuc79D9Ugc2YkHXpRqYhwaxts4zc5KKnqpEsDxvvMav-Sv7sKngGbktFWgGE-0qx0pzUqOPgV2fWMlhhqAilbDABsvG0DjnPANSLBrriah8iahW0-uJmy8L7d5v8K85oLTHxbNmYK0LK5BFX94z5Pys-5ICupOLX90KjhagwX-w2RbWisPFEJQo23DNE2D1b70ALJgQU4hOsrMT_bbZz4-O8lChIvlkxOYvTYyikXIBmp0wd6-9vgCkg')"></div>
+</div>
+<div class="relative z-10 w-full max-w-4xl text-center space-y-stack-md mx-auto">
+<h1 class="font-display-lg text-display-lg text-deep-void tracking-tight">Find a home that feels right.</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Describe your ideal living space in your own words. Our AI understands nuance, lifestyle needs, and the unsaid.</p>
+<!-- NL Search Input -->
+<div class="mt-stack-lg bg-surface-container-lowest rounded-[16px] p-2 shadow-[0px_8px_24px_rgba(45,54,46,0.08)] border border-sand-border flex flex-col md:flex-row items-center focus-within:border-petrol transition-colors relative">
+<textarea class="w-full bg-transparent border-none resize-none font-body-md text-on-surface placeholder:text-outline p-4 focus:ring-0 min-h-[120px] md:min-h-[80px]" placeholder="I'm looking for a quiet 2BHK near Bandra Kurla Complex with plenty of natural light, a modern kitchen, and pet-friendly policies. Preferably under 85k..."></textarea>
+<div class="w-full md:w-auto p-2 flex justify-end">
+<button class="bg-petrol text-on-primary rounded-[10px] px-6 py-3 font-label-md text-label-md flex items-center gap-2 hover:bg-primary-container transition-colors shadow-[0_2px_12px_rgba(45,54,46,0.04)] whitespace-nowrap">
+<span class="material-symbols-outlined" data-icon="auto_awesome" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                            Search
+                        </button>
+</div>
+</div>
+<div class="flex flex-wrap justify-center gap-2 mt-stack-sm">
+<span class="font-label-md text-label-md text-secondary">Try:</span>
+<button class="font-label-md text-label-md text-petrol hover:bg-surface-variant px-3 py-1 rounded-[10px] border border-sand-border transition-colors">"Sea view in Worli"</button>
+<button class="font-label-md text-label-md text-petrol hover:bg-surface-variant px-3 py-1 rounded-[10px] border border-sand-border transition-colors">"Studio near tech park"</button>
+</div>
+</div>
+</section>
+</main>
+</body></html>

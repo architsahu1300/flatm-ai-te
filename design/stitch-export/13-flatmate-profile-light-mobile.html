@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Homley - Flatmate Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "primary-fixed-dim": "#81d1f0",
+                    "on-surface": "#1b1c1a",
+                    "sand-border": "#DFDCD6",
+                    "electric-cyan": "#22D3EE",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary": "#5e5e5d",
+                    "on-secondary-fixed-variant": "#464746",
+                    "on-surface-variant": "#3f484c",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fbf9f6",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "onyx": "#1D262B",
+                    "surface-tint": "#006781",
+                    "on-background": "#1b1c1a",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1",
+                    "on-primary-fixed-variant": "#004d62",
+                    "on-secondary-container": "#636362",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f6",
+                    "on-primary-fixed": "#001f29",
+                    "surface-container-high": "#eae8e5",
+                    "error-container": "#ffdad6",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d3f1ff",
+                    "outline-variant": "#bec8cd",
+                    "outline": "#6f787d",
+                    "inverse-primary": "#81d1f0",
+                    "petrol": "#0E7490",
+                    "inverse-surface": "#30312f",
+                    "surface-variant": "#e4e2df",
+                    "deep-void": "#0B1114",
+                    "on-tertiary-container": "#f0ece6",
+                    "surface-container-low": "#f5f3f0",
+                    "surface-container-highest": "#e4e2df",
+                    "tertiary-container": "#6c6b66",
+                    "primary-container": "#0e7490",
+                    "secondary-container": "#e1dfde",
+                    "sand-light": "#F7F5F2",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "surface-dim": "#dbdad7",
+                    "surface-container": "#efeeeb",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary": "#54534e",
+                    "primary": "#005a71",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "primary-fixed": "#b9eaff",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "80px",
+                    "stack-sm": "8px",
+                    "stack-xl": "48px",
+                    "stack-xs": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "stack-md": "16px",
+                    "stack-lg": "24px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 80px); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface h-screen w-full md:hidden flex flex-col overflow-hidden relative">
+<!-- Top App Bar (Custom for Profile Detail) -->
+<header class="fixed top-0 w-full z-40 bg-surface/90 backdrop-blur-md px-margin-mobile h-16 flex items-center justify-between shadow-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-petrol" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-secondary" data-icon="ios_share">ios_share</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-lowest shadow-[0_4px_12px_rgba(0,0,0,0.04)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-error" data-icon="favorite" data-weight="fill" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</header>
+<!-- Scrollable Content -->
+<main class="flex-1 overflow-y-auto pb-safe pt-16 hide-scrollbar relative">
+<!-- Hero Profile Section -->
+<section class="px-margin-mobile pt-stack-lg pb-stack-md flex flex-col items-center relative">
+<div class="relative w-32 h-32 mb-stack-md">
+<!-- Compatibility Ring -->
+<svg class="absolute inset-0 w-full h-full -rotate-90 z-0" viewbox="0 0 100 100">
+<circle class="stroke-surface-container-high" cx="50" cy="50" fill="none" r="48" stroke-width="4"></circle>
+<circle class="stroke-petrol" cx="50" cy="50" fill="none" r="48" stroke-dasharray="301.59" stroke-dashoffset="45.23" stroke-linecap="round" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-2 rounded-full overflow-hidden z-10 border-4 border-surface shadow-md bg-surface-container-high">
+<img class="w-full h-full object-cover" data-alt="A high-quality, professional headshot of a friendly young woman in her late 20s, wearing casual modern clothing, set against a bright, airy coastal aesthetic background with soft natural lighting and sophisticated petrol-blue accents. Warm and approachable vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGC_s9cD24EtcmTsb6CMjTc3lHXnquo8wUn7x4dK0_eu0U2R5i9UXpMakIeSMxpFOQ1pDohkgGx1rPE9FFn6sLU_YOnTK0Dl6SjAsenqs32IyO-0-qnIIBwmvWAyFiQueuwCmUxTX8YHoFNyH_0Tp7V36jQSH9Pamxbusi53Pcih1ALVQGKZ_DL6aeDuSnkxfH69Q_0dNNmi_M6OKz5chxJ-cdb3V3ahK1jmNf5XkEwj6iHLzT3rHSCw"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-petrol text-white rounded-full px-2 py-1 flex items-center gap-1 shadow-md z-20">
+<span class="material-symbols-outlined text-[12px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-md text-[10px] font-bold">85% Match</span>
+</div>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-1">Sarah Jenkins, 28</h1>
+<p class="font-body-md text-body-md text-secondary flex items-center gap-1 mb-stack-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="work">work</span> Graphic Designer
+            </p>
+<div class="flex gap-2 mb-stack-lg flex-wrap justify-center">
+<span class="bg-surface-container-high px-3 py-1 rounded-full font-label-md text-label-md text-on-surface-variant">Early Bird</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full font-label-md text-label-md text-on-surface-variant">Non-smoker</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full font-label-md text-label-md text-on-surface-variant">Vegetarian</span>
+</div>
+</section>
+<!-- About Section -->
+<section class="px-margin-mobile mb-stack-lg">
+<h2 class="font-title-md text-title-md mb-stack-sm">About Sarah</h2>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)]">
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+                    Hi! I'm a graphic designer looking for a friendly, clean flatshare. I value a peaceful home environment but always up for a glass of wine or weekend brunch. I come with a well-behaved Monstera plant and a great coffee machine.
+                </p>
+</div>
+</section>
+<!-- Lifestyle Grid -->
+<section class="px-margin-mobile mb-stack-lg">
+<h2 class="font-title-md text-title-md mb-stack-sm">Lifestyle &amp; Habits</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] flex flex-col items-start gap-2">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-petrol">
+<span class="material-symbols-outlined" data-icon="cleaning_services">cleaning_services</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Cleanliness</h3>
+<p class="font-body-md text-[12px] text-secondary">Very tidy, weekly chores</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] flex flex-col items-start gap-2">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-petrol">
+<span class="material-symbols-outlined" data-icon="volume_up">volume_up</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Noise Level</h3>
+<p class="font-body-md text-[12px] text-secondary">Quiet on weekdays</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] flex flex-col items-start gap-2">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-petrol">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Guests</h3>
+<p class="font-body-md text-[12px] text-secondary">Occasional dinners</p>
+</div>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] flex flex-col items-start gap-2">
+<div class="w-10 h-10 rounded-full bg-primary-container/10 flex items-center justify-center text-petrol">
+<span class="material-symbols-outlined" data-icon="pets">pets</span>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface">Pets</h3>
+<p class="font-body-md text-[12px] text-secondary">Loves dogs, has none</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Current Location / Looking For -->
+<section class="px-margin-mobile mb-stack-xl">
+<h2 class="font-title-md text-title-md mb-stack-sm">Looking in</h2>
+<div class="bg-surface-container-lowest rounded-xl p-4 shadow-[0_4px_12px_rgba(0,0,0,0.04)] flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary" data-icon="location_on">location_on</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Bandra West, Andheri</p>
+<p class="font-body-md text-[12px] text-secondary">Move by Oct 1st</p>
+</div>
+</div>
+<div class="text-right">
+<p class="font-title-md text-title-md text-petrol">₹45k</p>
+<p class="font-body-md text-[12px] text-secondary">Max Budget</p>
+</div>
+</div>
+</section>
+</main>
+<!-- Sticky Message CTA -->
+<div class="fixed bottom-[80px] w-full px-margin-mobile py-4 bg-gradient-to-t from-surface via-surface/90 to-transparent z-40">
+<button class="w-full bg-petrol text-on-primary py-4 rounded-xl font-title-md text-title-md flex items-center justify-center gap-2 shadow-[0_8px_24px_rgba(14,116,144,0.3)] active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="chat">chat</span>
+            Message Sarah
+        </button>
+</div>
+<!-- Bottom Nav Bar (From JSON) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-surface bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)]">
+<button class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 px-3 py-1 rounded-xl">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 px-3 py-1 rounded-xl">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</button>
+<!-- AI Search (Raised Center Button) -->
+<div class="relative -top-5">
+<button class="w-14 h-14 bg-petrol rounded-full flex flex-col items-center justify-center text-on-primary shadow-lg active:scale-90 transition-transform duration-200 border-4 border-surface">
+<span class="material-symbols-outlined text-[28px]" data-icon="auto_awesome">auto_awesome</span>
+</button>
+<span class="font-label-md text-[10px] text-secondary absolute -bottom-4 w-full text-center left-0">AI Search</span>
+</div>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 px-3 py-1 rounded-xl">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-label-md text-[10px] mt-1">Inbox</span>
+</button>
+<!-- Active State: Profile Detail falls under Explore typically, but let's assume it's just browsing so Explore is active, or none is heavily active. Since JSON says "Explore" is active in this scenario if it's browsing, but to follow strict active rules, if none match perfectly, we default to the intent. We'll leave them all inactive since it's a detail page and detail pages often suppress shell, BUT prompt requested 5-tab nav. We will set Explore as active. -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 px-3 py-1 rounded-xl">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</button>
+</nav>
+</body></html>

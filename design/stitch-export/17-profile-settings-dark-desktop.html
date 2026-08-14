@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Profile &amp; Settings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface": "#1b1c1a",
+                        "sand-border": "#DFDCD6",
+                        "electric-cyan": "#22D3EE",
+                        "inverse-on-surface": "#f2f0ed",
+                        "secondary": "#5e5e5d",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-surface-variant": "#3f484c",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#fbf9f6",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "onyx": "#1D262B",
+                        "surface-tint": "#006781",
+                        "on-background": "#1b1c1a",
+                        "surface": "#fbf9f6",
+                        "secondary-fixed": "#e4e2e1",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-secondary-container": "#636362",
+                        "on-error-container": "#93000a",
+                        "background": "#fbf9f6",
+                        "on-primary-fixed": "#001f29",
+                        "surface-container-high": "#eae8e5",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#d3f1ff",
+                        "outline-variant": "#bec8cd",
+                        "outline": "#6f787d",
+                        "inverse-primary": "#81d1f0",
+                        "petrol": "#0E7490",
+                        "inverse-surface": "#30312f",
+                        "surface-variant": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "on-tertiary-container": "#f0ece6",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-highest": "#e4e2df",
+                        "tertiary-container": "#6c6b66",
+                        "primary-container": "#0e7490",
+                        "secondary-container": "#e1dfde",
+                        "sand-light": "#F7F5F2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "surface-dim": "#dbdad7",
+                        "surface-container": "#efeeeb",
+                        "tertiary-fixed": "#e5e2dc",
+                        "tertiary": "#54534e",
+                        "primary": "#005a71",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "primary-fixed": "#b9eaff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "surface-container-lowest": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "stack-sm": "8px",
+                        "stack-xl": "48px",
+                        "stack-xs": "4px",
+                        "gutter": "24px",
+                        "container-max": "1280px",
+                        "stack-md": "16px",
+                        "stack-lg": "24px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface dark:bg-onyx text-on-surface dark:text-inverse-on-surface min-h-screen flex flex-col pt-20 pb-24 md:pb-0">
+<!-- TopNavBar (Web) -->
+<header class="hidden md:flex fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm border-b border-sand-border dark:border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-between h-20 w-full">
+<div class="font-display-lg text-display-lg font-bold text-petrol dark:text-electric-cyan">Homley</div>
+<nav class="flex gap-gutter font-body-md text-body-md">
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-petrol dark:hover:text-electric-cyan transition-colors scale-95 active:opacity-80 transition-all" href="#">Browse homes</a>
+<a class="text-secondary dark:text-secondary-fixed-dim hover:text-petrol dark:hover:text-electric-cyan transition-colors scale-95 active:opacity-80 transition-all" href="#">Find flatmates</a>
+</nav>
+<div class="flex gap-stack-md items-center font-body-md text-body-md">
+<a class="text-petrol dark:text-electric-cyan hover:text-petrol dark:hover:text-electric-cyan transition-colors scale-95 active:opacity-80 transition-all" href="#">Sign in</a>
+<a class="bg-petrol text-on-primary px-4 py-2 rounded-lg font-label-md hover:opacity-90 transition-opacity" href="#">Get started</a>
+</div>
+</div>
+</header>
+<main class="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-stack-xl flex flex-col md:flex-row gap-gutter">
+<!-- Sidebar Navigation (Desktop Settings) -->
+<aside class="hidden md:block w-64 shrink-0">
+<div class="sticky top-28 flex flex-col gap-stack-sm">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Personal Info</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-petrol dark:text-electric-cyan bg-primary-container/10 border-l-4 border-petrol transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">manage_accounts</span>
+<span class="font-label-md text-label-md font-semibold">Account Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined">notifications</span>
+<span class="font-label-md text-label-md">Notifications</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-secondary dark:text-secondary-fixed-dim hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined">security</span>
+<span class="font-label-md text-label-md">Security</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="flex-grow flex flex-col gap-stack-xl">
+<header>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-petrol dark:text-electric-cyan mb-2">Account Settings</h1>
+<p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim">Manage your preferences, discovery settings, and account details.</p>
+</header>
+<!-- Discovery Settings Card -->
+<section class="bg-surface-container-lowest dark:bg-deep-void rounded-xl p-6 shadow-sm border border-sand-border dark:border-outline-variant/30 flex flex-col gap-stack-lg">
+<h2 class="font-title-md text-title-md border-b border-sand-border dark:border-outline-variant/30 pb-4">Discovery Profile</h2>
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-label-md text-label-md font-semibold mb-1">Show my profile in search</h3>
+<p class="font-body-sm text-secondary dark:text-secondary-fixed-dim text-sm">Allow other users to find you when looking for flatmates.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-secondary-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-petrol dark:peer-checked:bg-electric-cyan"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-label-md text-label-md font-semibold mb-1">Show budget preferences</h3>
+<p class="font-body-sm text-secondary dark:text-secondary-fixed-dim text-sm">Display your estimated budget range on your public profile.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-secondary-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-petrol dark:peer-checked:bg-electric-cyan"></div>
+</label>
+</div>
+</section>
+<!-- Subscription Settings Card -->
+<section class="bg-surface-container-lowest dark:bg-deep-void rounded-xl p-6 shadow-sm border border-sand-border dark:border-outline-variant/30 flex flex-col gap-stack-lg">
+<div class="flex justify-between items-center border-b border-sand-border dark:border-outline-variant/30 pb-4">
+<h2 class="font-title-md text-title-md">Current Plan</h2>
+<span class="bg-primary-container/20 text-petrol dark:text-electric-cyan px-3 py-1 rounded-full font-label-md text-sm font-semibold">Premium</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-sand-border dark:border-outline-variant/30 text-secondary dark:text-secondary-fixed-dim font-label-md text-sm">
+<th class="py-3 px-2 font-medium">Feature</th>
+<th class="py-3 px-2 font-medium">Basic</th>
+<th class="py-3 px-2 font-medium text-petrol dark:text-electric-cyan">Premium</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-sm">
+<tr class="border-b border-sand-border dark:border-outline-variant/10">
+<td class="py-3 px-2">Message Limits</td>
+<td class="py-3 px-2 text-secondary">10/day</td>
+<td class="py-3 px-2 font-semibold">Unlimited</td>
+</tr>
+<tr class="border-b border-sand-border dark:border-outline-variant/10">
+<td class="py-3 px-2">AI Search Filters</td>
+<td class="py-3 px-2 text-secondary">Basic</td>
+<td class="py-3 px-2 font-semibold">Advanced</td>
+</tr>
+<tr>
+<td class="py-3 px-2">Profile Boost</td>
+<td class="py-3 px-2 text-secondary"><span class="material-symbols-outlined text-sm">close</span></td>
+<td class="py-3 px-2 font-semibold"><span class="material-symbols-outlined text-sm text-petrol dark:text-electric-cyan">check</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex justify-end mt-4">
+<button class="border border-sand-border dark:border-outline-variant text-on-surface dark:text-inverse-on-surface px-4 py-2 rounded-lg font-label-md hover:bg-sand-light dark:hover:bg-surface-dim transition-colors mr-3">Cancel Plan</button>
+<button class="bg-petrol text-on-primary px-4 py-2 rounded-lg font-label-md hover:opacity-90 transition-opacity">Manage Billing</button>
+</div>
+</section>
+<!-- Danger Zone -->
+<section class="bg-error-container/10 dark:bg-error-container/5 rounded-xl p-6 border border-error/20 flex flex-col gap-stack-md">
+<h2 class="font-title-md text-title-md text-error">Danger Zone</h2>
+<p class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim text-sm">Once you delete your account, there is no going back. Please be certain.</p>
+<div class="mt-2">
+<button class="bg-error text-on-error px-4 py-2 rounded-lg font-label-md hover:opacity-90 transition-opacity">Delete Account</button>
+</div>
+</section>
+</div>
+</main>
+<!-- SideNavBar (Mobile BottomNav fallback) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 flex justify-around items-end pb-4 pt-2 px-2 bg-surface dark:bg-onyx bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)] shadow-lg">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-[10px] mt-1">AI Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 active:scale-90 transition-transform duration-200 w-16 h-14 rounded-xl" href="#">
+<span class="material-symbols-outlined">mail</span>
+<span class="font-label-md text-[10px] mt-1">Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-200 w-16 h-14" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px] mt-1 font-semibold">Profile</span>
+</a>
+</nav>
+</body></html>

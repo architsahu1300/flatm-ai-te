@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - Compare Matches</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary-fixed": "#1c1c18",
+                      "primary-fixed-dim": "#81d1f0",
+                      "on-surface-variant": "#3f484c",
+                      "secondary": "#5e5e5d",
+                      "tertiary-fixed": "#e5e2dc",
+                      "primary-container": "#0e7490",
+                      "surface-container-low": "#f5f3f0",
+                      "surface-container-high": "#eae8e5",
+                      "surface-variant": "#e4e2df",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#484742",
+                      "primary-fixed": "#b9eaff",
+                      "background": "#fbf9f6",
+                      "tertiary-container": "#6c6b66",
+                      "onyx": "#1D262B",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#006781",
+                      "sand-border": "#DFDCD6",
+                      "inverse-on-surface": "#f2f0ed",
+                      "inverse-surface": "#30312f",
+                      "on-background": "#1b1c1a",
+                      "secondary-fixed-dim": "#c7c6c5",
+                      "on-error-container": "#93000a",
+                      "petrol": "#0E7490",
+                      "on-secondary-container": "#636362",
+                      "on-primary": "#ffffff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed-variant": "#004d62",
+                      "on-primary-container": "#d3f1ff",
+                      "sand-light": "#F7F5F2",
+                      "on-tertiary-container": "#f0ece6",
+                      "on-secondary-fixed": "#1b1c1b",
+                      "outline": "#6f787d",
+                      "secondary-container": "#e1dfde",
+                      "on-primary-fixed": "#001f29",
+                      "on-error": "#ffffff",
+                      "on-secondary-fixed-variant": "#464746",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#dbdad7",
+                      "on-surface": "#1b1c1a",
+                      "electric-cyan": "#22D3EE",
+                      "tertiary-fixed-dim": "#c9c6c0",
+                      "secondary-fixed": "#e4e2e1",
+                      "inverse-primary": "#81d1f0",
+                      "surface-bright": "#fbf9f6",
+                      "outline-variant": "#bec8cd",
+                      "tertiary": "#54534e",
+                      "surface-container-highest": "#e4e2df",
+                      "deep-void": "#0B1114",
+                      "error-container": "#ffdad6",
+                      "surface": "#fbf9f6",
+                      "primary": "#005a71",
+                      "surface-container": "#efeeeb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-desktop": "80px",
+                      "container-max": "1280px",
+                      "stack-xl": "48px",
+                      "stack-sm": "8px",
+                      "gutter": "24px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-mobile": "20px",
+                      "stack-xs": "4px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "display-lg-mobile": ["Inter"],
+                      "label-md": ["Inter"],
+                      "display-lg": ["Inter"],
+                      "title-md": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Hide scrollbar for a cleaner mobile look */
+        ::-webkit-scrollbar { width: 0px; height: 0px; }
+    </style>
+</head>
+<body class="bg-surface font-body-md text-on-surface antialiased h-screen overflow-hidden flex flex-col relative">
+<!-- Mock Background Content (to show bottom sheet context) -->
+<div class="flex-1 p-gutter bg-surface-container-low opacity-40">
+<div class="h-48 bg-surface-variant rounded-xl mb-stack-md"></div>
+<div class="h-48 bg-surface-variant rounded-xl"></div>
+</div>
+<!-- Backdrop Overlay -->
+<div class="absolute inset-0 bg-onyx/40 z-10 backdrop-blur-sm"></div>
+<!-- Bottom Sheet Component -->
+<div class="absolute bottom-0 left-0 w-full bg-surface-container-lowest rounded-t-xl z-20 shadow-[0px_-8px_24px_rgba(0,0,0,0.12)] flex flex-col" style="height: 85vh; padding-bottom: 80px;">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center py-3">
+<div class="w-12 h-1.5 bg-outline-variant rounded-full"></div>
+</div>
+<!-- Sheet Header & AI Summary Strip -->
+<div class="px-margin-mobile mb-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-stack-xs">Compare Matches</h2>
+<div class="bg-primary-container text-on-primary-container p-3 rounded-lg flex items-start gap-3 shadow-sm border border-primary-container/20">
+<span class="material-symbols-outlined text-primary-fixed shrink-0" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<p class="font-label-md text-label-md">
+<strong>AI Insight:</strong> Sea View A offers the best commute, while Green Park has the lowest overall deposit.
+                </p>
+</div>
+</div>
+<!-- Compare Table (Scrollable Container) -->
+<div class="flex-1 overflow-y-auto px-margin-mobile pb-stack-xl">
+<div class="min-w-max">
+<!-- Headers (Properties) -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 mb-stack-sm sticky top-0 bg-surface-container-lowest pt-2 pb-4 z-10 border-b border-surface-variant">
+<div class="text-secondary font-label-md text-label-md flex items-end pb-2">Specs</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-variant mb-2 border-2 border-primary overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A bright, modern living room with large coastal windows, warm natural lighting, sophisticated petrol blue and sand accents, organic textures, high-end photography, 8k resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD89iDCl8eUA9MxgCKUVt3kK38F9gPPxBSqtpy0mlwRFNv1kyWB--5eK8uZaqASrRLqPXD497rBGiW9W96wm70dbz78Iw9V5fyVJIpPge-yf7W3_zjZJjevWmG-chj0vySV3FBVpb45DFnktsz8vKH6zHfA9LnP-nfn2uoLw6ur0vfFxYj36o58D1LNH0Fyvg8Aex-yN5xCNUD2qY3HwAG_ANHQyu2csJNaVK39tR74RlgZGsB2sniSkQ"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface line-clamp-1">Sea View A</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-variant mb-2 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A modern, high-end apartment kitchen with sleek minimal cabinetry, warm sand tones, clean lines, professional real estate photography, soft natural daylight, corporate modern aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8bSLs24floLLQIWdfYvtBqav5pJqKaOgOK5Yf_YXOFBgfHu-KcyZ3PLqKWpXIKylW0N8LnhYJxZ7ssmHFQAA3LBKdJTD6jYuUzLzssWfBXG8EUrRH8dyB6ZWBc-kGdwREUQioN3VNTLDzwc4N4QANtk7InQYdpUqOGPAkixs7NKfCipRgjBsbR_rseE0p0zxHmuD2GjwgXq0RpoYw0eE4pKqHhYJ2YhkxfITQcdjo9KrXmnppdKJjAg"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface line-clamp-1">Green Park</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-surface-variant mb-2 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A sophisticated minimalist bedroom with premium organic cotton bedding, large windows showing a city skyline, calm soft lighting, subtle coastal luxury vibe, crisp architectural photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK_qAljMteHm5x9ppXDDnjuDkA5jVa5TaZzfE1mC6-TehNQF70RLFwZh3uMRNm5Wltl_MXxIhaxsvIEV9lhcBWsiJe-FdDdBuFcs6aEUVgEAYRQj8Q52qs91ihVXOlAvSQXGE0s84yqdpvV2sJRlGwX8lkRS7QeUzVILRibWO-GMvIoRrwIBxLXSweXtMYNyvdI3-O8L5Qq4hkxh9PluaQoUUFZUItYu32OTYc03-r2AjaTyw8TqSnEg"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface line-clamp-1">Oasis Heights</span>
+</div>
+</div>
+<!-- Rows -->
+<div class="space-y-4">
+<!-- Match % -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Match</div>
+<div class="text-center font-title-md text-title-md text-on-surface tabular-nums">98%</div>
+<div class="text-center font-title-md text-title-md text-on-surface tabular-nums">92%</div>
+<div class="text-center font-title-md text-title-md text-on-surface tabular-nums">85%</div>
+</div>
+<!-- Rent -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Rent/mo</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">₹45k</div>
+<div class="text-center font-body-md text-body-md text-primary font-semibold tabular-nums bg-primary-fixed-dim/20 rounded px-2 py-1">₹38k</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">₹42k</div>
+</div>
+<!-- Deposit -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Deposit</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">₹1.5L</div>
+<div class="text-center font-body-md text-body-md text-primary font-semibold tabular-nums bg-primary-fixed-dim/20 rounded px-2 py-1">₹1.0L</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">₹1.2L</div>
+</div>
+<!-- Room -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Room</div>
+<div class="text-center font-body-md text-body-md text-on-surface">2 BHK</div>
+<div class="text-center font-body-md text-body-md text-on-surface">1 RK</div>
+<div class="text-center font-body-md text-body-md text-on-surface">2 BHK</div>
+</div>
+<!-- Furnishing -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md leading-tight">Furnishing</div>
+<div class="text-center font-body-md text-body-md text-on-surface">Semi</div>
+<div class="text-center font-body-md text-body-md text-primary font-semibold bg-primary-fixed-dim/20 rounded px-2 py-1">Full</div>
+<div class="text-center font-body-md text-body-md text-on-surface">None</div>
+</div>
+<!-- Commute -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Commute</div>
+<div class="text-center font-body-md text-body-md text-primary font-semibold tabular-nums bg-primary-fixed-dim/20 rounded px-2 py-1">10m</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">35m</div>
+<div class="text-center font-body-md text-body-md text-on-surface tabular-nums">25m</div>
+</div>
+<!-- Available -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center border-b border-surface-variant/50">
+<div class="text-secondary font-label-md text-label-md">Available</div>
+<div class="text-center font-body-md text-body-md text-on-surface text-sm">Now</div>
+<div class="text-center font-body-md text-body-md text-on-surface text-sm">1 Week</div>
+<div class="text-center font-body-md text-body-md text-primary font-semibold text-sm bg-primary-fixed-dim/20 rounded px-2 py-1">Now</div>
+</div>
+<!-- Top concern -->
+<div class="grid grid-cols-[80px_1fr_1fr_1fr] gap-4 py-2 items-center">
+<div class="text-secondary font-label-md text-label-md leading-tight">Top<br/>concern</div>
+<div class="text-center font-label-md text-label-md text-error flex items-center justify-center gap-1"><span class="material-symbols-outlined text-sm">noise_control_off</span> Noise</div>
+<div class="text-center font-label-md text-label-md text-on-surface flex items-center justify-center gap-1">Small</div>
+<div class="text-center font-label-md text-label-md text-error flex items-center justify-center gap-1"><span class="material-symbols-outlined text-sm">local_parking</span> Parking</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- BottomNavBar (Shared Component) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-surface dark:bg-surface border-t border-tertiary-fixed dark:border-tertiary-container bg-surface/90 backdrop-blur-md shadow-[0px_-2px_12px_rgba(45,54,46,0.04)] rounded-t-xl">
+<!-- Explore (Inactive) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all p-2 rounded-lg cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1 text-2xl">explore</span>
+<span class="font-label-md text-label-md">Explore</span>
+</a>
+<!-- Saved (Inactive) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all p-2 rounded-lg cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1 text-2xl">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</a>
+<!-- AI Chat (Center Raised Button) -->
+<a class="flex flex-col items-center justify-center scale-110 bg-primary text-on-primary rounded-full p-4 -translate-y-4 shadow-lg hover:bg-primary/90 transition-all cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="sr-only font-label-md text-label-md">AI Chat</span>
+</a>
+<!-- Matches (Active) -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-semibold hover:bg-secondary-container/20 transition-all p-2 rounded-lg cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1 text-2xl" style="font-variation-settings: 'FILL' 1;">handshake</span>
+<span class="font-label-md text-label-md">Matches</span>
+</a>
+<!-- Profile (Inactive) -->
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all p-2 rounded-lg cursor-pointer active:scale-95" href="#">
+<span class="material-symbols-outlined mb-1 text-2xl">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+</body></html>

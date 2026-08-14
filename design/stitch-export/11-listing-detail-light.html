@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=390, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Listing Detail - Homley</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1c1c18",
+                        "primary-fixed-dim": "#81d1f0",
+                        "on-surface-variant": "#3f484c",
+                        "secondary": "#5e5e5d",
+                        "tertiary-fixed": "#e5e2dc",
+                        "primary-container": "#0e7490",
+                        "surface-container-low": "#f5f3f0",
+                        "surface-container-high": "#eae8e5",
+                        "surface-variant": "#e4e2df",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#484742",
+                        "primary-fixed": "#b9eaff",
+                        "background": "#fbf9f6",
+                        "tertiary-container": "#6c6b66",
+                        "onyx": "#1D262B",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#006781",
+                        "sand-border": "#DFDCD6",
+                        "inverse-on-surface": "#f2f0ed",
+                        "inverse-surface": "#30312f",
+                        "on-background": "#1b1c1a",
+                        "secondary-fixed-dim": "#c7c6c5",
+                        "on-error-container": "#93000a",
+                        "petrol": "#0E7490",
+                        "on-secondary-container": "#636362",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed-variant": "#004d62",
+                        "on-primary-container": "#d3f1ff",
+                        "sand-light": "#F7F5F2",
+                        "on-tertiary-container": "#f0ece6",
+                        "on-secondary-fixed": "#1b1c1b",
+                        "outline": "#6f787d",
+                        "secondary-container": "#e1dfde",
+                        "on-primary-fixed": "#001f29",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#464746",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#dbdad7",
+                        "on-surface": "#1b1c1a",
+                        "electric-cyan": "#22D3EE",
+                        "tertiary-fixed-dim": "#c9c6c0",
+                        "secondary-fixed": "#e4e2e1",
+                        "inverse-primary": "#81d1f0",
+                        "surface-bright": "#fbf9f6",
+                        "outline-variant": "#bec8cd",
+                        "tertiary": "#54534e",
+                        "surface-container-highest": "#e4e2df",
+                        "deep-void": "#0B1114",
+                        "error-container": "#ffdad6",
+                        "surface": "#fbf9f6",
+                        "primary": "#005a71",
+                        "surface-container": "#efeeeb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "80px",
+                        "container-max": "1280px",
+                        "stack-xl": "48px",
+                        "stack-sm": "8px",
+                        "gutter": "24px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-mobile": "20px",
+                        "stack-xs": "4px",
+                        "pb-safe": "env(safe-area-inset-bottom)"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "title-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    },
+                    "boxShadow": {
+                        "whisper": "0 2px 4px rgba(0,0,0,0.04)",
+                        "soft-pop": "0 8px 24px rgba(0,0,0,0.08)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for gallery strip */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        body {
+            max-width: 390px;
+            margin: 0 auto;
+            background-color: #e4e2df; /* surface-variant behind the mobile frame */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .mobile-canvas {
+            background-color: #fbf9f6; /* surface */
+            width: 100%;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+            padding-bottom: calc(80px + 90px); /* Space for bottom rail + bottom nav */
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-surface">
+<div class="mobile-canvas flex flex-col">
+<!-- App Bar (Top) -->
+<header class="bg-surface dark:bg-surface text-primary dark:text-primary-fixed docked full-width top-0 sticky border-b border-tertiary-fixed dark:border-tertiary-container shadow-sm flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16 z-40 bg-surface/90 backdrop-blur-md">
+<button class="p-2 -ml-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-title-md">arrow_back</span>
+</button>
+<button class="p-2 -mr-2 rounded-full hover:bg-surface-variant transition-colors cursor-pointer active:scale-95">
+<span class="material-symbols-outlined text-title-md">favorite_border</span>
+</button>
+</header>
+<!-- Main Content -->
+<main class="flex-1 w-full">
+<!-- Gallery Section -->
+<section class="w-full relative">
+<div class="aspect-[4/3] w-full bg-surface-container-high relative overflow-hidden">
+<div class="w-full h-full bg-cover bg-center absolute inset-0" data-alt="A beautifully styled coastal modern living room bathed in natural sunlight. White linen sofas, light oak wood floors, and touches of deep petrol blue in throw pillows. The room feels airy, sophisticated, and pristine, high-end real estate photography." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCCYG682K35MEKQFCI91tmuOBALDQgP71Q39PFqhThbXcWc_5tKSE-i9rh9FWmbCVNDC0w5LewQnFUFyR71jtEsicwJrWK7dIHZSeVlAcNyhqlwMF4mwYQRutAyVqFvbwLgPQLYVW_T1PQoF-1A0aTnTsRr53_kLXkfkNvXI57Ra1-tjEU9Gq1W_JquTCxpDyns-JqbX1upzhA6RCSK5scgZhGCpXZLmpxYD4OBsxjZQovRQx2aycCXkA')"></div>
+<div class="absolute bottom-4 right-4 bg-surface-container-lowest/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-whisper flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-primary">photo_library</span>
+<span class="font-label-md text-label-md text-on-surface">1/12</span>
+</div>
+</div>
+<!-- Thumbnail Strip -->
+<div class="flex gap-2 overflow-x-auto no-scrollbar px-margin-mobile py-4 w-full bg-surface">
+<div class="w-20 h-20 rounded-lg flex-shrink-0 border-2 border-primary overflow-hidden relative">
+<div class="w-full h-full bg-cover bg-center" data-alt="A beautifully styled coastal modern living room bathed in natural sunlight. White linen sofas, light oak wood floors, and touches of deep petrol blue in throw pillows." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-C3qMNpWRDbDelrwLsnMRFc-BMq7aEPwx-77QOJ34NUea2ICUlP5Q1-jwtUlWqihfAVAcXz60qKkB9MM8y5APhTtOroviUKjsQ77eqN2fVJklCCY9GKk_65844hd2J45afr5AlNLakGJw48zSpyMM_OmmQrMzAeUa0gm_IoQB-1okk-xUC3n2mGmYDMWXvnZegmZlBXReUlwGugJtYZgg5SGaF1TgM6KrDNtkH9vw-N0UIvgSpELtrg')"></div>
+</div>
+<div class="w-20 h-20 rounded-lg flex-shrink-0 border border-sand-border overflow-hidden relative opacity-70">
+<div class="w-full h-full bg-cover bg-center" data-alt="A modern pristine kitchen with white marble countertops, light wood cabinetry, and sleek stainless steel appliances. Bright, airy, and sophisticated coastal aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5K4-4zOplbDgmcLVOHtKIzohxcGbcmdwxcqmeIz9_VWlEp-TkectMf2BguX3aC79UoXaY_ZbxJA_MVk4dw2UBnF-cT9rx9LPw5_2lmonDjnexkBzx7gPyifAGq0XU03pJkKg2bbLuY-PczetlT5WydeM7g645-oiVUZHE4AoBdxdjcj4gDYumQOJKgEMYX4daSdBxFS8G352K4cHUq-RbqOqD2zV_KhPd4TqZzAao88pd_msvcanLQQ')"></div>
+</div>
+<div class="w-20 h-20 rounded-lg flex-shrink-0 border border-sand-border overflow-hidden relative opacity-70">
+<div class="w-full h-full bg-cover bg-center" data-alt="A minimalist contemporary bedroom featuring a large window, a low-profile bed with crisp white sheets, and a serene petrol blue accent wall. Soft natural lighting." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC0EisIfRPw0WuZrytVuZ7CV5TN8VWPy9IjmaTkVEdS4iIc488ZRd2iBT4531x42FHtbxpyONhGiAGZVRt_Fh4npdKpTl982gVA9yzbu0R1236BxciYeKONkJsMk2hZpMOm1rnWChaTRQdWoANPHvJK2nuHPM2-MdQ-t_lKg8DkAwJP_t_Hw2NEng3JGHZmuJnURix5oN5PVHU1YQnEZX0gi-3qEOs5Au5GMNakDkXvLmf8uQHxbmNiFg')"></div>
+</div>
+<div class="w-20 h-20 rounded-lg flex-shrink-0 border border-sand-border overflow-hidden relative opacity-70">
+<div class="w-full h-full bg-cover bg-center" data-alt="A luxurious bathroom with a glass walk-in shower, freestanding tub, and textured beige tile walls. Upscale spa-like atmosphere in a modern home." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA4Q-NRSDrLdVjWbz-9W8XxyVb740FtV3jhVdZZhSp3Bd2RvpJG21cDRszm5M_dWdN1RZflXOPR2PoYz5Fc-r-ZY6XMP9T7qRBy1pFkSaGUc5pV9VGdEwBjZhmtmKalQEZ9x4QjvBraAQS9yfP6RXggKz0KhG6ijKBJ2x4a4ItHQERMXnuosmb4yxq0we_-wOP60qcY6B8k0sXlr64ZaROMi5MQo6Z32QdwXhcnbl24Ai9Yjn7cA4zbGA')"></div>
+</div>
+</div>
+</section>
+<!-- Header Info -->
+<section class="px-margin-mobile py-stack-md flex flex-col gap-2">
+<div class="flex justify-between items-start">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-on-surface font-bold tracking-tight">Sunny Coastal Room in Shared Flat</h1>
+</div>
+<p class="font-body-md text-body-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">location_on</span>
+                Bandra West, Mumbai
+            </p>
+</section>
+<hr class="border-t border-sand-border mx-margin-mobile my-stack-sm"/>
+<!-- About this place -->
+<section class="px-margin-mobile py-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-stack-sm">About this place</h2>
+<p class="font-body-md text-body-md text-secondary line-clamp-4">
+                Experience the perfect blend of modern luxury and coastal charm. This bright, airy room features a large window with afternoon sun, ample closet space, and access to a beautifully furnished shared living area. Ideal for a professional looking for a peaceful sanctuary.
+            </p>
+<button class="font-label-md text-label-md text-primary font-semibold mt-2 hover:underline focus:outline-none">Read more</button>
+</section>
+<hr class="border-t border-sand-border mx-margin-mobile my-stack-sm"/>
+<!-- Facts Grid -->
+<section class="px-margin-mobile py-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-stack-md">Key Facts</h2>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-xl border border-sand-border shadow-whisper">
+<span class="material-symbols-outlined text-primary text-[24px]">bed</span>
+<div>
+<p class="font-label-md text-label-md text-secondary">Room type</p>
+<p class="font-body-md text-body-md font-medium text-on-surface">Private Room</p>
+</div>
+</div>
+<div class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-xl border border-sand-border shadow-whisper">
+<span class="material-symbols-outlined text-primary text-[24px]">shower</span>
+<div>
+<p class="font-label-md text-label-md text-secondary">Bathroom</p>
+<p class="font-body-md text-body-md font-medium text-on-surface">Shared (1 person)</p>
+</div>
+</div>
+<div class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-xl border border-sand-border shadow-whisper">
+<span class="material-symbols-outlined text-primary text-[24px]">calendar_today</span>
+<div>
+<p class="font-label-md text-label-md text-secondary">Available</p>
+<p class="font-body-md text-body-md font-medium text-on-surface">Oct 1st</p>
+</div>
+</div>
+<div class="flex items-start gap-3 bg-surface-container-lowest p-3 rounded-xl border border-sand-border shadow-whisper">
+<span class="material-symbols-outlined text-primary text-[24px]">timelapse</span>
+<div>
+<p class="font-label-md text-label-md text-secondary">Minimum stay</p>
+<p class="font-body-md text-body-md font-medium text-on-surface">6 Months</p>
+</div>
+</div>
+</div>
+</section>
+<hr class="border-t border-sand-border mx-margin-mobile my-stack-sm"/>
+<!-- Amenities -->
+<section class="px-margin-mobile py-stack-md">
+<h2 class="font-title-md text-title-md text-on-surface mb-stack-md">Amenities</h2>
+<div class="flex flex-wrap gap-2">
+<div class="bg-surface-container-high px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-surface-dim">
+<span class="material-symbols-outlined text-[18px] text-secondary">wifi</span>
+<span class="font-label-md text-label-md text-on-surface">Fast WiFi</span>
+</div>
+<div class="bg-surface-container-high px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-surface-dim">
+<span class="material-symbols-outlined text-[18px] text-secondary">ac_unit</span>
+<span class="font-label-md text-label-md text-on-surface">Air Con</span>
+</div>
+<div class="bg-surface-container-high px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-surface-dim">
+<span class="material-symbols-outlined text-[18px] text-secondary">local_laundry_service</span>
+<span class="font-label-md text-label-md text-on-surface">Washer</span>
+</div>
+<div class="bg-surface-container-high px-3 py-1.5 rounded-full flex items-center gap-1.5 border border-surface-dim">
+<span class="material-symbols-outlined text-[18px] text-secondary">kitchen</span>
+<span class="font-label-md text-label-md text-on-surface">Kitchen</span>
+</div>
+<button class="font-label-md text-label-md text-primary font-semibold hover:underline ml-1">
+                    +6 more
+                </button>
+</div>
+</section>
+<hr class="border-t border-sand-border mx-margin-mobile my-stack-sm"/>
+<!-- Safety Note -->
+<section class="px-margin-mobile py-stack-sm">
+<div class="bg-error-container/30 border border-error-container p-4 rounded-xl flex items-start gap-3">
+<span class="material-symbols-outlined text-error mt-0.5">warning</span>
+<p class="font-body-md text-body-md text-on-surface text-sm">
+                    Never transfer a deposit before verifying the property and owner in person.
+                </p>
+</div>
+</section>
+<div class="h-8"></div> <!-- spacer for bottom overlap -->
+</main>
+<!-- Sticky Bottom Rail (Listing Actions) -->
+<div class="fixed bottom-20 left-0 w-full z-40 bg-surface-container-lowest border-t border-sand-border shadow-[0px_-4px_16px_rgba(0,0,0,0.06)] px-margin-mobile py-3 flex justify-between items-center transition-all">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border border-sand-border relative shadow-sm">
+<div class="w-full h-full bg-cover bg-center" data-alt="A professional headshot of a friendly young woman with warm brown eyes and natural makeup, smiling warmly. She is wearing a modern casual beige blazer. The background is a soft, blurred bright interior." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB7YgL_frhyTAW0mCRLER7JZYTzbEY9XHQLZQdT37JJoUN6zrAyDSr0Bvz05e3EiowJtiVg6cpDnci3fyqWgKZ8rhiBFfVj6YiNYjwOkWXrlHynvWeQyXTdqZfP17Nal8CGJLvxIp9QsPDkqb1hkCINQBai9YxNAysse2Tz_As2TxlMOLVN1ee_35fh9G9LGk3sl1Luy11j96E_7ot8qAsZWRmSkud8581_f6XlAQ0cWAhhBHihmQELTA')"></div>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface font-bold leading-tight">₹25,000<span class="font-body-md text-body-md font-normal text-secondary text-sm">/mo</span></p>
+<p class="font-label-md text-label-md text-secondary text-xs">Dep: ₹50,000</p>
+</div>
+</div>
+<button class="bg-petrol text-on-primary font-label-md text-label-md font-semibold py-3 px-6 rounded-lg shadow-soft-pop hover:bg-primary transition-colors flex items-center gap-2 active:scale-95">
+<span class="material-symbols-outlined text-[20px]">chat</span>
+            Message
+        </button>
+</div>
+<!-- BottomNavBar -->
+<nav class="bg-surface dark:bg-surface text-primary dark:text-primary-fixed font-label-md text-label-md docked full-width bottom-0 rounded-t-xl border-t border-tertiary-fixed dark:border-tertiary-container bg-surface/90 backdrop-blur-md shadow-[0px_-2px_12px_rgba(45,54,46,0.04)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20">
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-semibold w-16 gap-1 group">
+<span class="material-symbols-outlined icon-filled group-active:scale-95 transition-transform">explore</span>
+<span class="text-[10px] leading-tight">Explore</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all w-16 gap-1 group">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform">favorite</span>
+<span class="text-[10px] leading-tight">Saved</span>
+</button>
+<!-- Center Action (AI Chat) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim w-16 gap-1 relative group hover:bg-secondary-container/20 transition-all">
+<div class="scale-110 bg-primary text-on-primary rounded-full p-4 -translate-y-4 shadow-lg flex items-center justify-center group-active:scale-100 transition-transform">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<span class="text-[10px] leading-tight absolute bottom-2 font-medium">AI Chat</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all w-16 gap-1 group">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform">handshake</span>
+<span class="text-[10px] leading-tight">Matches</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-secondary-container/20 transition-all w-16 gap-1 group">
+<span class="material-symbols-outlined group-active:scale-95 transition-transform">person</span>
+<span class="text-[10px] leading-tight">Profile</span>
+</button>
+</nav>
+</div>
+</body></html>

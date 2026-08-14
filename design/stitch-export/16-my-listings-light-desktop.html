@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Homley - My Listings</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#1c1c18",
+                    "primary-fixed-dim": "#81d1f0",
+                    "on-surface": "#1b1c1a",
+                    "sand-border": "#DFDCD6",
+                    "electric-cyan": "#22D3EE",
+                    "inverse-on-surface": "#f2f0ed",
+                    "secondary": "#5e5e5d",
+                    "on-secondary-fixed-variant": "#464746",
+                    "on-surface-variant": "#3f484c",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fbf9f6",
+                    "tertiary-fixed-dim": "#c9c6c0",
+                    "onyx": "#1D262B",
+                    "surface-tint": "#006781",
+                    "on-background": "#1b1c1a",
+                    "surface": "#fbf9f6",
+                    "secondary-fixed": "#e4e2e1",
+                    "on-primary-fixed-variant": "#004d62",
+                    "on-secondary-container": "#636362",
+                    "on-error-container": "#93000a",
+                    "background": "#fbf9f6",
+                    "on-primary-fixed": "#001f29",
+                    "surface-container-high": "#eae8e5",
+                    "error-container": "#ffdad6",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#d3f1ff",
+                    "outline-variant": "#bec8cd",
+                    "outline": "#6f787d",
+                    "inverse-primary": "#81d1f0",
+                    "petrol": "#0E7490",
+                    "inverse-surface": "#30312f",
+                    "surface-variant": "#e4e2df",
+                    "deep-void": "#0B1114",
+                    "on-tertiary-container": "#f0ece6",
+                    "surface-container-low": "#f5f3f0",
+                    "surface-container-highest": "#e4e2df",
+                    "tertiary-container": "#6c6b66",
+                    "primary-container": "#0e7490",
+                    "secondary-container": "#e1dfde",
+                    "sand-light": "#F7F5F2",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#1b1c1b",
+                    "surface-dim": "#dbdad7",
+                    "surface-container": "#efeeeb",
+                    "tertiary-fixed": "#e5e2dc",
+                    "tertiary": "#54534e",
+                    "primary": "#005a71",
+                    "on-tertiary": "#ffffff",
+                    "secondary-fixed-dim": "#c7c6c5",
+                    "primary-fixed": "#b9eaff",
+                    "on-tertiary-fixed-variant": "#484742",
+                    "surface-container-lowest": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "80px",
+                    "stack-sm": "8px",
+                    "stack-xl": "48px",
+                    "stack-xs": "4px",
+                    "gutter": "24px",
+                    "container-max": "1280px",
+                    "stack-md": "16px",
+                    "stack-lg": "24px",
+                    "margin-mobile": "20px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "title-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "display-lg-mobile": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .whisper-shadow {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        .soft-pop-shadow {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        .text-truncate-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md antialiased min-h-screen pb-24">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md dark:bg-surface-dim/80 shadow-sm border-b border-sand-border dark:border-outline-variant">
+<div class="max-w-container-max mx-auto px-margin-desktop flex items-center justify-between h-20">
+<div class="flex items-center gap-8">
+<a class="font-display-lg text-display-lg font-bold text-petrol dark:text-electric-cyan" href="#">Homley</a>
+<!-- Main Nav Links - Top App Bar -->
+<nav class="hidden md:flex gap-8 ml-8">
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-petrol transition-colors scale-95 active:opacity-80" href="#">Browse homes</a>
+<a class="font-body-md text-body-md text-secondary dark:text-secondary-fixed-dim hover:text-petrol transition-colors scale-95 active:opacity-80" href="#">Find flatmates</a>
+</nav>
+</div>
+<div class="hidden md:flex items-center gap-4">
+<button class="font-label-md text-label-md text-secondary dark:text-secondary-fixed-dim hover:text-petrol transition-colors px-4 py-2 scale-95 active:opacity-80">Sign in</button>
+<button class="font-label-md text-label-md bg-petrol text-on-primary hover:bg-primary-container px-6 py-2.5 rounded-lg shadow-sm hover:shadow-md transition-all scale-95 active:opacity-80">Get started</button>
+</div>
+</div>
+</header>
+<!-- Side Navigation Bar (Desktop) -->
+<aside class="hidden md:flex flex-col w-[280px] h-screen fixed left-0 top-0 pt-24 bg-surface dark:bg-onyx border-r border-sand-border dark:border-outline-variant z-40">
+<div class="px-6 pb-6">
+<h2 class="font-headline-lg text-headline-lg font-black text-petrol">Homley</h2>
+<p class="font-label-md text-label-md text-secondary mt-1">Mumbai Rentals</p>
+</div>
+<nav class="flex-1 px-4 flex flex-col gap-2">
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="explore">explore</span>
+<span class="font-label-md text-label-md">Explore</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-label-md">AI Search</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" data-icon="mail">mail</span>
+<span class="font-label-md text-label-md">Inbox</span>
+</a>
+<a class="flex items-center gap-4 px-4 py-3 rounded-xl text-petrol dark:text-electric-cyan bg-primary-container/10 font-semibold" href="#">
+<span class="material-symbols-outlined" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="pt-28 md:pl-[280px] max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop w-full transition-all duration-300">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between mb-stack-xl gap-stack-md">
+<div>
+<h1 class="font-display-lg text-display-lg font-bold text-on-surface">My Listings</h1>
+<p class="font-body-lg text-body-lg text-secondary mt-stack-xs">Manage your properties and active listings.</p>
+</div>
+<div class="flex items-center gap-4">
+<div class="text-secondary font-label-md text-label-md flex items-center gap-1 opacity-70">
+<span class="material-symbols-outlined text-[16px]" data-icon="cloud_done">cloud_done</span>
+                    Saved
+                </div>
+<button class="bg-petrol text-on-primary hover:bg-primary-container font-label-md text-label-md px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all scale-95 active:scale-90 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+                    List a Property
+                </button>
+</div>
+</div>
+<!-- In Progress Wizard Rail (Example) -->
+<section class="mb-stack-xl bg-surface-container-lowest border border-sand-border rounded-[16px] p-stack-lg whisper-shadow flex flex-col md:flex-row gap-stack-md items-center justify-between">
+<div class="flex items-center gap-stack-md flex-1 w-full">
+<div class="w-12 h-12 bg-primary-container/10 rounded-xl flex items-center justify-center text-petrol flex-shrink-0">
+<span class="material-symbols-outlined text-[24px]" data-icon="edit_document">edit_document</span>
+</div>
+<div class="flex-1">
+<h3 class="font-title-md text-title-md text-on-surface mb-1">New Listing in Progress</h3>
+<p class="font-body-md text-body-md text-secondary text-truncate-2">Sea View Apartment, Bandra West • Step 3 of 5: Upload Photos</p>
+</div>
+</div>
+<div class="flex items-center gap-4 w-full md:w-auto mt-4 md:mt-0">
+<div class="w-full md:w-48 bg-surface-container-high h-2 rounded-full overflow-hidden">
+<div class="bg-petrol h-full rounded-full" style="width: 60%;"></div>
+</div>
+<button class="font-label-md text-label-md text-petrol border border-petrol/20 hover:bg-primary-container/5 px-6 py-2.5 rounded-lg transition-colors whitespace-nowrap">Resume</button>
+</div>
+</section>
+<!-- Listings Table / Dashboard Rows -->
+<section class="bg-surface-container-lowest border border-sand-border rounded-[16px] overflow-hidden whisper-shadow">
+<!-- Table Header (Desktop only) -->
+<div class="hidden md:grid grid-cols-[100px_1fr_120px_120px_200px] gap-gutter p-stack-md border-b border-sand-border bg-surface-container-low text-secondary font-label-md text-label-md uppercase tracking-wider text-[12px]">
+<div>Image</div>
+<div>Property Details</div>
+<div>Status</div>
+<div class="text-right">Price / Mo.</div>
+<div class="text-right">Actions</div>
+</div>
+<!-- Row 1: Active -->
+<div class="grid grid-cols-1 md:grid-cols-[100px_1fr_120px_120px_200px] gap-stack-sm md:gap-gutter p-stack-md border-b border-sand-border hover:bg-surface-bright transition-colors items-center relative group">
+<!-- Thumbnail -->
+<div class="w-full md:w-[100px] h-48 md:h-[72px] rounded-lg overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A modern, high-end apartment living room with expansive floor-to-ceiling windows showing a bright Mumbai skyline view. The decor is Sophisticated Coastal with light sand colors, white linens, and warm wood accents. Professional architectural photography style, natural daylight, light mode aesthetic, pristine and inviting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsyqOp7tqEYTuzMkUQqNHqvzwmYdYbM0booFMxjb8ssf3yhFSn0ZoNOz92aX5QwSf1HJlj0W5qT2-5ZDYUDH5pnfT4F4ZlW_llr7lGqn4krredd-lz8hlujrL3qQlX8ktAUJ7zmKw8QfJIWZvKq-K0aJjSRYhOPNFpRKAVOXhn_CnWyVE7qEzHqH3Ycz6IYMxd3PyMu6edsV08_W_GjWt_Zoyus6UbcKTkJvEAstXmwE1z-XTu2bFBKA"/>
+</div>
+<!-- Title & Location -->
+<div class="mt-2 md:mt-0">
+<h4 class="font-title-md text-title-md md:text-body-lg font-semibold text-on-surface text-truncate-2 mb-1">Luxury 3BHK Penthouse with Sea View</h4>
+<p class="font-body-md md:text-label-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                        Worli Sea Face, Mumbai
+                    </p>
+</div>
+<!-- Status Badge -->
+<div class="mt-2 md:mt-0">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E8F5E9] text-[#2E7D32] font-label-md text-[12px] border border-[#C8E6C9]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E7D32]"></span>
+                        Active
+                    </span>
+</div>
+<!-- Price -->
+<div class="mt-1 md:mt-0 md:text-right font-title-md text-title-md md:text-body-lg text-on-surface font-semibold">
+                    ₹2,45,000
+                </div>
+<!-- Actions -->
+<div class="mt-4 md:mt-0 flex items-center gap-2 md:justify-end">
+<button class="p-2 text-secondary hover:text-petrol hover:bg-primary-container/10 rounded-lg transition-colors tooltip-trigger" title="Edit Listing">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-secondary hover:text-petrol hover:bg-primary-container/10 rounded-lg transition-colors tooltip-trigger" title="Pause Listing">
+<span class="material-symbols-outlined" data-icon="pause_circle">pause_circle</span>
+</button>
+<button class="px-3 py-1.5 text-[13px] font-label-md text-on-surface border border-sand-border rounded-lg hover:border-outline transition-colors ml-auto md:ml-0">Mark Rented</button>
+</div>
+</div>
+<!-- Row 2: Paused -->
+<div class="grid grid-cols-1 md:grid-cols-[100px_1fr_120px_120px_200px] gap-stack-sm md:gap-gutter p-stack-md border-b border-sand-border hover:bg-surface-bright transition-colors items-center">
+<div class="w-full md:w-[100px] h-48 md:h-[72px] rounded-lg overflow-hidden flex-shrink-0 opacity-70 grayscale-[20%]">
+<img class="w-full h-full object-cover" data-alt="A bright, airy bedroom in a modern flat with large windows, light oak flooring, and white minimalist furniture. Subtle warm lighting and indoor plants add a touch of nature. Sophisticated Coastal style, premium feel, clean composition, light mode palette with soft shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRrUgdKhG2I82uYcarYZz0hRZ2vy_EGqBibIxXbVcidHgUdm1vS_yPnMsVJC_m13hdSEhTmEESC32pV0Z0wN6i1ZbeaGTFVVk1U5MhBr8DFEGA5srPzdYGpExrSk9JKPvuZjVm51tCyc0c48l8xnO_bDj3n5xzrFAUJEEkKnnJ7F1dy10Q-oR-OBtBWEaokXyhl4n7nS_ngcOlSTqbELvpO7IcyEE_SNaJIPS5V8xUhdqkSVZ0ZTYD6Q"/>
+</div>
+<div class="mt-2 md:mt-0 opacity-80">
+<h4 class="font-title-md text-title-md md:text-body-lg font-semibold text-on-surface text-truncate-2 mb-1">Cozy 1BHK near BKC</h4>
+<p class="font-body-md md:text-label-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                        Kurla West, Mumbai
+                    </p>
+</div>
+<div class="mt-2 md:mt-0">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest text-secondary font-label-md text-[12px] border border-outline-variant">
+<span class="material-symbols-outlined text-[12px]" data-icon="pause">pause</span>
+                        Paused
+                    </span>
+</div>
+<div class="mt-1 md:mt-0 md:text-right font-title-md text-title-md md:text-body-lg text-on-surface font-semibold opacity-80">
+                    ₹45,000
+                </div>
+<div class="mt-4 md:mt-0 flex items-center gap-2 md:justify-end">
+<button class="p-2 text-secondary hover:text-petrol hover:bg-primary-container/10 rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+</button>
+<button class="px-3 py-1.5 text-[13px] font-label-md text-petrol bg-primary-container/10 border border-petrol/20 rounded-lg hover:bg-primary-container/20 transition-colors ml-auto md:ml-0 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="play_arrow">play_arrow</span> Publish
+                    </button>
+</div>
+</div>
+<!-- Row 3: Draft -->
+<div class="grid grid-cols-1 md:grid-cols-[100px_1fr_120px_120px_200px] gap-stack-sm md:gap-gutter p-stack-md hover:bg-surface-bright transition-colors items-center">
+<div class="w-full md:w-[100px] h-48 md:h-[72px] rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high flex items-center justify-center border border-dashed border-outline-variant">
+<span class="material-symbols-outlined text-outline text-[32px]" data-icon="image">image</span>
+</div>
+<div class="mt-2 md:mt-0 opacity-70">
+<h4 class="font-title-md text-title-md md:text-body-lg font-semibold text-on-surface text-truncate-2 mb-1 italic">Untitled Property</h4>
+<p class="font-body-md md:text-label-md text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span>
+                        Location pending...
+                    </p>
+</div>
+<div class="mt-2 md:mt-0">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFF8E1] text-[#F57F17] font-label-md text-[12px] border border-[#FFECB3]">
+<span class="material-symbols-outlined text-[12px]" data-icon="draft">draft</span>
+                        Draft
+                    </span>
+</div>
+<div class="mt-1 md:mt-0 md:text-right font-title-md text-title-md md:text-body-lg text-secondary font-semibold italic">
+                    TBD
+                </div>
+<div class="mt-4 md:mt-0 flex items-center gap-2 md:justify-end">
+<button class="px-4 py-1.5 text-[13px] font-label-md text-secondary border border-sand-border rounded-lg hover:border-outline transition-colors ml-auto md:ml-0 w-full md:w-auto">Continue Editing</button>
+</div>
+</div>
+</section>
+<!-- Empty State Example (Hidden by default for this layout, but good to have) -->
+<!--
+        <div class="py-stack-xl flex flex-col items-center justify-center text-center opacity-0 hidden">
+            <div class="w-24 h-24 bg-surface-container-low rounded-full flex items-center justify-center mb-stack-md">
+                <span class="material-symbols-outlined text-outline text-[48px]" data-icon="real_estate_agent">real_estate_agent</span>
+            </div>
+            <h3 class="font-title-md text-title-md text-on-surface mb-2">No listings yet</h3>
+            <p class="font-body-md text-body-md text-secondary max-w-md mb-stack-lg">Start listing your properties to find the perfect flatmates and tenants quickly.</p>
+            <button class="bg-petrol text-on-primary hover:bg-primary-container font-label-md text-label-md px-6 py-3 rounded-xl shadow-sm hover:shadow-md transition-all">List a Property</button>
+        </div>
+        -->
+</main>
+<!-- Mobile Bottom Navigation Bar (Hidden on md and up) -->
+<nav class="md:hidden docked full-width bottom-0 fixed w-full z-50 bg-surface-container-lowest dark:bg-deep-void shadow-[0_-4px_12px_rgba(0,0,0,0.04)] pb-4 pt-2 px-2 flex justify-around items-end bg-surface">
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 rounded-xl px-2 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="explore">explore</span>
+<span class="font-label-md text-[10px] mt-1">Explore</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 rounded-xl px-2 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="favorite">favorite</span>
+<span class="font-label-md text-[10px] mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 rounded-xl px-2 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-label-md text-[10px] mt-1">AI Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-on-secondary-container hover:bg-sand-light dark:hover:bg-tertiary-container/20 rounded-xl px-2 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="mail">mail</span>
+<span class="font-label-md text-[10px] mt-1">Inbox</span>
+</a>
+<a class="flex flex-col items-center justify-center text-petrol dark:text-electric-cyan bg-primary-container/10 rounded-xl px-3 py-1 active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined text-[24px]" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-md text-[10px] mt-1 font-semibold">Profile</span>
+</a>
+</nav>
+</body></html>
