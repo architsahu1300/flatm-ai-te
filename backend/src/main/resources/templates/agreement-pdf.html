@@ -1,0 +1,85 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Leave and License Agreement</title>
+  <style type="text/css">
+    @page { size: A4; margin: 22mm 18mm; }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 10.5pt; color: #1b1c1a; line-height: 1.55; }
+    h1 { font-size: 15pt; text-align: center; margin: 0 0 2mm 0; letter-spacing: 0.5px; }
+    .subtitle { text-align: center; font-size: 9pt; color: #5e5e5d; margin-bottom: 8mm; }
+    h2 { font-size: 11pt; margin: 6mm 0 2mm 0; color: #005a71; border-bottom: 0.5pt solid #dfdcd6; padding-bottom: 1mm; }
+    table.terms { width: 100%; border-collapse: collapse; margin: 3mm 0; }
+    table.terms td { border: 0.5pt solid #dfdcd6; padding: 2mm 3mm; vertical-align: top; }
+    table.terms td.k { width: 38%; color: #5e5e5d; }
+    .clause { margin: 0 0 3mm 0; }
+    .clause .t { font-weight: bold; }
+    .ai-tag { font-size: 8pt; color: #0e7490; }
+    .sig-table { width: 100%; border-collapse: collapse; margin-top: 6mm; }
+    .sig-table td { width: 50%; padding: 8mm 3mm 2mm 3mm; border-top: 0.5pt solid #1b1c1a; font-size: 9pt; }
+    .disclaimer { margin-top: 8mm; padding: 3mm; border: 0.5pt solid #dfdcd6; background: #f5f3f0; font-size: 8.5pt; color: #5e5e5d; }
+    .meta { font-size: 8.5pt; color: #5e5e5d; margin-top: 4mm; }
+  </style>
+</head>
+<body>
+  <h1>LEAVE AND LICENSE AGREEMENT</h1>
+  <div class="subtitle">Draft prepared via <span th:text="${appName}">Platform</span> · State: Maharashtra · Version <span th:text="${a.currentVersion()}">1</span> · Status: <span th:text="${a.status()}">DRAFT</span></div>
+
+  <h2>Parties</h2>
+  <p>
+    This agreement is made between <b th:text="${a.landlordName()}">Landlord</b> (the "Licensor")
+    and
+    <span th:each="s, it : ${tenants}">
+      <b th:text="${s.name()}">Tenant</b><span th:if="${!it.last}">, </span>
+    </span>
+    (the "Licensee(s)") in respect of the premises described below.
+  </p>
+
+  <h2>Premises</h2>
+  <p th:text="${a.propertyAddress() != null ? a.propertyAddress() : 'As described in the annexed listing.'}">Address</p>
+
+  <h2>Commercial terms</h2>
+  <table class="terms">
+    <tr><td class="k">Monthly licence fee</td><td th:text="${rentFormatted}">Rs. 25,000</td></tr>
+    <tr><td class="k">Security deposit</td><td th:text="${depositFormatted}">Rs. 50,000</td></tr>
+    <tr><td class="k">Term</td><td><span th:text="${a.durationMonths()}">11</span> months from <span th:text="${a.startDate()}">2026-09-01</span></td></tr>
+    <tr><td class="k">Lock-in period</td><td><span th:text="${a.lockInMonths()}">6</span> months</td></tr>
+    <tr><td class="k">Notice period</td><td><span th:text="${a.noticePeriodDays()}">30</span> days</td></tr>
+    <tr><td class="k">Annual escalation</td><td><span th:text="${a.annualEscalationPct()}">0</span>%</td></tr>
+  </table>
+
+  <h2>Clauses</h2>
+  <div class="clause" th:each="c, it : ${a.clauses()}">
+    <div class="t"><span th:text="${it.count}">1</span>. <span th:text="${c.title()}">Title</span>
+      <span class="ai-tag" th:if="${c.source() == 'ai'}">(AI-drafted — review before use)</span>
+    </div>
+    <div th:text="${c.body()}">Body</div>
+  </div>
+
+  <h2>Stamp duty and registration</h2>
+  <p>
+    This agreement is intended to be stamped and registered as required under applicable
+    Maharashtra law. Government stamp duty and registration charges are payable separately and are
+    not platform fees. E-stamping and registration provider integration is pending; this document
+    is a draft for that process.
+  </p>
+
+  <h2>Signatures</h2>
+  <table class="sig-table">
+    <tr>
+      <td th:each="s : ${a.signatures()}">
+        <span th:text="${s.name()}">Name</span> (<span th:text="${s.role()}">role</span>)<br/>
+        <span th:if="${s.status() == 'SIGNED'}">Signed electronically on <span th:text="${s.signedAt()}">date</span></span>
+        <span th:if="${s.status() != 'SIGNED'}">Signature pending</span>
+      </td>
+    </tr>
+  </table>
+
+  <div class="disclaimer">
+    This document was generated with software assistance, including AI-drafted clauses where
+    marked, and is provided for convenience only. It is not legal advice. Parties should have the
+    agreement reviewed by a qualified professional and completed with e-stamping and registration
+    as required by law.
+  </div>
+  <div class="meta">Generated on <span th:text="${generatedAt}">date</span> · Agreement ID <span th:text="${a.id()}">id</span></div>
+</body>
+</html>

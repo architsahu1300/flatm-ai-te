@@ -60,6 +60,19 @@ public class AiProviderConfig {
         org.springframework.ai.chat.client.ChatClient.create(chatModel.getObject()), objectMapper, model);
   }
 
+  @Bean
+  public com.flatmaite.agreement.ClauseAdvisor clauseAdvisor(
+      FlatmaiteProperties props,
+      ObjectProvider<org.springframework.ai.chat.model.ChatModel> chatModel,
+      com.fasterxml.jackson.databind.ObjectMapper objectMapper,
+      @Value("${spring.ai.openai.api-key}") String apiKey) {
+    if (useMock(props, apiKey)) {
+      return new com.flatmaite.agreement.ClauseAdvisor.Mock();
+    }
+    return new com.flatmaite.agreement.ClauseAdvisor.OpenAi(
+        org.springframework.ai.chat.client.ChatClient.create(chatModel.getObject()), objectMapper);
+  }
+
   public static boolean useMock(FlatmaiteProperties props, String apiKey) {
     return switch (props.getAi().getMock()) {
       case "true" -> true;
