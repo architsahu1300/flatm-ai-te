@@ -1,0 +1,4 @@
+# Seed profile: run the SeedRunner and exit (no web server).
+spring:
+  main:
+    web-application-type: none

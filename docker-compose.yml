@@ -1,0 +1,20 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: flatmaite-db
+    environment:
+      POSTGRES_DB: flatmaite
+      POSTGRES_USER: flatmaite
+      POSTGRES_PASSWORD: flatmaite
+    ports:
+      - "5433:5432"
+    volumes:
+      - flatmaite-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U flatmaite -d flatmaite"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  flatmaite-pgdata:

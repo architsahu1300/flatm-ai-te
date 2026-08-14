@@ -1,0 +1,67 @@
+spring:
+  application:
+    name: flatmaite
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/flatmaite}
+    username: ${DB_USER:flatmaite}
+    password: ${DB_PASSWORD:flatmaite}
+  jpa:
+    # Flyway owns the schema; entities are hand-matched (vector/tsvector columns stay JPA-invisible)
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 25MB
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-mock-key-not-set}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+          temperature: 0.2
+      embedding:
+        options:
+          model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui
+
+flatmaite:
+  jwt:
+    # HS256 needs >= 32 bytes; override in real deployments
+    secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789}
+    ttl-hours: ${JWT_TTL_HOURS:168}
+    cookie-name: fm_token
+  ai:
+    # auto → mock when OPENAI_API_KEY is absent; force with true/false
+    mock: ${AI_MOCK:auto}
+    explanations-enabled: ${AI_EXPLANATIONS_ENABLED:true}
+    daily-search-limit: ${AI_DAILY_SEARCH_LIMIT:50}
+    daily-cost-limit-usd: ${AI_DAILY_COST_LIMIT_USD:0.50}
+    anon-daily-search-limit: ${AI_ANON_DAILY_SEARCH_LIMIT:10}
+  google:
+    client-id: ${GOOGLE_CLIENT_ID:}
+    client-secret: ${GOOGLE_CLIENT_SECRET:}
+  storage:
+    upload-dir: ${UPLOAD_DIR:./uploads}
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}

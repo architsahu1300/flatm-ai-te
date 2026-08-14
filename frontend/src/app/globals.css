@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Petrol & Sand — the design scheme from design/stitch-export/
+   Light and dark values live in :root / .dark below; @theme inline
+   maps them onto Tailwind utilities, so overriding a variable in
+   .dark re-themes every component with no per-element dark: classes.
+   ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Surfaces & text — warm sand neutrals */
+  --fm-bg: #fbf9f6;
+  --fm-surface: #ffffff;
+  --fm-surface-2: #f5f3f0;
+  --fm-border: #dfdcd6;
+  --fm-text: #1b1c1a;
+  --fm-text-muted: #5e5e5d;
+
+  /* Accent — deep petrol. Primary CTA, active nav, focus, links, AI moments. */
+  --fm-brand: #005a71;
+  --fm-brand-hover: #004d62;
+  --fm-brand-soft: #d3f1ff;
+
+  /* Semantic — match reasons, concerns, destructive only. AA on --fm-surface. */
+  --fm-success: #15803d;
+  --fm-success-soft: #dcfce7;
+  --fm-warning: #a16207;
+  --fm-warning-soft: #fef3c7;
+  --fm-danger: #ba1a1a;
+  --fm-danger-soft: #ffdad6;
+
+  /* Elevation */
+  --fm-shadow-card: 0 1px 2px rgb(27 28 26 / 0.04), 0 4px 24px -8px rgb(27 28 26 / 0.06);
+  --fm-shadow-pop: 0 2px 8px rgb(27 28 26 / 0.04), 0 12px 32px -8px rgb(27 28 26 / 0.12);
+
+  color-scheme: light;
+}
+
+.dark {
+  /* Deep-void → onyx elevation ladder */
+  --fm-bg: #0b1114;
+  --fm-surface: #151e24;
+  --fm-surface-2: #1d262b;
+  --fm-border: #2a343a;
+  --fm-text: #e5e9ec;
+  --fm-text-muted: #a2abb0;
+
+  /* Accent brightens in dark, per the scheme (electric cyan) */
+  --fm-brand: #22d3ee;
+  --fm-brand-hover: #67e8f9;
+  --fm-brand-soft: #103a45;
+
+  --fm-success: #4ade80;
+  --fm-success-soft: #123524;
+  --fm-warning: #fbbf24;
+  --fm-warning-soft: #3a2e12;
+  --fm-danger: #ffb4ab;
+  --fm-danger-soft: #4e1114;
+
+  --fm-shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 24px -8px rgb(0 0 0 / 0.45);
+  --fm-shadow-pop: 0 2px 8px rgb(0 0 0 / 0.35), 0 12px 32px -8px rgb(0 0 0 / 0.55);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --color-bg: var(--fm-bg);
+  --color-surface: var(--fm-surface);
+  --color-surface-2: var(--fm-surface-2);
+  --color-border: var(--fm-border);
+  --color-text: var(--fm-text);
+  --color-text-muted: var(--fm-text-muted);
+
+  --color-brand: var(--fm-brand);
+  --color-brand-hover: var(--fm-brand-hover);
+  --color-brand-soft: var(--fm-brand-soft);
+
+  --color-success: var(--fm-success);
+  --color-success-soft: var(--fm-success-soft);
+  --color-warning: var(--fm-warning);
+  --color-warning-soft: var(--fm-warning-soft);
+  --color-danger: var(--fm-danger);
+  --color-danger-soft: var(--fm-danger-soft);
+
+  /* Radii */
+  --radius-card: 1rem;
+  --radius-control: 0.625rem;
+  --radius-chip: 9999px;
+
+  /* Shadows — two levels only */
+  --shadow-card: var(--fm-shadow-card);
+  --shadow-pop: var(--fm-shadow-pop);
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prices, scores, counts always align */
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Focus visibility — brand ring everywhere, no exceptions */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
