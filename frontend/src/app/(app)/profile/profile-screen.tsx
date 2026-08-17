@@ -20,6 +20,19 @@ import {
   upsertMyFlatmateProfile,
 } from "@/lib/flatmates-client";
 import { getLocalities } from "@/lib/profile-client";
+import {
+  fetchMyVerifications,
+  requestVerification,
+  type Verification,
+  type VerificationType,
+} from "@/lib/safety-client";
+
+const VERIFICATION_ROWS: { type: VerificationType; label: string; hint: string; icon: string }[] = [
+  { type: "EMAIL", label: "Email", hint: "Confirms you own your email address.", icon: "✉️" },
+  { type: "PHONE", label: "Phone", hint: "Confirms your number via OTP.", icon: "📱" },
+  { type: "GOV_ID", label: "Government ID", hint: "Reviewed by our team — unlocks the ✓ ID badge.", icon: "🪪" },
+  { type: "SELFIE", label: "Selfie check", hint: "Matches your face to your ID.", icon: "🤳" },
+];
 
 interface MyFlatmateProfile {
   exists?: boolean;
@@ -213,6 +226,82 @@ export function ProfileScreen() {
           </div>
         </div>
       </section>
+
+      <VerificationSection />
     </div>
+  );
+}
+
+function VerificationSection() {
+  const [verifications, setVerifications] = useState<Verification[] | null>(null);
+  const [pendingType, setPendingType] = useState<VerificationType | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchMyVerifications().then(setVerifications).catch(() => setVerifications([]));
+  }, []);
+
+  async function request(type: VerificationType) {
+    setPendingType(type);
+    setError(null);
+    try {
+      await requestVerification(type);
+      setVerifications(await fetchMyVerifications());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not start verification");
+    } finally {
+      setPendingType(null);
+    }
+  }
+
+  const statusOf = (type: VerificationType) =>
+    verifications?.find((v) => v.type === type)?.status ?? "UNVERIFIED";
+
+  return (
+    <section className="rounded-card border border-border bg-surface p-6 shadow-card">
+      <h2 className="font-semibold">Verifications</h2>
+      <p className="text-sm text-text-muted">
+        Verified members get more replies — badges show on your listings and flatmate card.
+      </p>
+
+      <div className="mt-4 space-y-2.5">
+        {verifications === null ? (
+          <Skeleton className="h-32 rounded-card" />
+        ) : (
+          VERIFICATION_ROWS.map(({ type, label, hint, icon }) => {
+            const status = statusOf(type);
+            return (
+              <div
+                key={type}
+                className="flex items-center gap-3 rounded-control bg-surface-2 px-3.5 py-3"
+              >
+                <span aria-hidden className="text-lg">{icon}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium">{label}</p>
+                  <p className="text-xs text-text-muted">{hint}</p>
+                </div>
+                {status === "VERIFIED" ? (
+                  <Badge variant="success">✓ Verified</Badge>
+                ) : status === "PENDING" ? (
+                  <Badge variant="warning">Under review</Badge>
+                ) : status === "REJECTED" ? (
+                  <Badge variant="outline">Rejected</Badge>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={pendingType !== null}
+                    onClick={() => request(type)}
+                  >
+                    {pendingType === type ? <Spinner /> : "Verify"}
+                  </Button>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+      {error && <p className="mt-3 text-sm text-danger">{error}</p>}
+    </section>
   );
 }

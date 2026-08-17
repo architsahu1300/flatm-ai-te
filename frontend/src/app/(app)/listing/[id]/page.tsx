@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { serverFetch } from "@/lib/api";
 import { LABELS, formatINR } from "@/lib/domain";
 import type { ListingDetail } from "@/lib/listings-client";
+import { ReportDialog } from "@/components/report/ReportDialog";
 import { AmenityChips, ExpandableText, MobileActionBar } from "./detail-bits";
 import { ListingGallery } from "./gallery";
 
@@ -162,6 +163,9 @@ export default async function ListingDetailPage({
               <p className="mt-3 rounded-control bg-warning-soft p-2.5 text-xs leading-relaxed text-warning">
                 ⚠ Never transfer a deposit before verifying the property and owner in person.
               </p>
+              <div className="mt-3 text-center">
+                <ReportDialog listingId={card.id} subject="this listing" />
+              </div>
             </div>
           </div>
         </aside>

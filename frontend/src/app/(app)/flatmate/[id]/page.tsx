@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CompatibilityRing } from "@/components/flatmate/CompatibilityRing";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { ReportDialog } from "@/components/report/ReportDialog";
 import { serverFetch } from "@/lib/api";
 import { formatINR } from "@/lib/domain";
 import type { FlatmateDetail } from "@/lib/flatmates-client";
@@ -115,13 +116,14 @@ export default async function FlatmateDetailPage({ params }: { params: Promise<{
           </dl>
         </section>
 
-        <div className="mt-8 flex gap-3">
+        <div className="mt-8 flex items-center gap-3">
           <Link
             href={`/messages?to=${card.userId}`}
             className="flex-1 rounded-control bg-brand px-4 py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-brand-hover"
           >
             Message {card.name.split(" ")[0]}
           </Link>
+          <ReportDialog userId={card.userId} subject={card.name.split(" ")[0]} />
         </div>
       </div>
     </article>

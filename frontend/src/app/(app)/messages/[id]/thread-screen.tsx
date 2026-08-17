@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getSession } from "@/lib/auth-client";
 import { APP_NAME } from "@/lib/brand";
+import { ReportDialog } from "@/components/report/ReportDialog";
 import {
   fetchMessages,
   listConversations,
@@ -124,13 +125,16 @@ export function ThreadScreen({ conversationId }: { conversationId: string }) {
               )}
             </div>
             {conversation.status === "ACCEPTED" && (
-              <button
-                type="button"
-                onClick={() => respond("block")}
-                className="cursor-pointer text-xs text-text-muted hover:text-danger"
-              >
-                Block
-              </button>
+              <div className="flex items-center gap-3">
+                <ReportDialog userId={conversation.otherUserId} subject={conversation.otherUserName} />
+                <button
+                  type="button"
+                  onClick={() => respond("block")}
+                  className="cursor-pointer text-xs text-text-muted hover:text-danger"
+                >
+                  Block
+                </button>
+              </div>
             )}
             {closed && <Badge variant="outline">{conversation.status === "BLOCKED" ? "Blocked" : "Declined"}</Badge>}
           </>
