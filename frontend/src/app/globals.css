@@ -124,3 +124,12 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Leaflet gives its panes z-index 400–700 and its zoom/attribution controls 1000,
+   which is far above app overlays (sheets sit at z-50). Without a stacking context
+   of its own, a map paints straight through an open dialog. Isolating the container
+   keeps those values internal — the map then layers by document order like any
+   other block, so every current and future map is covered. */
+.leaflet-container {
+  isolation: isolate;
+}
