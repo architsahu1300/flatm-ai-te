@@ -22,6 +22,8 @@ public class FlatmaiteProperties {
     private String secret;
     private int ttlHours = 168;
     private String cookieName = "fm_token";
+    /** Must be true wherever the app is served over HTTPS; false only for local http dev. */
+    private boolean secureCookie = false;
   }
 
   @Getter

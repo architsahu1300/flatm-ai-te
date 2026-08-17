@@ -55,6 +55,7 @@ public class JwtService {
   public void writeCookie(HttpServletResponse response, String token) {
     Cookie cookie = new Cookie(props.getJwt().getCookieName(), token);
     cookie.setHttpOnly(true);
+    cookie.setSecure(props.getJwt().isSecureCookie());
     cookie.setPath("/");
     cookie.setMaxAge(props.getJwt().getTtlHours() * 3600);
     cookie.setAttribute("SameSite", "Lax");
@@ -64,6 +65,7 @@ public class JwtService {
   public void clearCookie(HttpServletResponse response) {
     Cookie cookie = new Cookie(props.getJwt().getCookieName(), "");
     cookie.setHttpOnly(true);
+    cookie.setSecure(props.getJwt().isSecureCookie());
     cookie.setPath("/");
     cookie.setMaxAge(0);
     cookie.setAttribute("SameSite", "Lax");

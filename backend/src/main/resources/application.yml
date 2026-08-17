@@ -76,6 +76,8 @@ flatmaite:
     secret: ${JWT_SECRET:dev-only-secret-change-me-0123456789abcdef0123456789}
     ttl-hours: ${JWT_TTL_HOURS:168}
     cookie-name: fm_token
+    # HTTPS-only cookie — set JWT_SECURE_COOKIE=true in every deployed environment
+    secure-cookie: ${JWT_SECURE_COOKIE:false}
   ai:
     # auto → mock when OPENAI_API_KEY is absent; force with true/false
     mock: ${AI_MOCK:auto}
