@@ -55,6 +55,7 @@ public interface ClauseAdvisor {
 
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
+    private final String providerName;
 
     @Override
     public List<Clause> suggest(String context, List<Clause> existing) {
@@ -88,7 +89,7 @@ public interface ClauseAdvisor {
 
     @Override
     public String providerName() {
-      return "openai";
+      return providerName;
     }
   }
 }

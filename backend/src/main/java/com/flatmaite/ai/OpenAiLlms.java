@@ -52,6 +52,7 @@ public final class OpenAiLlms {
     private final KeywordIntentParser fallback;
     private final ObjectMapper objectMapper;
     private final String modelName;
+    private final String providerName;
 
     @Override
     public SearchIntent extract(String query, SearchIntent prior) {
@@ -113,7 +114,7 @@ public final class OpenAiLlms {
 
     @Override
     public String providerName() {
-      return "openai";
+      return providerName;
     }
 
     @Override
@@ -141,6 +142,7 @@ public final class OpenAiLlms {
     private final ChatClient chatClient;
     private final ObjectMapper objectMapper;
     private final String modelName;
+    private final String providerName;
 
     @Override
     public List<Explanation> explainBatch(SearchIntent intent, List<CandidateFacts> candidates) {
@@ -175,7 +177,7 @@ public final class OpenAiLlms {
 
     @Override
     public String providerName() {
-      return "openai";
+      return providerName;
     }
 
     @Override

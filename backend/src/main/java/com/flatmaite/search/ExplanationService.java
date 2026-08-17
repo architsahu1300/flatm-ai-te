@@ -72,6 +72,14 @@ public class ExplanationService {
     return out;
   }
 
+  public String providerName() {
+    return explainerLlm.providerName();
+  }
+
+  public String modelName() {
+    return explainerLlm.model();
+  }
+
   public boolean usesLlm() {
     return props.getAi().isExplanationsEnabled() && !"mock".equals(explainerLlm.providerName());
   }

@@ -169,7 +169,7 @@ public class SearchPipeline {
     return new SearchDtos.AiSearchResponse(
         sessionId,
         intent,
-        explanationService.usesLlm() ? "openai" : "mock",
+        explanationService.usesLlm() ? explanationService.providerName() : "mock",
         homes,
         flatmates,
         relaxers,
@@ -246,7 +246,7 @@ public class SearchPipeline {
                 .map(r -> new Explainable(r.listing().getId(), r.listing().getTitle(), r.scored(), r.listing().getUpdatedAt()))
                 .toList());
     if (explanationService.usesLlm()) {
-      usageService.log(viewerId, anonKey, AiFeature.EXPLANATION, "openai", "gpt-4o-mini",
+      usageService.log(viewerId, anonKey, AiFeature.EXPLANATION, explanationService.providerName(), explanationService.modelName(),
           Math.min(top.size(), ExplanationService.LLM_TOP_N) * 220 + 400,
           Math.min(top.size(), ExplanationService.LLM_TOP_N) * 90,
           false, true, System.currentTimeMillis() - llmStart, intentHash);

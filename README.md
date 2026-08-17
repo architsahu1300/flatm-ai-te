@@ -21,7 +21,10 @@ docker compose up -d          # Postgres 16 + pgvector on localhost:5433
 
 # 2. Backend (http://localhost:8080, Swagger at /swagger-ui)
 cd backend
-export OPENAI_API_KEY=sk-...  # optional — omit to run with the deterministic mock AI provider
+# Optional — omit both to run with the deterministic mock AI provider.
+export OPENAI_API_KEY=sk-...                # paid: OpenAI (production default)
+# ...or the free Gemini tier for testing (key from https://aistudio.google.com/apikey):
+# export FM_AI_PROVIDER=google-genai GEMINI_API_KEY=AIza...
 ./mvnw spring-boot:run
 
 # 3. Seed data (once; idempotent — safe to re-run)
@@ -49,7 +52,9 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 
 | Var | Default | Purpose |
 |-----|---------|---------|
-| `OPENAI_API_KEY` | _unset_ → mock AI | Real LLM intent extraction + explanations |
+| `FM_AI_PROVIDER` | `openai` | AI provider: `openai` or `google-genai` (free Gemini tier) |
+| `OPENAI_API_KEY` | _unset_ → mock AI | Real LLM intent extraction + explanations (openai mode) |
+| `GEMINI_API_KEY` | _unset_ → mock AI | Same, via Gemini free tier (google-genai mode) |
 | `DB_URL` | `jdbc:postgresql://localhost:5433/flatmaite` | |
 | `JWT_SECRET` | dev-only value | HS256 signing key (≥32 bytes) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | _unset_ → Google login hidden | OAuth |

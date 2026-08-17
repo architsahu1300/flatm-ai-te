@@ -21,6 +21,11 @@ spring:
       max-file-size: 10MB
       max-request-size: 25MB
   ai:
+    # Which Spring AI provider builds the ChatModel/EmbeddingModel beans.
+    # openai (default) | google-genai (free Gemini tier — also set GEMINI_API_KEY)
+    model:
+      chat: ${FM_AI_PROVIDER:openai}
+      embedding: ${FM_AI_PROVIDER:openai}
     openai:
       api-key: ${OPENAI_API_KEY:sk-mock-key-not-set}
       chat:
@@ -30,6 +35,25 @@ spring:
       embedding:
         options:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY:}
+        chat:
+          options:
+            model: ${GEMINI_CHAT_MODEL:gemini-2.5-flash-lite}
+            temperature: 0.2
+        embedding:
+          # placeholder default: this connection bean constructs on every boot (no property gate
+          # upstream) and rejects a blank key — the model bean itself only exists in gemini mode
+          api-key: ${GEMINI_API_KEY:genai-mock-key-not-set}
+          text:
+            options:
+              model: ${GEMINI_EMBEDDING_MODEL:gemini-embedding-001}
+              # must match the pgvector column: vector(1536)
+              dimensions: 1536
+
+# Google's text-embedding autoconfig keys off this longer property (its chat uses spring.ai.model.chat)
+spring.ai.model.embedding.text: ${FM_AI_PROVIDER:openai}
 
 server:
   port: 8080

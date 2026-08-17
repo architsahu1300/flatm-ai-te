@@ -8,6 +8,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 public class OpenAiEmbeddingProvider implements EmbeddingProvider {
 
   private final EmbeddingModel embeddingModel;
+  private final String providerName;
 
   @Override
   public float[] embed(String text) {
@@ -21,6 +22,6 @@ public class OpenAiEmbeddingProvider implements EmbeddingProvider {
 
   @Override
   public String providerName() {
-    return "openai";
+    return providerName;
   }
 }

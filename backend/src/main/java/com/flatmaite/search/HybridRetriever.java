@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class HybridRetriever {
 
   public record Candidate(UUID id, UUID localityId, Double lat, Double lng, Double cosineSim) {}
@@ -39,29 +41,33 @@ public class HybridRetriever {
     Map<String, Object> params = new LinkedHashMap<>();
     String where = ListingQueryService.buildWhere(filters, params);
 
-    String semanticText = semanticText(intent);
-    float[] queryEmbedding = embeddingProvider.embed(semanticText);
-    params.put("qvec", VectorStoreWriter.toVectorLiteral(queryEmbedding));
+    float[] queryEmbedding = safeEmbed(semanticText(intent));
+    boolean withVector = queryEmbedding != null;
     params.put("vlimit", VECTOR_LIMIT);
-
-    jdbc.getJdbcTemplate().execute("SET LOCAL hnsw.ef_search = 100");
+    if (withVector) {
+      params.put("qvec", VectorStoreWriter.toVectorLiteral(queryEmbedding));
+      jdbc.getJdbcTemplate().execute("SET LOCAL hnsw.ef_search = 100");
+    }
 
     String vectorSql =
         """
         WITH filtered AS (
-          SELECT l.id, p.locality_id, p.lat, p.lng, l.embedding
+          SELECT l.id, p.locality_id, p.lat, p.lng, l.embedding, l.created_at
           FROM listings l
           LEFT JOIN properties p ON p.id = l.property_id
           WHERE %s
         )
-        SELECT id, locality_id, lat, lng,
-               CASE WHEN embedding IS NOT NULL
-                    THEN 1 - (embedding <=> CAST(:qvec AS vector)) END AS sim
+        SELECT id, locality_id, lat, lng, %s AS sim
         FROM filtered
-        ORDER BY embedding <=> CAST(:qvec AS vector) NULLS LAST
+        ORDER BY %s
         LIMIT :vlimit
         """
-            .formatted(where);
+            .formatted(
+                where,
+                withVector
+                    ? "CASE WHEN embedding IS NOT NULL THEN 1 - (embedding <=> CAST(:qvec AS vector)) END"
+                    : "NULL::float8",
+                withVector ? "embedding <=> CAST(:qvec AS vector) NULLS LAST" : "created_at DESC");
 
     Map<UUID, Candidate> merged = new LinkedHashMap<>();
     jdbc.query(
@@ -138,21 +144,27 @@ public class HybridRetriever {
       params.put("gender", genderValue);
     }
 
-    float[] queryEmbedding = embeddingProvider.embed(semanticText(intent));
-    params.put("qvec", VectorStoreWriter.toVectorLiteral(queryEmbedding));
+    float[] queryEmbedding = safeEmbed(semanticText(intent));
+    boolean withVector = queryEmbedding != null;
     params.put("vlimit", VECTOR_LIMIT);
+    if (withVector) {
+      params.put("qvec", VectorStoreWriter.toVectorLiteral(queryEmbedding));
+    }
 
     String sql =
         """
-        SELECT fp.id,
-               CASE WHEN fp.embedding IS NOT NULL
-                    THEN 1 - (fp.embedding <=> CAST(:qvec AS vector)) END AS sim
+        SELECT fp.id, %s AS sim
         FROM flatmate_profiles fp
         WHERE %s
-        ORDER BY fp.embedding <=> CAST(:qvec AS vector) NULLS LAST
+        ORDER BY %s
         LIMIT :vlimit
         """
-            .formatted(where);
+            .formatted(
+                withVector
+                    ? "CASE WHEN fp.embedding IS NOT NULL THEN 1 - (fp.embedding <=> CAST(:qvec AS vector)) END"
+                    : "NULL::float8",
+                where,
+                withVector ? "fp.embedding <=> CAST(:qvec AS vector) NULLS LAST" : "fp.updated_at DESC");
 
     List<Candidate> out = new ArrayList<>();
     jdbc.query(
@@ -163,6 +175,19 @@ public class HybridRetriever {
           out.add(new Candidate(rs.getObject("id", UUID.class), null, null, null, rs.wasNull() ? null : sim));
         });
     return out;
+  }
+
+  /**
+   * Embedding-provider outages must not take search down — the ladder degrades to filters + FTS,
+   * and MatchScorer renormalizes semanticSim away when sims are null.
+   */
+  private float[] safeEmbed(String text) {
+    try {
+      return embeddingProvider.embed(text);
+    } catch (Exception e) {
+      log.warn("Query embedding unavailable, degrading to filter/FTS retrieval: {}", e.getMessage());
+      return null;
+    }
   }
 
   /** Maps intent → shared hard-filter vocabulary (budget headroom ×1.1 — near-misses surface as concerns). */
