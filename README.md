@@ -28,6 +28,8 @@ export OPENAI_API_KEY=sk-...                # paid: OpenAI (production default)
 ./mvnw spring-boot:run
 
 # 3. Seed data (once; idempotent — safe to re-run)
+# NOTE: the seed profile runs with no web server and exits when finished —
+# it is not a way to start the app. Use step 2 for that.
 ./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
 
 # 4. Frontend (http://localhost:3000)
