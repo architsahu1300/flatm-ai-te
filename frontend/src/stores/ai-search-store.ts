@@ -27,6 +27,8 @@ interface AiSearchState {
   homes: AiResult[];
   flatmates: AiResult[];
   relaxers: Relaxer[];
+  /** Label of the relaxer whose widened intent produced the current results, if any. */
+  widenedBy: string | null;
   activeTab: "homes" | "flatmates";
   turns: Turn[];
   compareIds: string[];
@@ -37,6 +39,7 @@ interface AiSearchState {
   submit: (query: string) => Promise<void>;
   refine: (query: string) => Promise<void>;
   applyIntent: (intent: SearchIntent, note?: string) => Promise<void>;
+  applyRelaxer: (intent: SearchIntent, label: string) => Promise<void>;
   toggleCompare: (id: string) => void;
   runComparison: () => Promise<void>;
   closeComparison: () => void;
@@ -51,7 +54,11 @@ function resultId(r: AiResult): string {
 }
 
 export const useAiSearchStore = create<AiSearchState>()((set, get) => {
-  async function run(action: () => Promise<AiSearchResponse>, userText: string) {
+  async function run(
+    action: () => Promise<AiSearchResponse>,
+    userText: string,
+    widenedBy: string | null = null,
+  ) {
     const started = Date.now();
     set({
       status: "understanding",
@@ -76,6 +83,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         homes: response.homes,
         flatmates: response.flatmates,
         relaxers: response.relaxers,
+        widenedBy,
         activeTab,
         compareIds: [],
       });
@@ -95,6 +103,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
     homes: [],
     flatmates: [],
     relaxers: [],
+    widenedBy: null,
     activeTab: "homes",
     turns: [],
     compareIds: [],
@@ -118,6 +127,14 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         return Promise.resolve();
       }
       return run(() => aiApply(intent, sessionId), note ?? "(edited requirements)");
+    },
+
+    applyRelaxer: (intent, label) => {
+      const sessionId = get().sessionId;
+      if (!sessionId) {
+        return Promise.resolve();
+      }
+      return run(() => aiApply(intent, sessionId), label, label);
     },
 
     toggleCompare: (id) => {
@@ -154,6 +171,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         homes: [],
         flatmates: [],
         relaxers: [],
+        widenedBy: null,
         turns: [],
         compareIds: [],
         comparison: null,

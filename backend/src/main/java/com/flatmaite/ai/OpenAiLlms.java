@@ -30,9 +30,9 @@ public final class OpenAiLlms {
       - locations: names as the user said them (e.g. "BKC", "Andheri"). Do not guess ids; leave localityId null.
       - commuteTo: set when they mention working somewhere or wanting to be near/within X minutes of a place.
       - lifestyle.smoking: NO_SMOKERS when they don't want smokers. lifestyle.quiet: true when they want a calm/quiet home or no party house.
-      - roomType: PRIVATE for a room of their own, SHARED for shared/sharing, ENTIRE for whole flats (nBHK for themselves).
       - freeText: any residual nuance not captured by structured fields.
-      """;
+      """
+          + com.flatmaite.search.RentalVocabulary.GLOSSARY;
 
   private static final String REFINE_SYSTEM =
       """

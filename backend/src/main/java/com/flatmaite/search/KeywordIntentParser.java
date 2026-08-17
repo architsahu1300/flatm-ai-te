@@ -127,9 +127,11 @@ public class KeywordIntentParser {
       int n = Integer.parseInt(bhk.group(1));
       bhkRange = new BhkRange(n, n);
     }
-    if (q.contains("shared room") || q.contains("sharing")) {
-      roomType = RoomType.SHARED;
-    } else if (q.contains("private room") || (q.contains("room") && !q.contains("bhk"))) {
+    // occupancy vocabulary wins ("single sharing" is a PRIVATE room, not a shared one)
+    roomType = RentalVocabulary.explicitRoomType(q);
+    if (roomType != null) {
+      // stated outright — no shape guessing needed
+    } else if (q.contains("room") && !q.contains("bhk")) {
       roomType = RoomType.PRIVATE;
     } else if (bhkRange != null || q.contains("apartment") || q.contains("entire")) {
       // "2BHK where I can get a private room" stays private

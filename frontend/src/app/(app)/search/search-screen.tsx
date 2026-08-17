@@ -168,6 +168,23 @@ export function SearchScreen() {
 
           {results.length > 0 ? (
             <>
+              {store.widenedBy && (
+                <div className="mb-3 flex items-start gap-2 rounded-card bg-warning-soft p-3 text-[13px] leading-relaxed text-warning">
+                  <span aria-hidden>⚠</span>
+                  <p className="flex-1">
+                    Widened search — <strong>{store.widenedBy}</strong>. Some results fall outside
+                    what you originally asked for; the chips above show what is actually being
+                    matched.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => store.submit(store.intent?.originalQuery ?? "")}
+                    className="cursor-pointer whitespace-nowrap font-medium underline"
+                  >
+                    Undo
+                  </button>
+                </div>
+              )}
               <div className="mb-3 flex items-center justify-between">
                 <p className="text-sm text-text-muted">
                   {results.length} match{results.length === 1 ? "" : "es"}, best first
@@ -196,7 +213,7 @@ export function SearchScreen() {
                       <Button
                         key={rx.label}
                         variant="outline"
-                        onClick={() => store.applyIntent(rx.relaxedIntent, rx.label)}
+                        onClick={() => store.applyRelaxer(rx.relaxedIntent, rx.label)}
                       >
                         {rx.label} <span className="text-text-muted">· {rx.description}</span>
                       </Button>
