@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/avatar";
+import { NotificationBell } from "@/components/layout/NotificationBell";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { logout, type SessionUser } from "@/lib/auth-client";
 import { Wordmark } from "@/lib/brand";
@@ -74,6 +75,7 @@ export function TopNav({ user }: { user: SessionUser | null }) {
 
         <div className="ml-auto flex items-center gap-3">
           <ThemeToggle compact />
+          {user && <NotificationBell />}
           <Link
             href="/my-listings/new"
             className="rounded-control border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-surface-2"
@@ -102,6 +104,8 @@ export function TopNav({ user }: { user: SessionUser | null }) {
                   {[
                     { href: "/profile", label: "Profile" },
                     { href: "/my-listings", label: "My listings" },
+                    { href: "/notifications", label: "Notifications" },
+                    { href: "/plans", label: "Plans & boost" },
                     ...(user.role === "ADMIN" ? [{ href: "/admin", label: "Admin" }] : []),
                   ].map((item) => (
                     <Link

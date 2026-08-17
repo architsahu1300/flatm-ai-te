@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics";
 import { apiFetch, apiPost } from "@/lib/api";
 
 export interface ConversationSummary {
@@ -28,6 +29,7 @@ export function listConversations() {
 }
 
 export function startConversation(body: { recipientId: string; listingId?: string | null; firstMessage: string }) {
+  track("contact_initiated", { hasListing: Boolean(body.listingId) });
   return apiPost<{ id: string; status: string }>("/api/v1/conversations", body);
 }
 

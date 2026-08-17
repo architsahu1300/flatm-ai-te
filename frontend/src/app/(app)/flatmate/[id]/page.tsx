@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { CompatibilityRing } from "@/components/flatmate/CompatibilityRing";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { TrackView } from "@/components/analytics/TrackView";
 import { ReportDialog } from "@/components/report/ReportDialog";
 import { serverFetch } from "@/lib/api";
 import { formatINR } from "@/lib/domain";
@@ -42,6 +43,7 @@ export default async function FlatmateDetailPage({ params }: { params: Promise<{
 
   return (
     <article className="mx-auto max-w-3xl">
+      <TrackView event="flatmate_viewed" properties={{ flatmateId: id }} />
       <Link
         href="/flatmates"
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-text-muted transition-colors hover:text-text"

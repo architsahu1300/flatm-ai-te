@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { serverFetch } from "@/lib/api";
 import { LABELS, formatINR } from "@/lib/domain";
 import type { ListingDetail } from "@/lib/listings-client";
+import { TrackView } from "@/components/analytics/TrackView";
 import { ReportDialog } from "@/components/report/ReportDialog";
 import { AmenityChips, ExpandableText, MobileActionBar } from "./detail-bits";
 import { ListingGallery } from "./gallery";
@@ -54,6 +55,7 @@ export default async function ListingDetailPage({
   return (
     // extra bottom padding on mobile clears the sticky action bar
     <article className="mx-auto max-w-5xl pb-24 lg:pb-0">
+      <TrackView event="listing_viewed" properties={{ listingId: card.id }} />
       <ListingGallery images={detail.images} title={card.title} />
 
       <div className="mt-6 grid gap-8 lg:grid-cols-[1fr_320px]">

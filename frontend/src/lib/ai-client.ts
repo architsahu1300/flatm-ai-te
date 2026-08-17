@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics";
 import { apiPost } from "@/lib/api";
 import type { FlatmateCard } from "@/lib/flatmates-client";
 import type { ListingCard } from "@/lib/listings-client";
@@ -85,10 +86,12 @@ export interface CompareResponse {
 }
 
 export function aiSearch(query: string, sessionId?: string | null) {
+  track("ai_search", { queryLength: query.length });
   return apiPost<AiSearchResponse>("/api/v1/ai/search", { query, sessionId: sessionId ?? null });
 }
 
 export function aiRefine(query: string, sessionId: string) {
+  track("search_refined", { queryLength: query.length });
   return apiPost<AiSearchResponse>("/api/v1/ai/refine", { query, sessionId });
 }
 

@@ -1,3 +1,4 @@
+import { track } from "@/lib/analytics";
 import { apiFetch, apiPost } from "@/lib/api";
 import type { AiSearchResponse, SearchIntent } from "@/lib/ai-client";
 import type { ListingCard } from "@/lib/listings-client";
@@ -21,6 +22,7 @@ export function fetchSavedIds() {
 }
 
 export function saveListing(listingId: string, note?: string) {
+  track("listing_saved");
   return apiPost<{ saved: boolean }>("/api/v1/saved-listings", { listingId, note });
 }
 
@@ -33,6 +35,7 @@ export function fetchSavedSearches() {
 }
 
 export function createSavedSearch(name: string, intent: SearchIntent, alertsEnabled = false) {
+  track("search_saved");
   return apiPost<SavedSearch>("/api/v1/saved-searches", { name, intent, alertsEnabled });
 }
 

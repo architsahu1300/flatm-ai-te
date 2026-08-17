@@ -111,7 +111,14 @@ export function MyListingsScreen() {
                   <Button size="sm" onClick={() => transition(l.id, "ACTIVE")}>Publish</Button>
                 )}
                 {l.status === "ACTIVE" && (
-                  <Button variant="outline" size="sm" onClick={() => transition(l.id, "PAUSED")}>Pause</Button>
+                  <>
+                    <Link href={`/plans?boost=${l.id}`}>
+                      <Button variant="outline" size="sm">
+                        {l.isBoosted ? "★ Featured" : "🚀 Boost"}
+                      </Button>
+                    </Link>
+                    <Button variant="outline" size="sm" onClick={() => transition(l.id, "PAUSED")}>Pause</Button>
+                  </>
                 )}
                 {l.status === "PAUSED" && (
                   <Button size="sm" onClick={() => transition(l.id, "ACTIVE")}>Resume</Button>
