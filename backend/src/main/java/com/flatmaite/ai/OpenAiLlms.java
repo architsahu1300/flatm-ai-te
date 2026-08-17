@@ -40,6 +40,8 @@ public final class OpenAiLlms {
       Apply the modification and return the FULL updated intent (not a delta).
       "cheaper" reduces budgetMax ~10%%. "closer" tightens commuteTo.maxMinutes ~20%%.
       Keep every field the user did not change. Unknown fields stay null.
+      If the message is a complete request of its own (it states its own location, budget or room
+      type), REPLACE the intent with just what that message says — do not carry anything over.
       Current intent JSON:
       %s
       """;

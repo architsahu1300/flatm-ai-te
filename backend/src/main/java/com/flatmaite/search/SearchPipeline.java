@@ -155,6 +155,12 @@ public class SearchPipeline {
 
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId) {
+    return search(intent, viewerId, anonKey, sessionId, null);
+  }
+
+  @Transactional(readOnly = true)
+  public SearchDtos.AiSearchResponse search(
+      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note) {
     String intentHash = EmbeddingTextComposer.sha256(intentJson(intent));
     SearchTarget target = intent.targetOrDefault();
 
@@ -175,7 +181,7 @@ public class SearchPipeline {
         homes,
         flatmates,
         relaxers,
-        null);
+        note);
   }
 
   private List<AiResult> searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {

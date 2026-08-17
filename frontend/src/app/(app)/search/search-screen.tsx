@@ -123,6 +123,12 @@ export function SearchScreen() {
                 </span>
               )}
             </p>
+            {store.note && (
+              <p className="mb-3 flex items-start gap-2 rounded-card bg-brand-soft p-2.5 text-[13px] leading-relaxed text-brand">
+                <span aria-hidden>✦</span>
+                {store.note}
+              </p>
+            )}
             <IntentChips
               intent={store.intent}
               animateKey={store.sessionId + String(store.turns.length)}

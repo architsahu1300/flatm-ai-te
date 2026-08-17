@@ -29,6 +29,8 @@ interface AiSearchState {
   relaxers: Relaxer[];
   /** Label of the relaxer whose widened intent produced the current results, if any. */
   widenedBy: string | null;
+  /** Server-side explanation of anything surprising about this turn (e.g. a fresh-search reset). */
+  note: string | null;
   activeTab: "homes" | "flatmates";
   turns: Turn[];
   compareIds: string[];
@@ -83,6 +85,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         homes: response.homes,
         flatmates: response.flatmates,
         relaxers: response.relaxers,
+        note: response.note,
         widenedBy,
         activeTab,
         compareIds: [],
@@ -104,6 +107,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
     flatmates: [],
     relaxers: [],
     widenedBy: null,
+    note: null,
     activeTab: "homes",
     turns: [],
     compareIds: [],
@@ -172,6 +176,7 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         flatmates: [],
         relaxers: [],
         widenedBy: null,
+        note: null,
         turns: [],
         compareIds: [],
         comparison: null,

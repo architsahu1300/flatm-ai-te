@@ -38,6 +38,7 @@ public class AiSearchController {
   private final SearchSessionService sessions;
   private final AiUsageService usage;
   private final RateLimiter rateLimiter;
+  private final NewQueryDetector newQueryDetector;
 
   @PostMapping("/search")
   public ResponseEntity<Map<String, Object>> search(
@@ -56,12 +57,20 @@ public class AiSearchController {
       prior = sessions.intentOf(session);
     }
 
+    // A complete new request must not inherit the previous search's constraints — otherwise a
+    // stale locality or room type silently zeroes out results the user can plainly see exist.
+    String note = null;
+    if (prior != null && newQueryDetector.isSelfContained(body.query())) {
+      prior = null;
+      note = "Started a fresh search — this read as a new request, not a tweak of the last one.";
+    }
+
     SearchIntent intent = pipeline.extractIntent(body.query(), prior, userId, anonKey);
     if (session == null) {
       session = sessions.start(userId, anonKey, intent, body.query());
     }
 
-    AiSearchResponse result = pipeline.search(intent, userId, anonKey, session.getId());
+    AiSearchResponse result = pipeline.search(intent, userId, anonKey, session.getId(), note);
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
     result.flatmates().forEach(r -> resultIds.add(r.flatmate().id()));
