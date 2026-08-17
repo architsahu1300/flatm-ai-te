@@ -55,7 +55,7 @@ export function SearchBox({
     <div
       className={cn(
         "flex items-start gap-3 rounded-card border bg-surface transition-all",
-        focused ? "border-brand shadow-pop ring-2 ring-(--color-brand-soft)" : "border-border shadow-card",
+        focused ? "border-brand shadow-pop" : "border-border shadow-card",
         size === "lg" ? "p-4" : "p-3",
       )}
     >
@@ -80,7 +80,8 @@ export function SearchBox({
           }
         }}
         className={cn(
-          "min-w-0 flex-1 resize-none bg-transparent text-text placeholder:text-text-muted focus:outline-none",
+          "min-w-0 flex-1 resize-none bg-transparent text-text placeholder:text-text-muted",
+          "outline-none focus:outline-none focus-visible:outline-none",
           size === "lg" ? "text-base leading-6" : "text-sm leading-5",
         )}
       />

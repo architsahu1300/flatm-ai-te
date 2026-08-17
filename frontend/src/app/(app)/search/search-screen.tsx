@@ -51,17 +51,20 @@ function SaveSearchButton() {
 export function SearchScreen() {
   const searchParams = useSearchParams();
   const store = useAiSearchStore();
-  const bootQuery = useRef(searchParams.get("q"));
+  const handedOffQuery = searchParams.get("q");
+  const lastHandoff = useRef<string | null>(null);
   const [refineText, setRefineText] = useState("");
 
-  // Landing page hands off ?q=
+  // ?q= handoffs — from the landing hero and the top-nav search field. Reacting to the value
+  // (not just mounting) means a nav search from another page runs even when /search is cached.
   useEffect(() => {
-    if (bootQuery.current && store.status === "idle") {
-      store.submit(bootQuery.current);
-      bootQuery.current = null;
+    if (!handedOffQuery || handedOffQuery === lastHandoff.current) {
+      return;
     }
+    lastHandoff.current = handedOffQuery;
+    store.submit(handedOffQuery);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handedOffQuery]);
 
   const busy = store.status === "understanding" || store.status === "searching";
   const results = store.activeTab === "homes" ? store.homes : store.flatmates;

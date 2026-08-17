@@ -8,7 +8,8 @@ import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { logout, type SessionUser } from "@/lib/auth-client";
 import { Wordmark } from "@/lib/brand";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useAiSearchStore } from "@/stores/ai-search-store";
 
 const LINKS = [
   { href: "/explore", label: "Explore" },
@@ -22,13 +23,21 @@ export function TopNav({ user }: { user: SessionUser | null }) {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navQuery, setNavQuery] = useState("");
+  const [navFocused, setNavFocused] = useState(false);
+  const navInput = useRef<HTMLInputElement>(null);
+  const submitSearch = useAiSearchStore((s) => s.submit);
 
   // ⌘K / Ctrl+K — jump to the AI search from anywhere
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        router.push("/search");
+        if (navInput.current) {
+          navInput.current.focus();
+        } else {
+          router.push("/search");
+        }
       }
     }
     window.addEventListener("keydown", onKey);
@@ -48,13 +57,42 @@ export function TopNav({ user }: { user: SessionUser | null }) {
           <Wordmark />
         </Link>
 
-        <Link
-          href="/search"
-          className="flex h-10 w-72 items-center gap-2 rounded-chip border border-border bg-surface px-4 text-sm text-text-muted transition-colors hover:border-brand"
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const q = navQuery.trim();
+            if (q.length < 3) return;
+            setNavQuery("");
+            navInput.current?.blur();
+            // already on /search? run it in place — otherwise hand off through the URL
+            if (pathname === "/search") {
+              submitSearch(q);
+            } else {
+              router.push(`/search?q=${encodeURIComponent(q)}`);
+            }
+          }}
+          className={cn(
+            "flex h-10 w-72 items-center gap-2 rounded-chip border bg-surface px-4 text-sm transition-colors",
+            navFocused ? "border-brand" : "border-border hover:border-brand",
+          )}
         >
-          <span className="text-brand">✦</span> What are you looking for?
-          <kbd className="ml-auto rounded border border-border bg-surface-2 px-1.5 text-[11px]">⌘K</kbd>
-        </Link>
+          <span className="text-brand">✦</span>
+          <input
+            ref={navInput}
+            value={navQuery}
+            onChange={(e) => setNavQuery(e.target.value)}
+            onFocus={() => setNavFocused(true)}
+            onBlur={() => setNavFocused(false)}
+            placeholder="What are you looking for?"
+            aria-label="Search homes and flatmates"
+            className="min-w-0 flex-1 bg-transparent text-text placeholder:text-text-muted outline-none focus:outline-none focus-visible:outline-none"
+          />
+          {navQuery.trim().length === 0 && (
+            <kbd className="shrink-0 rounded border border-border bg-surface-2 px-1.5 text-[11px] text-text-muted">
+              ⌘K
+            </kbd>
+          )}
+        </form>
 
         <nav className="flex items-center gap-1 text-sm font-medium">
           {LINKS.map((link) => (
