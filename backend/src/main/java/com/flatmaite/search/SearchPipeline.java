@@ -38,8 +38,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -402,6 +404,10 @@ public class SearchPipeline {
         out.add(new Relaxer("Relax lifestyle filters", "shows %d more".formatted(count), relaxed, count));
       }
     }
+    // Nearby areas beat "everywhere": a Goregaon seeker will happily look in Malad 12 minutes
+    // away, but not in Ghatkopar across the city. Offered before the blunt city-wide reset.
+    out.addAll(nearbyAreaRelaxers(intent));
+
     if ((intent.locations() != null && !intent.locations().isEmpty()) || intent.commuteTo() != null) {
       SearchIntent relaxed = intent.toBuilder().locations(null).commuteTo(null).build();
       long count = countFor(relaxed);
@@ -431,6 +437,62 @@ public class SearchPipeline {
                 "drop the strict filters — %d homes available".formatted(count),
                 broad,
                 count));
+      }
+    }
+    return out;
+  }
+
+  private static final int NEARBY_MAX_MINUTES = 35;
+  private static final int NEARBY_MAX_SUGGESTIONS = 3;
+
+  /**
+   * "Nothing in Goregaon" → "also show Malad, ~12 min away (4 homes)". Each suggestion keeps every
+   * other constraint and only widens the area, so the counts shown are real.
+   */
+  private List<Relaxer> nearbyAreaRelaxers(SearchIntent intent) {
+    List<SearchIntent.LocationRef> requested =
+        intent.locations() == null ? List.of() : intent.locations();
+    UUID anchor =
+        requested.stream()
+            .map(SearchIntent.LocationRef::localityId)
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(intent.commuteTo() == null ? null : intent.commuteTo().localityId());
+    if (anchor == null) {
+      return List.of();
+    }
+    Set<UUID> already =
+        requested.stream()
+            .map(SearchIntent.LocationRef::localityId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toCollection(HashSet::new));
+    String anchorName = localityResolver.nameOf(anchor);
+
+    List<Relaxer> out = new ArrayList<>();
+    for (CommuteEstimator.Nearby nearby :
+        commuteEstimator.nearestLocalities(anchor, NEARBY_MAX_MINUTES, 8)) {
+      if (already.contains(nearby.localityId())) {
+        continue;
+      }
+      String name = localityResolver.nameOf(nearby.localityId());
+      if (name == null) {
+        continue;
+      }
+      List<SearchIntent.LocationRef> widened = new ArrayList<>(requested);
+      widened.add(new SearchIntent.LocationRef(name, nearby.localityId()));
+      SearchIntent relaxed = intent.toBuilder().locations(widened).build();
+      long count = countFor(relaxed);
+      if (count == 0) {
+        continue;
+      }
+      out.add(
+          new Relaxer(
+              "Also show %s (~%d min from %s)".formatted(name, nearby.minutes(), anchorName),
+              "shows %d more".formatted(count),
+              relaxed,
+              count));
+      if (out.size() == NEARBY_MAX_SUGGESTIONS) {
+        break;
       }
     }
     return out;

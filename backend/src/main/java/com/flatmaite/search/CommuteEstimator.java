@@ -3,7 +3,9 @@ package com.flatmaite.search;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
 import jakarta.annotation.PostConstruct;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +43,27 @@ public class CommuteEstimator {
       return null;
     }
     return minutes(a[0], a[1], b[0], b[1]);
+  }
+
+  /** A locality and the estimated travel time to reach it from the anchor. */
+  public record Nearby(UUID localityId, int minutes) {}
+
+  /**
+   * Localities closest to {@code anchor}, nearest first, excluding the anchor itself and anything
+   * beyond {@code maxMinutes}. Used to offer "also look in X, ~12 min away" instead of the blunt
+   * "search everywhere" when a locality has no matches.
+   */
+  public List<Nearby> nearestLocalities(UUID anchor, int maxMinutes, int limit) {
+    if (anchor == null || !centroids.containsKey(anchor)) {
+      return List.of();
+    }
+    return centroids.keySet().stream()
+        .filter(id -> !id.equals(anchor))
+        .map(id -> new Nearby(id, minutesBetween(anchor, id)))
+        .filter(n -> n.minutes() <= maxMinutes)
+        .sorted(Comparator.comparingInt(Nearby::minutes))
+        .limit(limit)
+        .toList();
   }
 
   public Integer minutesFromPoint(Double lat, Double lng, UUID toLocality) {
