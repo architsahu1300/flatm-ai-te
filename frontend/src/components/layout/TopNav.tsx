@@ -85,7 +85,7 @@ export function TopNav({ user }: { user: SessionUser | null }) {
             onBlur={() => setNavFocused(false)}
             placeholder="What are you looking for?"
             aria-label="Search homes and flatmates"
-            className="min-w-0 flex-1 bg-transparent text-text placeholder:text-text-muted outline-none focus:outline-none focus-visible:outline-none"
+            className="min-w-0 flex-1 bg-transparent text-text placeholder:text-text-muted"
           />
           {navQuery.trim().length === 0 && (
             <kbd className="shrink-0 rounded border border-border bg-surface-2 px-1.5 text-[11px] text-text-muted">

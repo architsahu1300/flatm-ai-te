@@ -115,6 +115,29 @@ body {
   outline-offset: 2px;
 }
 
+/* Typing surfaces only are exempt from that ring. Every text field here sits inside a shape that
+   already turns its border brand on focus — the nav pill, the AI search card, or the field's own
+   border — so the global ring drew a second hard-cornered rectangle inside the control.
+   Element-level `focus-visible:outline-none` utilities cannot fix this: Tailwind utilities live in
+   a layer and this file is unlayered, so the rule above wins regardless of specificity.
+   Checkboxes, radios, file inputs, selects and buttons keep the ring — they have no border-colour
+   focus state to fall back on. Anything added to this list needs one. */
+textarea:focus-visible,
+[contenteditable="true"]:focus-visible,
+input:not(
+    [type="checkbox"],
+    [type="radio"],
+    [type="file"],
+    [type="range"],
+    [type="color"],
+    [type="submit"],
+    [type="button"],
+    [type="reset"],
+    [type="image"]
+  ):focus-visible {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

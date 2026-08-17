@@ -81,7 +81,6 @@ export function SearchBox({
         }}
         className={cn(
           "min-w-0 flex-1 resize-none bg-transparent text-text placeholder:text-text-muted",
-          "outline-none focus:outline-none focus-visible:outline-none",
           size === "lg" ? "text-base leading-6" : "text-sm leading-5",
         )}
       />
