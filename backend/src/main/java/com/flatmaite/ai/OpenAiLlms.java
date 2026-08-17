@@ -55,6 +55,11 @@ public final class OpenAiLlms {
     private final String providerName;
 
     @Override
+    public void healthCheck() {
+      chatClient.prompt().user("Reply with the single word OK").call().content();
+    }
+
+    @Override
     public SearchIntent extract(String query, SearchIntent prior) {
       BeanOutputConverter<SearchIntent> converter = new BeanOutputConverter<>(SearchIntent.class);
       String system;

@@ -14,6 +14,12 @@ public interface IntentLlm {
    */
   SearchIntent extract(String query, SearchIntent prior);
 
+  /**
+   * Minimal round-trip that must propagate provider errors — {@link #extract} deliberately swallows
+   * them to fall back, which hides a dead key or retired model. Mock impls stay no-ops.
+   */
+  default void healthCheck() {}
+
   String providerName();
 
   String model();

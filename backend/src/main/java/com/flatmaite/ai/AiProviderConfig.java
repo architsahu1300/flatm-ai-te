@@ -46,7 +46,7 @@ public class AiProviderConfig {
       @Value("${spring.ai.openai.api-key}") String openaiKey,
       @Value("${spring.ai.google.genai.api-key:}") String geminiKey,
       @Value("${spring.ai.openai.chat.options.model:gpt-4o-mini}") String openaiModel,
-      @Value("${spring.ai.google.genai.chat.options.model:gemini-2.5-flash-lite}") String geminiModel) {
+      @Value("${spring.ai.google.genai.chat.options.model:gemini-flash-lite-latest}") String geminiModel) {
     if (useMock(props, provider, openaiKey, geminiKey)) {
       return new MockLlms.MockIntentLlm(keywordParser);
     }
@@ -67,7 +67,7 @@ public class AiProviderConfig {
       @Value("${spring.ai.openai.api-key}") String openaiKey,
       @Value("${spring.ai.google.genai.api-key:}") String geminiKey,
       @Value("${spring.ai.openai.chat.options.model:gpt-4o-mini}") String openaiModel,
-      @Value("${spring.ai.google.genai.chat.options.model:gemini-2.5-flash-lite}") String geminiModel) {
+      @Value("${spring.ai.google.genai.chat.options.model:gemini-flash-lite-latest}") String geminiModel) {
     if (useMock(props, provider, openaiKey, geminiKey)) {
       return new MockLlms.MockExplainerLlm();
     }
