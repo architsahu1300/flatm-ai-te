@@ -6,9 +6,11 @@ import com.flatmaite.common.domain.GenderPreference;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.ListingQueryService;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,15 +19,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Candidate retrieval: hard SQL filters first (CTE), then vector ordering inside the filtered set,
- * unioned with full-text matches. Returns ids + cosine similarity; hydration/scoring happen above.
+ * Candidate retrieval: hard SQL filters first (CTE), then two rankings inside the filtered set —
+ * vector similarity and full-text — merged with Reciprocal Rank Fusion. Returns ids plus a
+ * {@link Retrieval} for every candidate; hydration/scoring happen above.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class HybridRetriever {
 
-  public record Candidate(UUID id, UUID localityId, Double lat, Double lng, Double cosineSim) {}
+  /**
+   * Fused retrieval standing of one candidate. {@code score} is the RRF score normalized so the
+   * best candidate is 1.0 — never null, because a candidate exists only if some ranking produced
+   * it. The hit flags say which rankings did, so the scorer's detail text stays honest.
+   */
+  public record Retrieval(double score, boolean semanticHit, boolean lexicalHit) {}
+
+  public record Candidate(UUID id, UUID localityId, Double lat, Double lng, Retrieval retrieval) {}
 
   private static final int VECTOR_LIMIT = 100;
   private static final int FTS_LIMIT = 50;
@@ -34,6 +44,9 @@ public class HybridRetriever {
   private final EmbeddingProvider embeddingProvider;
   private final CommuteEstimator commuteEstimator;
   private final LocalityResolver localityResolver;
+
+  /** Row attributes carried through fusion, keyed by id while the rankings are collected. */
+  private record Row(UUID localityId, Double lat, Double lng) {}
 
   @Transactional(readOnly = true)
   public List<Candidate> retrieveListings(SearchIntent intent) {
@@ -69,24 +82,31 @@ public class HybridRetriever {
                     : "NULL::float8",
                 withVector ? "embedding <=> CAST(:qvec AS vector) NULLS LAST" : "created_at DESC");
 
-    Map<UUID, Candidate> merged = new LinkedHashMap<>();
+    Map<UUID, Row> rows = new LinkedHashMap<>();
+    List<UUID> vectorRanking = new ArrayList<>();
+    Set<UUID> semanticHits = new HashSet<>();
     jdbc.query(
         vectorSql,
         params,
         rs -> {
           UUID id = rs.getObject("id", UUID.class);
-          double sim = rs.getDouble("sim");
-          merged.put(
+          rs.getDouble("sim");
+          // wasNull() reports the column read immediately before it — keep these two lines adjacent
+          boolean hasSim = !rs.wasNull();
+          vectorRanking.add(id);
+          if (hasSim) {
+            semanticHits.add(id);
+          }
+          rows.putIfAbsent(
               id,
-              new Candidate(
-                  id,
+              new Row(
                   rs.getObject("locality_id", UUID.class),
                   (Double) rs.getObject("lat"),
-                  (Double) rs.getObject("lng"),
-                  rs.wasNull() ? null : sim));
+                  (Double) rs.getObject("lng")));
         });
 
-    // Full-text union on the residual free text
+    // Full-text ranking on the residual free text
+    List<UUID> lexicalRanking = new ArrayList<>();
     if (intent.freeText() != null && !intent.freeText().isBlank()) {
       Map<String, Object> ftsParams = new LinkedHashMap<>();
       String ftsWhere = ListingQueryService.buildWhere(filters, ftsParams);
@@ -106,17 +126,16 @@ public class HybridRetriever {
           ftsParams,
           rs -> {
             UUID id = rs.getObject("id", UUID.class);
-            merged.putIfAbsent(
+            lexicalRanking.add(id);
+            rows.putIfAbsent(
                 id,
-                new Candidate(
-                    id,
+                new Row(
                     rs.getObject("locality_id", UUID.class),
                     (Double) rs.getObject("lat"),
-                    (Double) rs.getObject("lng"),
-                    null));
+                    (Double) rs.getObject("lng")));
           });
     }
-    return new ArrayList<>(merged.values());
+    return fuse(rows, vectorRanking, semanticHits, lexicalRanking);
   }
 
   @Transactional(readOnly = true)
@@ -166,14 +185,40 @@ public class HybridRetriever {
                 where,
                 withVector ? "fp.embedding <=> CAST(:qvec AS vector) NULLS LAST" : "fp.updated_at DESC");
 
-    List<Candidate> out = new ArrayList<>();
+    Map<UUID, Row> rows = new LinkedHashMap<>();
+    List<UUID> vectorRanking = new ArrayList<>();
+    Set<UUID> semanticHits = new HashSet<>();
     jdbc.query(
         sql,
         params,
         rs -> {
-          double sim = rs.getDouble("sim");
-          out.add(new Candidate(rs.getObject("id", UUID.class), null, null, null, rs.wasNull() ? null : sim));
+          UUID id = rs.getObject("id", UUID.class);
+          rs.getDouble("sim");
+          boolean hasSim = !rs.wasNull();
+          vectorRanking.add(id);
+          if (hasSim) {
+            semanticHits.add(id);
+          }
+          rows.putIfAbsent(id, new Row(null, null, null));
         });
+    return fuse(rows, vectorRanking, semanticHits, List.of());
+  }
+
+  /** Merges the rankings with RRF and attaches each candidate's {@link Retrieval}. */
+  private static List<Candidate> fuse(
+      Map<UUID, Row> rows, List<UUID> vectorRanking, Set<UUID> semanticHits, List<UUID> lexicalRanking) {
+    Set<UUID> lexicalHits = new HashSet<>(lexicalRanking);
+    List<Candidate> out = new ArrayList<>();
+    for (RankFusion.Fused f : RankFusion.fuse(List.of(vectorRanking, lexicalRanking))) {
+      Row r = rows.get(f.id());
+      out.add(
+          new Candidate(
+              f.id(),
+              r.localityId(),
+              r.lat(),
+              r.lng(),
+              new Retrieval(f.normalized(), semanticHits.contains(f.id()), lexicalHits.contains(f.id()))));
+    }
     return out;
   }
 

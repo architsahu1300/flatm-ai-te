@@ -237,7 +237,7 @@ public class SearchPipeline {
               lister != null && lister.getEmailVerifiedAt() != null,
               lister != null && lister.getPhoneVerifiedAt() != null,
               idVerified.contains(l.getListerId()),
-              c == null ? null : c.cosineSim(),
+              c == null ? new HybridRetriever.Retrieval(0, false, false) : c.retrieval(),
               commuteMinutes,
               c != null && preferred.contains(c.localityId()));
       rows.add(new Row(l, c, MatchScorer.scoreListing(intent, candidate), commuteMinutes));
@@ -330,7 +330,7 @@ public class SearchPipeline {
               u != null && u.getEmailVerifiedAt() != null,
               u != null && u.getPhoneVerifiedAt() != null,
               idVerified.contains(fp.getUserId()),
-              c == null ? null : c.cosineSim(),
+              c == null ? new HybridRetriever.Retrieval(0, false, false) : c.retrieval(),
               locationOverlap,
               p == null ? 0.3 : p.getProfileCompleteness() / 100.0);
       rows.add(new Row(fp, MatchScorer.scoreFlatmate(intent, viewerProfile, candidate)));

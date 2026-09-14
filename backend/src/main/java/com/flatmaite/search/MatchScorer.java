@@ -34,7 +34,7 @@ public final class MatchScorer {
       boolean emailVerified,
       boolean phoneVerified,
       boolean idOrPropertyVerified,
-      Double cosineSim,
+      HybridRetriever.Retrieval retrieval,
       Integer commuteMinutes,
       boolean inPreferredLocality) {}
 
@@ -44,7 +44,7 @@ public final class MatchScorer {
       boolean emailVerified,
       boolean phoneVerified,
       boolean idVerified,
-      Double cosineSim,
+      HybridRetriever.Retrieval retrieval,
       double locationOverlap,
       double profileCompleteness) {}
 
@@ -119,11 +119,11 @@ public final class MatchScorer {
       parts.add(new Component("lifestyle", 0.20, mean, detail));
     }
 
-    // semantic similarity (.15)
-    if (c.cosineSim() != null) {
-      double rescaled = clamp01((c.cosineSim() - 0.15) / 0.6);
-      parts.add(new Component("semantic", 0.15, rescaled, "Description matches what you asked for"));
-    }
+    // relevance (.15) — always applies: every candidate came from at least one retrieval ranking,
+    // so there is never a missing component whose weight could flow to the others
+    parts.add(
+        new Component(
+            "relevance", 0.15, clamp01(c.retrieval().score()), listingRelevanceDetail(c.retrieval())));
 
     // verification (.10) — always applies
     double verification =
@@ -253,12 +253,10 @@ public final class MatchScorer {
       parts.add(new Component("lifestyle", 0.30, s, intentVsProfileDetail(intent.lifestyleOrEmpty(), c.profile())));
     }
 
-    // semantic (.20)
-    if (c.cosineSim() != null) {
-      parts.add(
-          new Component(
-              "semantic", 0.20, clamp01((c.cosineSim() - 0.15) / 0.6), "Their profile matches your description"));
-    }
+    // relevance (.20) — always applies, see scoreListing
+    parts.add(
+        new Component(
+            "relevance", 0.20, clamp01(c.retrieval().score()), flatmateRelevanceDetail(c.retrieval())));
 
     // budget overlap (.15)
     if (intent.budgetMax() != null && c.flatmate().getBudgetMax() != null) {
@@ -370,6 +368,32 @@ public final class MatchScorer {
     return hits.isEmpty() ? "Compared against what you asked for" : String.join("; ", hits);
   }
 
+  static String listingRelevanceDetail(HybridRetriever.Retrieval r) {
+    if (r.semanticHit() && r.lexicalHit()) {
+      return "Matches your description on both wording and meaning";
+    }
+    if (r.semanticHit()) {
+      return "Description matches what you asked for";
+    }
+    if (r.lexicalHit()) {
+      return "Mentions the specific things you asked for";
+    }
+    return "Newest listings shown — semantic matching unavailable";
+  }
+
+  static String flatmateRelevanceDetail(HybridRetriever.Retrieval r) {
+    if (r.semanticHit() && r.lexicalHit()) {
+      return "Matches your description on both wording and meaning";
+    }
+    if (r.semanticHit()) {
+      return "Their profile matches your description";
+    }
+    if (r.lexicalHit()) {
+      return "Their profile mentions what you asked for";
+    }
+    return "Recently active profiles shown";
+  }
+
   // ------------------------------------------------------------------ shared
 
   /** Renormalizes weights over the components that apply, rounds to a 0–100 score. */
@@ -394,7 +418,7 @@ public final class MatchScorer {
   public static List<String> concernDetails(Scored scored) {
     return scored.breakdown().stream()
         .filter(cmp -> cmp.score() <= 0.35 && cmp.detail() != null && !cmp.detail().isBlank())
-        .filter(cmp -> !Set.of("freshness", "semantic", "completeness").contains(cmp.component()))
+        .filter(cmp -> !Set.of("freshness", "relevance", "completeness").contains(cmp.component()))
         .map(Component::detail)
         .toList();
   }
