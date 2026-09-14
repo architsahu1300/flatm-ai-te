@@ -96,8 +96,10 @@ public List<String> vocabulary()                // "Name (alias, alias)" lines f
 
 Turns `scan` output plus the token stream into roles:
 
-- **exclude** if any of the 3 tokens before the match is in `{not, no, except, excluding, avoid,
-  nahi}` or the 2 tokens are `other than` / `anywhere but` / `apart from`.
+- **exclude** if the token immediately before the match is a cue in `{not, no, except, excluding,
+  avoid, nahi}`, or the token immediately before is a preposition and the token two back is such a
+  cue, or the two tokens before are `other than` / `anywhere but` / `apart from`, or `nahi`/`mat`
+  immediately follows the match.
 - **commute** if any of the 4 tokens before the match is in `{near, nearby, close, around, next,
   within, work, working, office, commute, commuting}` (covers "near BKC", "close to BKC", "work at
   BKC", "office in BKC", "within 20 min of BKC").
@@ -181,7 +183,8 @@ adds a removable "🚫 Not in {name}" chip per exclusion and a removable "📍? 
   `commuteLabel` reads "~12 min from Goregaon (estimate)" for home-locality anchors and keeps
   "~12 min to BKC (estimate)" for commute anchors. Response `note` is set to
   "Also showing nearby areas within ~25 min" when any returned home is outside the requested
-  localities (appended to any existing note).
+  localities **and the intent carries no commute anchor** (with a commute anchor the per-result
+  "~N min to X" label already explains an out-of-area home, appended to any existing note).
 - `MatchScorer.scoreListing` location component: in a requested locality → 1.0; otherwise
   `max(0.3, 1 − minutes / (2 × radius))` where radius = `commuteTo.maxMinutes` for commute intents
   or `nearbyRadiusMinutes` for home intents (passed in via `ListingCandidate.radiusMinutes`).
@@ -216,11 +219,13 @@ adds a removable "🚫 Not in {name}" chip per exclusion and a removable "📍? 
 `NewQueryDetector.decide(String query)` → `Verdict { NEW, REFINE, AMBIGUOUS }`:
 
 1. fresh cue present (`forget that|forget it|start over|new search|scrap that|from scratch`) → NEW
-2. refinement cue present (`make it|instead|also|actually|same but|but in|rather|change (it|the)|
-   only|cheaper|closer|nearer`) → REFINE
-3. anchors = locality (any `scan` match with confidence ≥ 0.75) + budget + roomType + BHK;
-   anchors ≥ 3 → NEW; anchors ≥ 2 and housing noun → NEW; anchors == 0 → REFINE
-4. otherwise AMBIGUOUS
+2. anchors = locality (any `scan` match with confidence ≥ 0.75) + budget + roomType + BHK;
+   anchors ≥ 3 → NEW
+3. refinement cue present (`make it|instead|also|actually|same but|but in|rather|change (it|the)|
+   cheaper|closer|nearer`) → REFINE
+4. anchors ≥ 2 and housing noun → NEW
+5. anchors == 0 → REFINE
+6. otherwise AMBIGUOUS
 
 `isSelfContained(query)` remains as `decide(query) == NEW` (existing tests unchanged).
 
@@ -270,7 +275,8 @@ The fresh path already resets `originalQuery` and `freeText`.
 | Fuzzy match < 0.75 | accepted, but detector does not count it as an anchor; WS4 will lower its confidence |
 | LLM emits an unknown place | moved to `unresolvedLocations`, kept in `freeText`, chip shown |
 | Model returns no `mode` / unparsable | `Mode.UNSURE` → detector's verdict stands (REFINE) |
-| `excludeLocations` removes every admitted locality | empty result → existing relaxers ("Search all of Mumbai" drops both lists) |
+| `excludeLocations` names a requested locality | exclusion wins: the locality is dropped from the request; if nothing requested remains, the search runs city-wide minus the exclusions |
+| `excludeLocations` removes every admitted listing | empty result → existing relaxers; "Search all of Mumbai" drops `locations` and `commuteTo` but keeps `excludeLocations` |
 
 ## 5. Testing
 
