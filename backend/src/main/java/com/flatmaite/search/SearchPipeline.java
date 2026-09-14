@@ -133,26 +133,18 @@ public class SearchPipeline {
     return resolved;
   }
 
-  /** Deterministic name→id resolution; unresolved names stay as free-text signal only. */
+  /** Name → id binding; names no layer can place are surfaced and logged for the eval report. */
   private SearchIntent resolveLocalities(SearchIntent intent) {
-    if (intent.locations() == null && intent.commuteTo() == null) {
-      return intent;
-    }
-    List<SearchIntent.LocationRef> resolved = null;
-    if (intent.locations() != null) {
-      resolved = new ArrayList<>();
-      for (SearchIntent.LocationRef ref : intent.locations()) {
-        UUID id = ref.localityId() != null ? ref.localityId() : firstId(localityResolver.resolve(ref.name()));
-        resolved.add(new SearchIntent.LocationRef(ref.name(), id));
+    SearchIntent resolved = IntentLocalities.resolve(intent, localityResolver);
+    List<String> before = intent.unresolvedLocations() == null ? List.of() : intent.unresolvedLocations();
+    if (resolved.unresolvedLocations() != null) {
+      for (String name : resolved.unresolvedLocations()) {
+        if (!before.contains(name)) {
+          log.info("search.unresolved-locality name=\"{}\" query=\"{}\"", name, intent.originalQuery());
+        }
       }
     }
-    SearchIntent.CommuteTo commute = intent.commuteTo();
-    if (commute != null && commute.localityId() == null) {
-      commute =
-          new SearchIntent.CommuteTo(
-              commute.place(), firstId(localityResolver.resolve(commute.place())), commute.maxMinutes());
-    }
-    return intent.toBuilder().locations(resolved).commuteTo(commute).build();
+    return resolved;
   }
 
   // ------------------------------------------------------------- search
@@ -520,9 +512,5 @@ public class SearchPipeline {
     String normalized = query.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", " ");
     String priorPart = prior == null ? "" : String.valueOf(prior.hashCode());
     return EmbeddingTextComposer.sha256(normalized + "|" + priorPart);
-  }
-
-  private static UUID firstId(java.util.Optional<LocalityResolver.Match> match) {
-    return match.map(m -> m.localityIds().get(0)).orElse(null);
   }
 }

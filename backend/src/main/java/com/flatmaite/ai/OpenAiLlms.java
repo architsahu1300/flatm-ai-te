@@ -20,33 +20,63 @@ public final class OpenAiLlms {
 
   private OpenAiLlms() {}
 
-  private static final String INTENT_SYSTEM =
+  static final String INTENT_RULES =
       """
       You convert flat/flatmate search queries for Mumbai into a structured SearchIntent JSON.
       Rules:
       - Only extract what the user actually said. Unknown fields stay null. Never invent budgets or places.
-      - Amounts: "25k" = 25000 rupees/month, "1 lakh" = 100000.
+      - Amounts: "25k" = 25000 rupees/month, "1 lakh" = 100000. budgetMax for ceilings ("under 25k"),
+        budgetMin for floors ("more than 30000", "at least 20k"), both for ranges ("between 20k and 30k").
       - searchTarget: PROPERTIES for rooms/flats, FLATMATES when they look for a person, BOTH when genuinely both.
-      - locations: names as the user said them (e.g. "BKC", "Andheri"). Do not guess ids; leave localityId null.
+      - locations: where they want to live. excludeLocations: places to avoid ("anywhere but Andheri", "not in Bandra").
+        Do not guess ids; leave localityId null.
       - commuteTo: set when they mention working somewhere or wanting to be near/within X minutes of a place.
       - lifestyle.smoking: NO_SMOKERS when they don't want smokers. lifestyle.quiet: true when they want a calm/quiet home or no party house.
       - freeText: any residual nuance not captured by structured fields.
       """
           + com.flatmaite.search.RentalVocabulary.GLOSSARY;
 
-  private static final String REFINE_SYSTEM =
+  static final String EXAMPLES =
       """
-      You update an existing SearchIntent JSON given a follow-up message from the user.
-      Apply the modification and return the FULL updated intent (not a delta).
-      "cheaper" reduces budgetMax ~10%%. "closer" tightens commuteTo.maxMinutes ~20%%.
-      Keep every field the user did not change. Unknown fields stay null.
-      If the message is a complete request of its own (it states its own location, budget or room
-      type), REPLACE the intent with just what that message says — do not carry anything over.
-      Current intent JSON:
-      %s
+      Examples (query → JSON, abbreviated to the fields that matter):
+      "single sharing room in powai under 25k" → {"searchTarget":"PROPERTIES","locations":[{"name":"Powai"}],"budgetMax":25000,"roomType":"PRIVATE"}
+      "Single sharing room chahiye powai me budget 40k hai" → {"searchTarget":"PROPERTIES","locations":[{"name":"Powai"}],"budgetMax":40000,"roomType":"PRIVATE"}
+      "anywhere but Andheri, budget 25k" → {"searchTarget":"PROPERTIES","excludeLocations":[{"name":"Andheri East"},{"name":"Andheri West"}],"budgetMax":25000}
+      "room in Andheri, I work at BKC" → {"searchTarget":"PROPERTIES","locations":[{"name":"Andheri East"},{"name":"Andheri West"}],"commuteTo":{"place":"BKC","maxMinutes":30},"roomType":"PRIVATE"}
+      "flat for twenty five thousand in Malad" → {"searchTarget":"PROPERTIES","locations":[{"name":"Malad"}],"budgetMax":25000}
+      "2bhk in Goregaon, more than 30000" → {"searchTarget":"PROPERTIES","locations":[{"name":"Goregaon"}],"bhk":{"min":2,"max":2},"budgetMin":30000,"roomType":"ENTIRE"}
+      "between 20k and 30k near Dadar" → {"searchTarget":"PROPERTIES","commuteTo":{"place":"Dadar","maxMinutes":30},"budgetMin":20000,"budgetMax":30000}
+      "female flatmate, no pets, quiet" → {"searchTarget":"FLATMATES","genderPreference":"FEMALE_ONLY","lifestyle":{"pets":"NO_PETS","quiet":true}}
+      "1bhk near Hiranandani Gardens" → {"searchTarget":"PROPERTIES","commuteTo":{"place":"Powai","maxMinutes":30},"bhk":{"min":1,"max":1},"roomType":"ENTIRE"}
       """;
 
-  @RequiredArgsConstructor
+  /** Rules + glossary + the controlled locality vocabulary + worked examples. Built once per bean. */
+  static String intentSystem(List<String> vocabulary) {
+    return INTENT_RULES
+        + "\nKnown localities — use these canonical names in locations, excludeLocations and commuteTo; map"
+        + " landmarks and aliases onto them; a place not in this list goes into locations exactly as the"
+        + " user wrote it:\n"
+        + String.join("\n", vocabulary)
+        + "\n\n"
+        + EXAMPLES;
+  }
+
+  static final String REFINE_SYSTEM =
+      """
+      You update an existing SearchIntent JSON given the user's follow-up message.
+      Apply the follow-up to the current intent and return the FULL merged intent — never drop
+      fields the user did not change. "cheaper" reduces budgetMax ~10%. "closer" tightens
+      commuteTo.maxMinutes ~20%. Unknown fields stay null.
+      Also report mode: NEW if the follow-up reads as a complete request on its own, REFINE if it
+      adjusts the current search, UNSURE otherwise. The caller decides what to do with it — you
+      always merge.
+      """;
+
+  /** The prior intent contains the user's own words, so it travels in the user role, never the system role. */
+  static String refineUserMessage(String priorJson, String query) {
+    return "Current intent:\n" + priorJson + "\n\nFollow-up:\n" + query;
+  }
+
   @Slf4j
   public static class OpenAiIntentLlm implements IntentLlm {
 
@@ -55,6 +85,22 @@ public final class OpenAiLlms {
     private final ObjectMapper objectMapper;
     private final String modelName;
     private final String providerName;
+    private final String intentSystem;
+
+    public OpenAiIntentLlm(
+        ChatClient chatClient,
+        KeywordIntentParser fallback,
+        ObjectMapper objectMapper,
+        String modelName,
+        String providerName,
+        com.flatmaite.search.LocalityResolver localityResolver) {
+      this.chatClient = chatClient;
+      this.fallback = fallback;
+      this.objectMapper = objectMapper;
+      this.modelName = modelName;
+      this.providerName = providerName;
+      this.intentSystem = intentSystem(localityResolver.vocabulary());
+    }
 
     @Override
     public void healthCheck() {
@@ -63,53 +109,65 @@ public final class OpenAiLlms {
 
     @Override
     public SearchIntent extract(String query, SearchIntent prior) {
-      BeanOutputConverter<SearchIntent> converter = new BeanOutputConverter<>(SearchIntent.class);
-      String system;
+      return extractWithMode(query, prior).intent();
+    }
+
+    @Override
+    public Extraction extractWithMode(String query, SearchIntent prior) {
       if (prior == null) {
-        system = INTENT_SYSTEM;
-      } else {
-        String priorJson;
+        BeanOutputConverter<SearchIntent> converter = new BeanOutputConverter<>(SearchIntent.class);
         try {
-          priorJson = objectMapper.writeValueAsString(prior);
-        } catch (Exception e) {
-          priorJson = "{}";
+          return new Extraction(finish(call(intentSystem, query, converter, null), query, null), Mode.NONE);
+        } catch (Exception first) {
+          log.warn("Intent extraction failed, attempting repair: {}", first.getMessage());
+          try {
+            return new Extraction(finish(call(intentSystem, query, converter, first.getMessage()), query, null), Mode.NONE);
+          } catch (Exception second) {
+            log.warn("Intent repair failed, using keyword fallback: {}", second.getMessage());
+            return new Extraction(fallback.parse(query), Mode.NONE);
+          }
         }
-        system = REFINE_SYSTEM.formatted(priorJson);
       }
+      BeanOutputConverter<RefineResult> converter = new BeanOutputConverter<>(RefineResult.class);
+      String priorJson;
       try {
-        SearchIntent extracted = call(system, query, converter, null);
-        return finish(extracted, query, prior);
+        priorJson = objectMapper.writeValueAsString(prior);
+      } catch (Exception e) {
+        priorJson = "{}";
+      }
+      String user = refineUserMessage(priorJson, query);
+      try {
+        RefineResult result = call(REFINE_SYSTEM, user, converter, null);
+        return new Extraction(finish(result.intent(), query, prior), Mode.parse(result.mode()));
       } catch (Exception first) {
-        log.warn("Intent extraction failed, attempting repair: {}", first.getMessage());
+        log.warn("Intent refinement failed, attempting repair: {}", first.getMessage());
         try {
-          SearchIntent extracted = call(system, query, converter, first.getMessage());
-          return finish(extracted, query, prior);
+          RefineResult result = call(REFINE_SYSTEM, user, converter, first.getMessage());
+          return new Extraction(finish(result.intent(), query, prior), Mode.parse(result.mode()));
         } catch (Exception second) {
-          log.warn("Intent repair failed, using keyword fallback: {}", second.getMessage());
-          SearchIntent parsed = fallback.parse(query);
-          return prior == null ? parsed : new MockLlms.MockIntentLlm(fallback).extract(query, prior);
+          log.warn("Intent refinement repair failed, using keyword merge: {}", second.getMessage());
+          return new Extraction(new MockLlms.MockIntentLlm(fallback).extract(query, prior), Mode.NONE);
         }
       }
     }
 
-    private SearchIntent call(
-        String system, String query, BeanOutputConverter<SearchIntent> converter, String repairHint) {
-      String user =
+    private <T> T call(String system, String user, BeanOutputConverter<T> converter, String repairHint) {
+      String content =
           repairHint == null
-              ? query
-              : query + "\n\n(Your previous output was invalid: " + repairHint + ". Return valid JSON only.)";
+              ? user
+              : user + "\n\n(Your previous output was invalid: " + repairHint + ". Return valid JSON only.)";
       String raw =
           chatClient
               .prompt()
               .system(system + "\n" + converter.getFormat())
-              .user(user)
+              .user(content)
               .call()
               .content();
-      SearchIntent intent = converter.convert(raw);
-      if (intent == null) {
+      T parsed = converter.convert(raw);
+      if (parsed == null) {
         throw new IllegalStateException("Converter returned null");
       }
-      return intent;
+      return parsed;
     }
 
     /**

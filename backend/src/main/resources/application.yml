@@ -31,7 +31,7 @@ spring:
       chat:
         options:
           model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
-          temperature: 0.2
+          temperature: 0
       embedding:
         options:
           model: ${OPENAI_EMBEDDING_MODEL:text-embedding-3-small}
@@ -41,7 +41,7 @@ spring:
         chat:
           options:
             model: ${GEMINI_CHAT_MODEL:gemini-flash-lite-latest}
-            temperature: 0.2
+            temperature: 0
         embedding:
           # placeholder default: this connection bean constructs on every boot (no property gate
           # upstream) and rejects a blank key — the model bean itself only exists in gemini mode

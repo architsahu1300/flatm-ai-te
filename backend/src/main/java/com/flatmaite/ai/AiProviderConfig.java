@@ -41,6 +41,7 @@ public class AiProviderConfig {
       FlatmaiteProperties props,
       ObjectProvider<org.springframework.ai.chat.model.ChatModel> chatModel,
       com.flatmaite.search.KeywordIntentParser keywordParser,
+      com.flatmaite.search.LocalityResolver localityResolver,
       com.fasterxml.jackson.databind.ObjectMapper objectMapper,
       @Value("${spring.ai.model.chat:openai}") String provider,
       @Value("${spring.ai.openai.api-key}") String openaiKey,
@@ -55,7 +56,8 @@ public class AiProviderConfig {
         keywordParser,
         objectMapper,
         chatModelName(provider, openaiModel, geminiModel),
-        provider);
+        provider,
+        localityResolver);
   }
 
   @Bean
