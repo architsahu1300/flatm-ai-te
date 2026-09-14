@@ -1942,6 +1942,15 @@ class KeywordIntentParserTest {
   }
 
   @Test
+  void bareNumbers_areBudgetsOnlyWithMoneyContext() {
+    assertThat(parser.parse("flat near pincode 400076").budgetMax()).isNull();
+    assertThat(parser.parse("1200 sqft flat in powai").budgetMax()).isNull();
+    assertThat(parser.parse("room for 25000").budgetMax()).isEqualTo(25000);
+    assertThat(parser.parse("25000 rent in powai").budgetMax()).isEqualTo(25000);
+    assertThat(parser.parse("rs 25000 in powai").budgetMax()).isEqualTo(25000);
+  }
+
+  @Test
   void spelledOutAmounts_matchTheGlossary() {
     assertThat(parser.parse("room for twenty five thousand in malad").budgetMax()).isEqualTo(25000);
     assertThat(parser.parse("flat around one and a half lakh").budgetMax()).isEqualTo(150000);
@@ -2073,13 +2082,21 @@ public class KeywordIntentParser {
       Set.of("above", "over", "least", "minimum", "min", "from", "starting", "upwards");
   static final Set<String> CEILING_CUES =
       Set.of("under", "below", "upto", "max", "maximum", "within", "cap", "budget");
-  private static final Set<String> RANGE_JOINERS = Set.of("and", "to");
+  /** Words that make a bare number read as money: every floor/ceiling cue plus these. */
+  static final Set<String> MONEY_BEFORE =
+      Set.of("for", "at", "around", "approx", "approximately", "rent", "than", "between", "rs", "inr", "price", "budget");
+  static final Set<String> MONEY_AFTER =
+      Set.of("rent", "rs", "rupees", "inr", "pm", "month", "monthly", "budget", "per", "p");
   private static final int CUE_WINDOW = 3;
 
   private final LocalityResolver localityResolver;
 
-  /** An amount in rupees with the character span it came from (in the lower-cased query). */
-  private record Amount(int value, int start, int end) {}
+  /**
+   * An amount in rupees with the character span it came from (in the lower-cased query).
+   * {@code bare} = a plain 4–7 digit number with no k/lakh/currency marker — it only counts as money
+   * when money words surround it (otherwise it is a pincode, an area, a year).
+   */
+  private record Amount(int value, int start, int end, boolean bare) {}
 
   public SearchIntent parse(String query) {
     String q = query.toLowerCase(Locale.ROOT);
@@ -2112,14 +2129,17 @@ public class KeywordIntentParser {
       int ti = tokenIndexAt(tokens, amt.start());
       int afterTi = tokenIndexAt(tokens, amt.end());
       List<String> before = precedingWords(tokens, ti, CUE_WINDOW);
+      Amount next = a + 1 < amounts.size() ? amounts.get(a + 1) : null;
+      if (amt.bare() && !moneyContext(tokens, ti, afterTi, before, next)) {
+        continue; // "pincode 400076", "1200 sqft": a number, not a budget
+      }
       if (isDeposit(tokens, ti, afterTi, usedDepositCues)) {
         if (maxDeposit == null) {
           maxDeposit = amt.value();
         }
         continue;
       }
-      if (a + 1 < amounts.size()) {
-        Amount next = amounts.get(a + 1);
+      if (next != null) {
         int nextTi = tokenIndexAt(tokens, next.start());
         if (isRange(tokens, afterTi, nextTi, before)) {
           budgetMin = Math.min(amt.value(), next.value());
@@ -2282,28 +2302,41 @@ public class KeywordIntentParser {
   /** Every rupee amount in the text, in order, with spelled-out phrases included and overlaps dropped. */
   private static List<Amount> amounts(String q) {
     List<Amount> out = new ArrayList<>();
-    collect(out, AMOUNT_LAKH.matcher(q), g -> (int) Math.round(Double.parseDouble(g) * 100_000));
-    collect(out, AMOUNT_K.matcher(q), g -> (int) Math.round(Double.parseDouble(g) * 1_000));
-    collect(out, AMOUNT_RUPEE.matcher(q), g -> Integer.parseInt(g.replace(",", "")));
-    collect(out, AMOUNT_PLAIN.matcher(q), Integer::parseInt);
+    collect(out, AMOUNT_LAKH.matcher(q), g -> (int) Math.round(Double.parseDouble(g) * 100_000), false);
+    collect(out, AMOUNT_K.matcher(q), g -> (int) Math.round(Double.parseDouble(g) * 1_000), false);
+    collect(out, AMOUNT_RUPEE.matcher(q), g -> Integer.parseInt(g.replace(",", "")), false);
+    collect(out, AMOUNT_PLAIN.matcher(q), Integer::parseInt, true);
     Matcher words = NumberWords.NUMBER_RUN.matcher(q);
     while (words.find()) {
       OptionalInt value = NumberWords.parse(words.group());
       int end = words.start() + words.group().trim().length();
       if (value.isPresent() && value.getAsInt() >= 1_000 && !overlaps(out, words.start(), end)) {
-        out.add(new Amount(value.getAsInt(), words.start(), end));
+        out.add(new Amount(value.getAsInt(), words.start(), end, false));
       }
     }
     out.sort((a, b) -> Integer.compare(a.start(), b.start()));
     return out;
   }
 
-  private static void collect(List<Amount> out, Matcher m, java.util.function.ToIntFunction<String> toRupees) {
+  private static void collect(
+      List<Amount> out, Matcher m, java.util.function.ToIntFunction<String> toRupees, boolean bare) {
     while (m.find()) {
       if (!overlaps(out, m.start(), m.end())) {
-        out.add(new Amount(toRupees.applyAsInt(m.group(1)), m.start(), m.end()));
+        out.add(new Amount(toRupees.applyAsInt(m.group(1)), m.start(), m.end(), bare));
       }
     }
+  }
+
+  /** A bare number is money when a money cue precedes it, a money word follows it, or it opens a range. */
+  private static boolean moneyContext(
+      List<Tokens.Token> tokens, int ti, int afterTi, List<String> before, Amount next) {
+    if (before.stream().anyMatch(w -> MONEY_BEFORE.contains(w) || FLOOR_CUES.contains(w) || CEILING_CUES.contains(w))) {
+      return true;
+    }
+    if (afterTi < tokens.size() && (MONEY_AFTER.contains(tokens.get(afterTi).text()) || tokens.get(afterTi).text().equals("deposit"))) {
+      return true;
+    }
+    return next != null && isRange(tokens, afterTi, tokenIndexAt(tokens, next.start()), before);
   }
 
   private static boolean overlaps(List<Amount> amounts, int start, int end) {
@@ -2407,7 +2440,7 @@ public class KeywordIntentParser {
 - [ ] **Step 4: Run the parser test, then every pure suite**
 
 Run: `./mvnw test -Dtest=KeywordIntentParserTest 2>&1 | tail -15`
-Expected: 11 tests, `Failures: 0`.
+Expected: 12 tests, `Failures: 0`.
 
 Run: `./mvnw test -Dtest='KeywordIntentParserTest,NewQueryDetectorTest,MockIntentLlmTest,RentalVocabularyTest,LocalityResolverTest,LocationMentionsTest,NumberWordsTest' 2>&1 | tail -20`
 Expected: all green — the detector's 13 cases and the mock LLM's 5 cases still pass on the new parser.
@@ -3387,7 +3420,7 @@ In `README.md`, in the "Backend (all optional in dev …)" environment table, ad
 - [ ] **Step 2: Full backend build (Docker running)**
 
 Run: `./mvnw verify 2>&1 | grep -E "Tests run:.*in com\.|Tests run: [0-9]+, Failures|BUILD|ERROR\]" | tail -40`
-Expected: every class green — new: `TokensTest` 5, `NumberWordsTest` 6, `TrigramsTest` 4, `LocalityResolverTest` 10, `LocationMentionsTest` 6, `ListingQueryServiceWhereTest` 2, `KeywordIntentParserTest` 11, `IntentLlmModeTest` 3, `OpenAiLlmsPromptTest` 3, `IntentLocalitiesTest` 7, `LocationWideningIntegrationTest` 4; changed: `MatchScorerTest` 11, `MockIntentLlmTest` 5, `NewQueryDetectorTest` 19, `SearchPipelineIntegrationTest` 5; unchanged WS1/WS0 suites — `BUILD SUCCESS`.
+Expected: every class green — new: `TokensTest` 5, `NumberWordsTest` 8, `TrigramsTest` 4, `LocalityResolverTest` 10, `LocationMentionsTest` 6, `ListingQueryServiceWhereTest` 2, `KeywordIntentParserTest` 12, `IntentLlmModeTest` 3, `OpenAiLlmsPromptTest` 3, `IntentLocalitiesTest` 7, `LocationWideningIntegrationTest` 4; changed: `MatchScorerTest` 11, `MockIntentLlmTest` 5, `NewQueryDetectorTest` 19, `SearchPipelineIntegrationTest` 5; unchanged WS1/WS0 suites — `BUILD SUCCESS`.
 
 - [ ] **Step 3: Frontend type check**
 
