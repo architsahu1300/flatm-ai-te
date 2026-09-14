@@ -50,7 +50,7 @@ class MatchScorerTest {
 
   private ListingCandidate candidate(Listing l, boolean preferred, Integer commute, Retrieval retrieval) {
     return new ListingCandidate(
-        l, UUID.randomUUID(), "BKC", true, true, true, retrieval, commute, preferred);
+        l, UUID.randomUUID(), "BKC", true, true, true, retrieval, commute, "BKC", true, 30, preferred);
   }
 
   @Test
@@ -169,6 +169,28 @@ class MatchScorerTest {
     double farLoc = component(far, "location").score();
     assertThat(nearLoc).isGreaterThan(farLoc);
     assertThat(component(far, "location").detail()).contains("~55 min");
+  }
+
+  @Test
+  void nearbyLocality_decaysWithDistance_andFloorsAtMinimum() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .locations(List.of(new LocationRef("Goregaon", UUID.randomUUID())))
+            .build();
+    Listing l = listing(20000, null, null);
+
+    MatchScorer.Scored near =
+        MatchScorer.scoreListing(intent, new ListingCandidate(l, UUID.randomUUID(), "Malad", true, true, true, SEMANTIC_TOP, 12, "Goregaon", false, 25, false));
+    MatchScorer.Scored edge =
+        MatchScorer.scoreListing(intent, new ListingCandidate(l, UUID.randomUUID(), "Kandivali", true, true, true, SEMANTIC_TOP, 25, "Goregaon", false, 25, false));
+    MatchScorer.Scored far =
+        MatchScorer.scoreListing(intent, new ListingCandidate(l, UUID.randomUUID(), "Colaba", true, true, true, SEMANTIC_TOP, 60, "Goregaon", false, 25, false));
+
+    assertThat(component(near, "location").score()).isCloseTo(0.76, within(0.001));
+    assertThat(component(edge, "location").score()).isCloseTo(0.5, within(0.001));
+    assertThat(component(far, "location").score()).isEqualTo(MatchScorer.MIN_LOCATION_SCORE);
+    assertThat(component(near, "location").detail()).isEqualTo("~12 min from Goregaon (estimate)");
   }
 
   @Test

@@ -2,10 +2,12 @@ package com.flatmaite.search;
 
 import com.flatmaite.ai.EmbeddingProvider;
 import com.flatmaite.ai.VectorStoreWriter;
+import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.common.domain.GenderPreference;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.ListingQueryService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,6 +55,7 @@ public class HybridRetriever {
   private final EmbeddingProvider embeddingProvider;
   private final CommuteEstimator commuteEstimator;
   private final LocalityResolver localityResolver;
+  private final FlatmaiteProperties props;
 
   /** Row attributes carried through fusion, keyed by id while the rankings are collected. */
   private record Row(UUID localityId, Double lat, Double lng) {}
@@ -348,34 +351,37 @@ public class HybridRetriever {
   }
 
   /**
-   * Requested localities ∪ commute-radius expansion, minus exclusions. Empty list = no locality
-   * hard filter (the location signal then only affects scoring).
+   * Requested localities plus everything within the nearby radius of each; plus the commute
+   * radius when a workplace is named; minus exclusions. Requested ids come first, then by minutes.
+   * Empty list = no locality hard filter (the location signal then only affects scoring).
    */
   public List<UUID> admittedLocalityIds(SearchIntent intent) {
-    List<UUID> ids = new ArrayList<>(requestedLocalityIds(intent));
+    List<UUID> requested = requestedLocalityIds(intent);
+    Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
+    LinkedHashSet<UUID> admitted = new LinkedHashSet<>(requested);
+    Map<UUID, Integer> nearbyMinutes = new HashMap<>();
+    int radius = props.getSearch().getNearbyRadiusMinutes();
+    for (UUID id : requested) {
+      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radius, Integer.MAX_VALUE)) {
+        nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+      }
+    }
     UUID anchor = commuteAnchor(intent);
     if (anchor != null) {
       int maxMinutes =
           intent.commuteTo().maxMinutes() == null
               ? SearchIntent.DEFAULT_COMMUTE_MINUTES
               : intent.commuteTo().maxMinutes();
-      for (UUID locality : allLocalityIds()) {
-        Integer minutes = commuteEstimator.minutesBetween(locality, anchor);
-        if (minutes != null && minutes <= maxMinutes && !ids.contains(locality)) {
-          ids.add(locality);
-        }
+      nearbyMinutes.merge(anchor, 0, Math::min);
+      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, maxMinutes, Integer.MAX_VALUE)) {
+        nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
       }
     }
-    ids.removeAll(excludedLocalityIds(intent));
-    return ids;
-  }
-
-  private List<UUID> allLocalityIds() {
-    List<UUID> ids = new ArrayList<>();
-    jdbc.query("SELECT id FROM localities", Map.of(), rs -> {
-      ids.add(rs.getObject("id", UUID.class));
-    });
-    return ids;
+    nearbyMinutes.entrySet().stream()
+        .sorted(Map.Entry.comparingByValue())
+        .forEach(e -> admitted.add(e.getKey()));
+    admitted.removeAll(excluded);
+    return new ArrayList<>(admitted);
   }
 
   /**

@@ -14,6 +14,7 @@ public class FlatmaiteProperties {
   private Ai ai = new Ai();
   private Google google = new Google();
   private Storage storage = new Storage();
+  private Search search = new Search();
   private String frontendUrl = "http://localhost:3000";
 
   @Getter
@@ -53,5 +54,12 @@ public class FlatmaiteProperties {
   @Setter
   public static class Storage {
     private String uploadDir = "./uploads";
+  }
+
+  @Getter
+  @Setter
+  public static class Search {
+    /** A named home locality also admits every locality within this many estimated minutes. */
+    private int nearbyRadiusMinutes = 25;
   }
 }

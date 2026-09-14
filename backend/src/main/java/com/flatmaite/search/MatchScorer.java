@@ -23,6 +23,9 @@ public final class MatchScorer {
 
   private MatchScorer() {}
 
+  /** Location score for anything admitted from the surrounding radius never drops below this. */
+  public static final double MIN_LOCATION_SCORE = 0.3;
+
   public record Component(String component, double weight, double score, String detail) {}
 
   public record Scored(int matchScore, List<Component> breakdown) {}
@@ -36,6 +39,9 @@ public final class MatchScorer {
       boolean idOrPropertyVerified,
       HybridRetriever.Retrieval retrieval,
       Integer commuteMinutes,
+      String anchorName,
+      boolean anchorIsCommute,
+      int radiusMinutes,
       boolean inPreferredLocality) {}
 
   public record FlatmateCandidate(
@@ -76,7 +82,9 @@ public final class MatchScorer {
       parts.add(new Component("budgetFit", 0.20, score, detail));
     }
 
-    // location / commute (.20) — applies when the intent has any location signal
+    // location (.20) — applies when the intent has any location signal. In a requested locality
+    // → 1.0; anything admitted from the surrounding radius decays with distance to the nearest
+    // requested locality (or the commute anchor), floored so nearby never reads as "wrong".
     boolean hasLocationSignal =
         (intent.locations() != null && !intent.locations().isEmpty()) || intent.commuteTo() != null;
     if (hasLocationSignal) {
@@ -86,20 +94,13 @@ public final class MatchScorer {
         score = 1.0;
         detail = "In %s — one of your preferred areas".formatted(c.localityName());
       } else if (c.commuteMinutes() != null) {
-        int maxMinutes =
-            intent.commuteTo() != null && intent.commuteTo().maxMinutes() != null
-                ? intent.commuteTo().maxMinutes()
-                : SearchIntent.DEFAULT_COMMUTE_MINUTES;
-        String place =
-            intent.commuteTo() != null ? intent.commuteTo().place() : "your preferred area";
-        if (c.commuteMinutes() <= 20) {
-          score = 0.9;
-        } else {
-          score = clamp01(1.0 - (double) c.commuteMinutes() / (2.0 * maxMinutes));
-        }
-        detail = "~%d min to %s (estimate)".formatted(c.commuteMinutes(), place);
+        int radius = Math.max(1, c.radiusMinutes());
+        score = Math.max(MIN_LOCATION_SCORE, 1.0 - c.commuteMinutes() / (2.0 * radius));
+        detail =
+            "~%d min %s %s (estimate)"
+                .formatted(c.commuteMinutes(), c.anchorIsCommute() ? "to" : "from", c.anchorName());
       } else {
-        score = 0.3;
+        score = MIN_LOCATION_SCORE;
         detail = "Outside your preferred areas";
       }
       parts.add(new Component("location", 0.20, score, detail));

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flatmaite.ai.ExplainerLlm.Explanation;
 import com.flatmaite.ai.EmbeddingTextComposer;
 import com.flatmaite.ai.IntentLlm;
+import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.common.domain.AiFeature;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.common.domain.VerificationStatus;
@@ -38,10 +39,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -75,9 +74,13 @@ public class SearchPipeline {
   private final ExplanationService explanationService;
   private final AiUsageService usageService;
   private final ObjectMapper objectMapper;
+  private final FlatmaiteProperties props;
 
   private final Cache<String, SearchIntent> intentCache =
       Caffeine.newBuilder().maximumSize(5_000).expireAfterWrite(Duration.ofHours(24)).build();
+
+  /** Ranked homes plus whether any came from outside the requested localities. */
+  private record Homes(List<AiResult> results, boolean includesNearby, int radiusMinutes) {}
 
   // ------------------------------------------------------------- intent
 
@@ -164,30 +167,38 @@ public class SearchPipeline {
     String intentHash = EmbeddingTextComposer.sha256(intentJson(intent));
     SearchTarget target = intent.targetOrDefault();
 
-    List<AiResult> homes =
-        target == SearchTarget.FLATMATES ? List.of() : searchHomes(intent, intentHash, viewerId, anonKey);
+    Homes homes =
+        target == SearchTarget.FLATMATES
+            ? new Homes(List.of(), false, 0)
+            : searchHomes(intent, intentHash, viewerId, anonKey);
     List<AiResult> flatmates =
         target == SearchTarget.PROPERTIES ? List.of() : searchFlatmates(intent, intentHash, viewerId, anonKey);
 
     List<Relaxer> relaxers = List.of();
-    if (homes.isEmpty() && target != SearchTarget.FLATMATES) {
+    if (homes.results().isEmpty() && target != SearchTarget.FLATMATES) {
       relaxers = computeRelaxers(intent);
+    }
+
+    String finalNote = note;
+    if (homes.includesNearby()) {
+      String nearby = "Also showing nearby areas within ~%d min.".formatted(homes.radiusMinutes());
+      finalNote = note == null ? nearby : note + " " + nearby;
     }
 
     return new SearchDtos.AiSearchResponse(
         sessionId,
         intent,
         explanationService.usesLlm() ? explanationService.providerName() : "mock",
-        homes,
+        homes.results(),
         flatmates,
         relaxers,
-        note);
+        finalNote);
   }
 
-  private List<AiResult> searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
+  private Homes searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
     List<Candidate> candidates = retriever.retrieveListings(intent);
     if (candidates.isEmpty()) {
-      return List.of();
+      return new Homes(List.of(), false, 0);
     }
     Map<UUID, Candidate> byId = new LinkedHashMap<>();
     candidates.forEach(c -> byId.put(c.id(), c));
@@ -205,30 +216,40 @@ public class SearchPipeline {
       }
     }
 
-    // preferred localities (not the commute-expanded set)
-    Set<UUID> preferred = new HashSet<>();
-    if (intent.locations() != null) {
-      intent.locations().forEach(l -> {
-        if (l.localityId() != null) preferred.add(l.localityId());
-      });
-    }
-    UUID commuteAnchor =
-        intent.commuteTo() == null
-            ? (preferred.isEmpty() ? null : preferred.iterator().next())
-            : intent.commuteTo().localityId();
+    // requested localities (not the widened set) — distances are measured from the nearest one
+    Set<UUID> preferred = new HashSet<>(retriever.requestedLocalityIds(intent));
+    boolean commuteIntent = intent.commuteTo() != null && intent.commuteTo().localityId() != null;
+    UUID commuteAnchor = commuteIntent ? intent.commuteTo().localityId() : null;
+    int radius =
+        commuteIntent
+            ? (intent.commuteTo().maxMinutes() == null
+                ? SearchIntent.DEFAULT_COMMUTE_MINUTES
+                : intent.commuteTo().maxMinutes())
+            : props.getSearch().getNearbyRadiusMinutes();
 
-    record Row(Listing listing, Candidate candidate, Scored scored, Integer commute) {}
+    record Row(Listing listing, Candidate candidate, Scored scored, Integer commute, String anchorName, boolean inPreferred) {}
     List<Row> rows = new ArrayList<>();
     for (Listing l : hydrated) {
       Candidate c = byId.get(l.getId());
       User lister = userById.get(l.getListerId());
+      boolean inPreferred = c != null && preferred.contains(c.localityId());
+      UUID anchor = commuteAnchor;
       Integer commuteMinutes = null;
-      if (commuteAnchor != null && c != null) {
-        commuteMinutes =
-            c.lat() != null
-                ? commuteEstimator.minutesFromPoint(c.lat(), c.lng(), commuteAnchor)
-                : commuteEstimator.minutesBetween(c.localityId(), commuteAnchor);
+      if (c != null) {
+        if (anchor == null && !preferred.isEmpty()) {
+          anchor = nearestOf(preferred, c);
+        }
+        if (anchor != null) {
+          commuteMinutes =
+              c.lat() != null
+                  ? commuteEstimator.minutesFromPoint(c.lat(), c.lng(), anchor)
+                  : commuteEstimator.minutesBetween(c.localityId(), anchor);
+        }
       }
+      String anchorName =
+          commuteIntent
+              ? intent.commuteTo().place()
+              : anchor == null ? "your area" : localityResolver.nameOf(anchor);
       ListingCandidate candidate =
           new ListingCandidate(
               l,
@@ -239,11 +260,16 @@ public class SearchPipeline {
               idVerified.contains(l.getListerId()),
               c == null ? HybridRetriever.Retrieval.NONE : c.retrieval(),
               commuteMinutes,
-              c != null && preferred.contains(c.localityId()));
-      rows.add(new Row(l, c, MatchScorer.scoreListing(intent, candidate), commuteMinutes));
+              anchorName,
+              commuteIntent,
+              radius,
+              inPreferred);
+      rows.add(new Row(l, c, MatchScorer.scoreListing(intent, candidate), commuteMinutes, anchorName, inPreferred));
     }
     rows.sort((a, b) -> Integer.compare(b.scored().matchScore(), a.scored().matchScore()));
     List<Row> top = rows.stream().limit(RESULT_LIMIT).toList();
+    boolean includesNearby =
+        !commuteIntent && !preferred.isEmpty() && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
 
     long llmStart = System.currentTimeMillis();
     Map<UUID, Explanation> explanations =
@@ -263,10 +289,14 @@ public class SearchPipeline {
     Map<UUID, com.flatmaite.listing.ListingDtos.CardResponse> cards = new HashMap<>();
     listingAssembler.toCards(top.stream().map(Row::listing).toList()).forEach(card -> cards.put(card.id(), card));
 
-    String commutePlace = intent.commuteTo() == null ? null : intent.commuteTo().place();
     List<AiResult> out = new ArrayList<>();
     for (Row r : top) {
       Explanation e = explanations.get(r.listing().getId());
+      // a home inside a requested locality needs no distance label; commute intents label everything
+      String label =
+          r.commute() == null || (!commuteIntent && r.inPreferred())
+              ? null
+              : "~%d min %s %s (estimate)".formatted(r.commute(), commuteIntent ? "to" : "from", r.anchorName());
       out.add(
           new AiResult(
               "home",
@@ -274,12 +304,29 @@ public class SearchPipeline {
               r.scored().breakdown(),
               e == null ? List.of() : e.matchReasons(),
               e == null ? List.of() : e.concerns(),
-              r.commute(),
-              r.commute() == null ? null : "~%d min to %s (estimate)".formatted(r.commute(), commutePlace == null ? "your area" : commutePlace),
+              label == null ? null : r.commute(),
+              label,
               cards.get(r.listing().getId()),
               null));
     }
-    return out;
+    return new Homes(out, includesNearby, radius);
+  }
+
+  /** The requested locality this candidate is closest to (by the commute estimate). */
+  private UUID nearestOf(Set<UUID> preferred, Candidate c) {
+    UUID best = null;
+    int bestMinutes = Integer.MAX_VALUE;
+    for (UUID id : preferred) {
+      Integer m =
+          c.lat() != null
+              ? commuteEstimator.minutesFromPoint(c.lat(), c.lng(), id)
+              : commuteEstimator.minutesBetween(c.localityId(), id);
+      if (m != null && m < bestMinutes) {
+        bestMinutes = m;
+        best = id;
+      }
+    }
+    return best == null ? preferred.iterator().next() : best;
   }
 
   private List<AiResult> searchFlatmates(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
@@ -306,7 +353,7 @@ public class SearchPipeline {
       }
     }
     Profile viewerProfile = viewerId == null ? null : profileByUser.get(viewerId);
-    Set<UUID> wantedLocalities = new HashSet<>(retriever.admittedLocalityIds(intent));
+    Set<UUID> wantedLocalities = new HashSet<>(retriever.requestedLocalityIds(intent));
 
     record Row(FlatmateProfile fp, Scored scored) {}
     List<Row> rows = new ArrayList<>();
@@ -410,10 +457,6 @@ public class SearchPipeline {
         out.add(new Relaxer("Relax lifestyle filters", "shows %d more".formatted(count), relaxed, count));
       }
     }
-    // Nearby areas beat "everywhere": a Goregaon seeker will happily look in Malad 12 minutes
-    // away, but not in Ghatkopar across the city. Offered before the blunt city-wide reset.
-    out.addAll(nearbyAreaRelaxers(intent));
-
     if ((intent.locations() != null && !intent.locations().isEmpty()) || intent.commuteTo() != null) {
       SearchIntent relaxed = intent.toBuilder().locations(null).commuteTo(null).build();
       long count = countFor(relaxed);
@@ -443,62 +486,6 @@ public class SearchPipeline {
                 "drop the strict filters — %d homes available".formatted(count),
                 broad,
                 count));
-      }
-    }
-    return out;
-  }
-
-  private static final int NEARBY_MAX_MINUTES = 35;
-  private static final int NEARBY_MAX_SUGGESTIONS = 3;
-
-  /**
-   * "Nothing in Goregaon" → "also show Malad, ~12 min away (4 homes)". Each suggestion keeps every
-   * other constraint and only widens the area, so the counts shown are real.
-   */
-  private List<Relaxer> nearbyAreaRelaxers(SearchIntent intent) {
-    List<SearchIntent.LocationRef> requested =
-        intent.locations() == null ? List.of() : intent.locations();
-    UUID anchor =
-        requested.stream()
-            .map(SearchIntent.LocationRef::localityId)
-            .filter(Objects::nonNull)
-            .findFirst()
-            .orElse(intent.commuteTo() == null ? null : intent.commuteTo().localityId());
-    if (anchor == null) {
-      return List.of();
-    }
-    Set<UUID> already =
-        requested.stream()
-            .map(SearchIntent.LocationRef::localityId)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toCollection(HashSet::new));
-    String anchorName = localityResolver.nameOf(anchor);
-
-    List<Relaxer> out = new ArrayList<>();
-    for (CommuteEstimator.Nearby nearby :
-        commuteEstimator.nearestLocalities(anchor, NEARBY_MAX_MINUTES, 8)) {
-      if (already.contains(nearby.localityId())) {
-        continue;
-      }
-      String name = localityResolver.nameOf(nearby.localityId());
-      if (name == null) {
-        continue;
-      }
-      List<SearchIntent.LocationRef> widened = new ArrayList<>(requested);
-      widened.add(new SearchIntent.LocationRef(name, nearby.localityId()));
-      SearchIntent relaxed = intent.toBuilder().locations(widened).build();
-      long count = countFor(relaxed);
-      if (count == 0) {
-        continue;
-      }
-      out.add(
-          new Relaxer(
-              "Also show %s (~%d min from %s)".formatted(name, nearby.minutes(), anchorName),
-              "shows %d more".formatted(count),
-              relaxed,
-              count));
-      if (out.size() == NEARBY_MAX_SUGGESTIONS) {
-        break;
       }
     }
     return out;

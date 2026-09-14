@@ -90,4 +90,7 @@ flatmaite:
     client-secret: ${GOOGLE_CLIENT_SECRET:}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
+  search:
+    # a named home locality also admits every locality within this many estimated minutes
+    nearby-radius-minutes: ${SEARCH_NEARBY_RADIUS_MINUTES:25}
   frontend-url: ${FRONTEND_URL:http://localhost:3000}
