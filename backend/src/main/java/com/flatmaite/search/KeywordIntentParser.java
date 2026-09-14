@@ -87,11 +87,13 @@ public class KeywordIntentParser {
     Integer maxDeposit = null;
     List<Amount> amounts = amounts(q);
     Set<Integer> usedDepositCues = new HashSet<>();
+    int windowFloor = 0; // cues before this token index belong to an earlier amount
     for (int a = 0; a < amounts.size(); a++) {
       Amount amt = amounts.get(a);
       int ti = tokenIndexAt(tokens, amt.start());
       int afterTi = tokenIndexAt(tokens, amt.end());
-      List<String> before = precedingWords(tokens, ti, CUE_WINDOW);
+      List<String> before = precedingWords(tokens, ti, CUE_WINDOW, windowFloor);
+      windowFloor = afterTi;
       Amount next = a + 1 < amounts.size() ? amounts.get(a + 1) : null;
       if (amt.bare() && !moneyContext(tokens, ti, afterTi, before, next)) {
         continue; // "pincode 400076", "1200 sqft": a number, not a budget
@@ -108,6 +110,7 @@ public class KeywordIntentParser {
           budgetMin = Math.min(amt.value(), next.value());
           budgetMax = Math.max(amt.value(), next.value());
           a++;
+          windowFloor = tokenIndexAt(tokens, next.end());
           continue;
         }
       }
@@ -293,6 +296,9 @@ public class KeywordIntentParser {
   /** A bare number is money when a money cue precedes it, a money word follows it, or it opens a range. */
   private static boolean moneyContext(
       List<Tokens.Token> tokens, int ti, int afterTi, List<String> before, Amount next) {
+    if (endsWithPhrase(before, "up", "to") || endsWithPhrase(before, "not", "more", "than")) {
+      return true;
+    }
     if (before.stream().anyMatch(w -> MONEY_BEFORE.contains(w) || FLOOR_CUES.contains(w) || CEILING_CUES.contains(w))) {
       return true;
     }
@@ -366,18 +372,32 @@ public class KeywordIntentParser {
     return tokens.size();
   }
 
-  private static List<String> precedingWords(List<Tokens.Token> tokens, int ti, int n) {
+  /** Words in {@code tokens[max(floor, ti - n), ti)} — the cue window for the token at {@code ti}. */
+  private static List<String> precedingWords(List<Tokens.Token> tokens, int ti, int n, int floor) {
     List<String> out = new ArrayList<>();
-    for (int i = Math.max(0, ti - n); i < ti && i < tokens.size(); i++) {
+    for (int i = Math.max(Math.max(0, ti - n), floor); i < ti && i < tokens.size(); i++) {
       out.add(tokens.get(i).text());
     }
     return out;
   }
 
+  private static boolean endsWithPhrase(List<String> words, String... phrase) {
+    if (words.size() < phrase.length) {
+      return false;
+    }
+    int offset = words.size() - phrase.length;
+    for (int i = 0; i < phrase.length; i++) {
+      if (!words.get(offset + i).equals(phrase[i])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   private static Boolean verifiedOnly(List<Tokens.Token> tokens) {
     for (int i = 0; i < tokens.size(); i++) {
       if (tokens.get(i).text().equals("verified")) {
-        List<String> before = precedingWords(tokens, i, 2);
+        List<String> before = precedingWords(tokens, i, 2, 0);
         if (!before.contains("not") && !before.contains("non") && !before.contains("un")) {
           return true;
         }

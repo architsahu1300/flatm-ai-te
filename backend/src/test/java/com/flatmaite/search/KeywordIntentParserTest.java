@@ -75,6 +75,29 @@ class KeywordIntentParserTest {
   }
 
   @Test
+  void adjacentThresholds_doNotLeakCuesIntoEachOther() {
+    SearchIntent k = parser.parse("min 20k max 30k");
+    assertThat(k.budgetMin()).isEqualTo(20000);
+    assertThat(k.budgetMax()).isEqualTo(30000);
+
+    SearchIntent words = parser.parse("over 20k under 30k in powai");
+    assertThat(words.budgetMin()).isEqualTo(20000);
+    assertThat(words.budgetMax()).isEqualTo(30000);
+
+    SearchIntent bare = parser.parse("min 20000 max 30000");
+    assertThat(bare.budgetMin()).isEqualTo(20000);
+    assertThat(bare.budgetMax()).isEqualTo(30000);
+  }
+
+  @Test
+  void upTo_isACeiling_forBareNumbersToo() {
+    assertThat(parser.parse("flat up to 30000").budgetMax()).isEqualTo(30000);
+    assertThat(parser.parse("budget up to 30000 in malad").budgetMax()).isEqualTo(30000);
+    assertThat(parser.parse("not more than 18000").budgetMax()).isEqualTo(18000);
+    assertThat(parser.parse("flat up to 30000").budgetMin()).isNull();
+  }
+
+  @Test
   void bareNumbers_areBudgetsOnlyWithMoneyContext() {
     assertThat(parser.parse("flat near pincode 400076").budgetMax()).isNull();
     assertThat(parser.parse("1200 sqft flat in powai").budgetMax()).isNull();
