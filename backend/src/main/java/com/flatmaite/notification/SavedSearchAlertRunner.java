@@ -59,7 +59,8 @@ public class SavedSearchAlertRunner {
 
   private boolean runOne(SavedSearch search) throws Exception {
     SearchIntent intent = objectMapper.readValue(search.getIntent(), SearchIntent.class);
-    ListingFilters filters = retriever.toFilters(intent);
+    // alerts fire only for the saved localities — there is no note here to explain a widened area
+    ListingFilters filters = retriever.toFilters(intent, false);
 
     Instant since =
         search.getLastRunAt() != null ? search.getLastRunAt() : Instant.now().minus(Duration.ofDays(1));

@@ -280,11 +280,20 @@ public class HybridRetriever {
     }
   }
 
-  /** Maps intent → shared hard-filter vocabulary (budget headroom ×1.1 — near-misses surface as concerns). */
+  /** Browse-time filters: the widened admission. */
   public ListingFilters toFilters(SearchIntent intent) {
+    return toFilters(intent, true);
+  }
+
+  /**
+   * Maps intent → shared hard-filter vocabulary (budget headroom ×1.1 — near-misses surface as
+   * concerns). Saved-search alerts pass {@code widenToNearby = false}: an alert cannot explain a
+   * widened area, so it fires only for the localities the user actually saved.
+   */
+  public ListingFilters toFilters(SearchIntent intent, boolean widenToNearby) {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
     return ListingFilters.builder()
-        .localityIds(admittedLocalityIds(intent))
+        .localityIds(admittedLocalityIds(intent, widenToNearby))
         .excludeLocalityIds(excludedLocalityIds(intent))
         .budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1))
         .maxDeposit(intent.maxDeposit())
@@ -350,20 +359,27 @@ public class HybridRetriever {
     return localityResolver.resolve(intent.commuteTo().place()).map(m -> m.localityIds().get(0)).orElse(null);
   }
 
-  /**
-   * Requested localities plus everything within the nearby radius of each; plus the commute
-   * radius when a workplace is named; minus exclusions. Requested ids come first, then by minutes.
-   * Empty list = no locality hard filter (the location signal then only affects scoring).
-   */
+  /** Browse-time admission: requested localities plus their nearby radius. */
   public List<UUID> admittedLocalityIds(SearchIntent intent) {
+    return admittedLocalityIds(intent, true);
+  }
+
+  /**
+   * Requested localities; plus everything within the nearby radius of each when
+   * {@code widenToNearby}; plus the commute radius when a workplace is named; minus exclusions.
+   * Requested ids come first, then by minutes. Empty list = no locality hard filter.
+   */
+  public List<UUID> admittedLocalityIds(SearchIntent intent, boolean widenToNearby) {
     List<UUID> requested = requestedLocalityIds(intent);
     Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
     LinkedHashSet<UUID> admitted = new LinkedHashSet<>(requested);
     Map<UUID, Integer> nearbyMinutes = new HashMap<>();
-    int radius = props.getSearch().getNearbyRadiusMinutes();
-    for (UUID id : requested) {
-      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radius, Integer.MAX_VALUE)) {
-        nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+    if (widenToNearby) {
+      int radius = props.getSearch().getNearbyRadiusMinutes();
+      for (UUID id : requested) {
+        for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radius, Integer.MAX_VALUE)) {
+          nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+        }
       }
     }
     UUID anchor = commuteAnchor(intent);

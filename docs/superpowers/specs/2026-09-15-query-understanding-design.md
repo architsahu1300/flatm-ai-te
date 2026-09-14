@@ -189,6 +189,9 @@ adds a removable "🚫 Not in {name}" chip per exclusion and a removable "📍? 
 - Flatmates: admitted set widened identically; `locationOverlap` (Jaccard) computed against the
   **requested** ids only.
 - `SearchPipeline.computeRelaxers`: `nearbyAreaRelaxers` removed; remaining relaxers unchanged.
+- Saved-search alerts (`SavedSearchAlertRunner`) call `toFilters(intent, false)`: exact requested
+  localities plus any explicit commute radius, never the nearby widening — an alert has no note in
+  which to explain a widened area.
 
 ### 4.6 Parser (`KeywordIntentParser`) and `NumberWords`
 
