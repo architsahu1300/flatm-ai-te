@@ -34,7 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiSearchController {
 
   private static final String ANON_COOKIE = "fm_anon";
-  private static final String FRESH_NOTE =
+  static final String FRESH_NOTE =
       "Started a fresh search — this read as a new request, not a tweak of the last one.";
 
   private final SearchPipeline pipeline;
@@ -74,7 +74,8 @@ public class AiSearchController {
     if (prior != null
         && verdict == NewQueryDetector.Verdict.AMBIGUOUS
         && extraction.mode() == IntentLlm.Mode.NEW) {
-      prior = null;
+      // the model overruled the detector's tie-break — by design this bills and calls the model a
+      // second time for one request, re-extracting with no prior instead of reusing a stale merge.
       note = FRESH_NOTE;
       extraction = pipeline.extractIntent(body.query(), null, userId, anonKey);
     }
