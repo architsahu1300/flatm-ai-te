@@ -30,14 +30,22 @@ public final class NumberWords {
 
   private static final Set<String> FILLER = Set.of("and", "a", "an", "rs", "rupees", "inr");
 
-  private static final String WORD_ALTERNATIVES =
+  private static final String CORE_WORDS =
       "one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen"
           + "|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety"
-          + "|hundred|thousand|lakhs?|lac|half|and|a|an|\\d+(?:\\.\\d+)?";
+          + "|hundred|thousand|lakhs?|lac";
+  private static final String FILLER_OR_DIGIT = "and|a|an|half|\\d+(?:\\.\\d+)?";
 
-  /** A run of number words inside a sentence, e.g. "twenty five thousand". Includes trailing space. */
+  /**
+   * A run of number words inside a sentence, e.g. "twenty five thousand" or "1.5 lakh". At least
+   * one real number or multiplier word must be present, so filler-only runs ("and a") and bare
+   * counts ("a 2 bhk") never read as an amount. Includes trailing whitespace.
+   */
   public static final Pattern NUMBER_RUN =
-      Pattern.compile("(?:\\b(?:" + WORD_ALTERNATIVES + ")\\b\\s*){2,}|\\b\\d+(?:\\.\\d+)?\\s*(?:lakhs?|lac)\\b");
+      Pattern.compile(
+          "(?:\\b(?:" + FILLER_OR_DIGIT + ")\\b\\s*)*"
+              + "\\b(?:" + CORE_WORDS + ")\\b\\s*"
+              + "(?:\\b(?:" + CORE_WORDS + "|" + FILLER_OR_DIGIT + ")\\b\\s*)*");
 
   private static final Pattern NUMERIC = Pattern.compile("\\d+(?:\\.\\d+)?");
 

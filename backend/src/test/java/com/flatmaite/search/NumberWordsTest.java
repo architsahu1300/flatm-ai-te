@@ -48,4 +48,25 @@ class NumberWordsTest {
     assertThat(m.find()).isTrue();
     assertThat(m.group().trim()).isEqualTo("twenty five thousand");
   }
+
+  @Test
+  void numberRun_ignoresFillerOnlyRunsAndBareCounts() {
+    assertThat(NumberWords.NUMBER_RUN.matcher("a room and a balcony").find()).isFalse();
+    assertThat(NumberWords.NUMBER_RUN.matcher("need a 2 bedroom apartment").find()).isFalse();
+    assertThat(NumberWords.NUMBER_RUN.matcher("get me a 3 bhk flat in bandra").find()).isFalse();
+    assertThat(NumberWords.NUMBER_RUN.matcher("between 20k and 30k").find()).isFalse();
+  }
+
+  @Test
+  void numberRun_stillFindsRealAmounts_withLeadingFillers() {
+    var lakh = NumberWords.NUMBER_RUN.matcher("flat around 1.5 lakh please");
+    assertThat(lakh.find()).isTrue();
+    assertThat(lakh.group().trim()).isEqualTo("1.5 lakh");
+
+    var thousand = NumberWords.NUMBER_RUN.matcher("for a thousand rupees");
+    assertThat(thousand.find()).isTrue();
+    assertThat(NumberWords.parse(thousand.group())).hasValue(1000);
+
+    assertThat(NumberWords.parse("one lakh twenty thousand")).hasValue(120000);
+  }
 }
