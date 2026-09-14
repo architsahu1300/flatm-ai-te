@@ -8,10 +8,13 @@ import com.flatmaite.listing.ListingQueryService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -39,6 +42,8 @@ public class HybridRetriever {
 
   private static final int VECTOR_LIMIT = 100;
   private static final int FTS_LIMIT = 50;
+  private static final Pattern STRUCTURED_TOKEN = Pattern.compile("^\\d+k?$");
+  private static final Pattern NON_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
 
   private final NamedParameterJdbcTemplate jdbc;
   private final EmbeddingProvider embeddingProvider;
@@ -105,25 +110,28 @@ public class HybridRetriever {
                   (Double) rs.getObject("lng")));
         });
 
-    // Full-text ranking on the residual free text
+    // Full-text ranking on the residual free text: ANY term matches, ts_rank_cd orders by how many
     List<UUID> lexicalRanking = new ArrayList<>();
-    if (intent.freeText() != null && !intent.freeText().isBlank()) {
-      Map<String, Object> ftsParams = new LinkedHashMap<>();
-      String ftsWhere = ListingQueryService.buildWhere(filters, ftsParams);
-      ftsParams.put("query", intent.freeText());
-      ftsParams.put("flimit", FTS_LIMIT);
-      String ftsSql =
+    String lexQuery = lexicalQuery(intent.freeText());
+    if (lexQuery != null) {
+      Map<String, Object> lexParams = new LinkedHashMap<>();
+      String lexWhere = ListingQueryService.buildWhere(filters, lexParams);
+      lexParams.put("lexQuery", lexQuery);
+      lexParams.put("flimit", FTS_LIMIT);
+      String lexicalSql =
           """
           SELECT l.id, p.locality_id, p.lat, p.lng
           FROM listings l
           LEFT JOIN properties p ON p.id = l.property_id
-          WHERE %s AND l.search_tsv @@ websearch_to_tsquery('english', :query)
+          CROSS JOIN websearch_to_tsquery('english', :lexQuery) AS q
+          WHERE %s AND l.search_tsv @@ q
+          ORDER BY ts_rank_cd(l.search_tsv, q) DESC, l.id
           LIMIT :flimit
           """
-              .formatted(ftsWhere);
+              .formatted(lexWhere);
       jdbc.query(
-          ftsSql,
-          ftsParams,
+          lexicalSql,
+          lexParams,
           rs -> {
             UUID id = rs.getObject("id", UUID.class);
             lexicalRanking.add(id);
@@ -201,7 +209,31 @@ public class HybridRetriever {
           }
           rows.putIfAbsent(id, new Row(null, null, null));
         });
-    return fuse(rows, vectorRanking, semanticHits, List.of());
+    List<UUID> lexicalRanking = new ArrayList<>();
+    String lexQuery = lexicalQuery(intent.freeText());
+    if (lexQuery != null) {
+      params.put("lexQuery", lexQuery);
+      params.put("flimit", FTS_LIMIT);
+      String lexicalSql =
+          """
+          SELECT fp.id
+          FROM flatmate_profiles fp
+          CROSS JOIN websearch_to_tsquery('english', :lexQuery) AS q
+          WHERE %s AND fp.search_tsv @@ q
+          ORDER BY ts_rank_cd(fp.search_tsv, q) DESC, fp.id
+          LIMIT :flimit
+          """
+              .formatted(where);
+      jdbc.query(
+          lexicalSql,
+          params,
+          rs -> {
+            UUID id = rs.getObject("id", UUID.class);
+            lexicalRanking.add(id);
+            rows.putIfAbsent(id, new Row(null, null, null));
+          });
+    }
+    return fuse(rows, vectorRanking, semanticHits, lexicalRanking);
   }
 
   /** Merges the rankings with RRF and attaches each candidate's {@link Retrieval}. */
@@ -295,6 +327,24 @@ public class HybridRetriever {
       ids.add(rs.getObject("id", UUID.class));
     });
     return ids;
+  }
+
+  /**
+   * Turns residual free text into a websearch_to_tsquery expression that matches ANY term and
+   * lets ts_rank_cd order by how many match. The default AND semantics need every word of a whole
+   * sentence to appear in one title+description — for real queries, that is never.
+   */
+  static String lexicalQuery(String freeText) {
+    if (freeText == null) {
+      return null;
+    }
+    Set<String> tokens = new LinkedHashSet<>();
+    for (String token : NON_WORD.split(freeText.toLowerCase(Locale.ROOT))) {
+      if (token.length() >= 3 && !STRUCTURED_TOKEN.matcher(token).matches()) {
+        tokens.add(token);
+      }
+    }
+    return tokens.isEmpty() ? null : String.join(" or ", tokens);
   }
 
   static String semanticText(SearchIntent intent) {
