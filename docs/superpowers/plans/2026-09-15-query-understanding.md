@@ -3420,7 +3420,7 @@ In `README.md`, in the "Backend (all optional in dev …)" environment table, ad
 - [ ] **Step 2: Full backend build (Docker running)**
 
 Run: `./mvnw verify 2>&1 | grep -E "Tests run:.*in com\.|Tests run: [0-9]+, Failures|BUILD|ERROR\]" | tail -40`
-Expected: every class green — new: `TokensTest` 5, `NumberWordsTest` 8, `TrigramsTest` 4, `LocalityResolverTest` 10, `LocationMentionsTest` 6, `ListingQueryServiceWhereTest` 2, `KeywordIntentParserTest` 12, `IntentLlmModeTest` 3, `OpenAiLlmsPromptTest` 3, `IntentLocalitiesTest` 7, `LocationWideningIntegrationTest` 4; changed: `MatchScorerTest` 11, `MockIntentLlmTest` 5, `NewQueryDetectorTest` 19, `SearchPipelineIntegrationTest` 5; unchanged WS1/WS0 suites — `BUILD SUCCESS`.
+Expected: every class green — new: `TokensTest` 5, `NumberWordsTest` 8, `TrigramsTest` 4, `LocalityResolverTest` 10, `LocationMentionsTest` 6, `ListingQueryServiceWhereTest` 2, `KeywordIntentParserTest` 14, `IntentLlmModeTest` 3, `OpenAiLlmsPromptTest` 3, `IntentLocalitiesTest` 7, `LocationWideningIntegrationTest` 4; changed: `MatchScorerTest` 11, `MockIntentLlmTest` 5, `NewQueryDetectorTest` 19, `SearchPipelineIntegrationTest` 5; unchanged WS1/WS0 suites — `BUILD SUCCESS`.
 
 - [ ] **Step 3: Frontend type check**
 
