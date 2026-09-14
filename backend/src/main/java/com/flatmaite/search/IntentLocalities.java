@@ -4,9 +4,11 @@ import com.flatmaite.search.LocalityResolver.Match;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -20,13 +22,24 @@ final class IntentLocalities {
   private IntentLocalities() {}
 
   static SearchIntent resolve(SearchIntent intent, LocalityResolver resolver) {
-    if (intent.locations() == null && intent.excludeLocations() == null && intent.commuteTo() == null) {
+    if (intent.locations() == null
+        && intent.excludeLocations() == null
+        && intent.commuteTo() == null
+        && intent.unresolvedLocations() == null) {
       return intent;
     }
     List<String> unresolved =
         new ArrayList<>(intent.unresolvedLocations() == null ? List.of() : intent.unresolvedLocations());
     List<LocationRef> home = resolveRefs(intent.locations(), resolver, unresolved);
     List<LocationRef> exclude = resolveRefs(intent.excludeLocations(), resolver, unresolved);
+
+    // exclusion wins: drop a requested ref once its resolved id is also excluded. If nothing
+    // requested remains the search runs city-wide minus the exclusions — no sentinel needed.
+    Set<UUID> excludedIds = new HashSet<>();
+    for (LocationRef ref : exclude) {
+      excludedIds.add(ref.localityId());
+    }
+    home = home.stream().filter(ref -> !excludedIds.contains(ref.localityId())).toList();
 
     CommuteTo commute = intent.commuteTo();
     if (commute != null && commute.localityId() == null) {

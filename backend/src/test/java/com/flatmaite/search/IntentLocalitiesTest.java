@@ -112,4 +112,40 @@ class IntentLocalitiesTest {
 
     assertThat(IntentLocalities.resolve(in, resolver)).isSameAs(in);
   }
+
+  @Test
+  void aLocalityBothRequestedAndExcluded_exclusionWins() {
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", null)))
+            .excludeLocations(List.of(new LocationRef("Powai", null)))
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver);
+
+    assertThat(out.locations()).isNull();
+    assertThat(out.excludeLocations()).extracting(LocationRef::localityId).containsExactly(id("Powai"));
+  }
+
+  @Test
+  void partiallyExcludedRequest_keepsWhatWasNotExcluded() {
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", null), new LocationRef("Andheri East", null)))
+            .excludeLocations(List.of(new LocationRef("Powai", null)))
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver);
+
+    assertThat(out.locations()).extracting(LocationRef::localityId).containsExactly(id("Andheri East"));
+  }
+
+  @Test
+  void unresolvedLocationsOnly_stillAppendsToFreeText() {
+    // reachable if a model emits only unresolvedLocations with no locations/exclude/commute set
+    SearchIntent in =
+        SearchIntent.builder().unresolvedLocations(List.of("Atlantis")).freeText("quiet room").build();
+
+    assertThat(IntentLocalities.resolve(in, resolver).freeText()).isEqualTo("quiet room Atlantis");
+  }
 }
