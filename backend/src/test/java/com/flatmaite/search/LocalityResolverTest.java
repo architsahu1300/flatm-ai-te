@@ -132,4 +132,18 @@ class LocalityResolverTest {
     assertThat(resolver.vocabulary())
         .contains("Powai (hiranandani)", "Kurla", "BKC (bandra kurla complex, bandra kurla)");
   }
+
+  @Test
+  void reload_picksUpLocalitiesAddedAfterStartup() {
+    LocalityRepository repo = Mockito.mock(LocalityRepository.class);
+    Mockito.when(repo.findAll()).thenReturn(List.of()).thenReturn(List.of(locality("Powai", "hiranandani")));
+    LocalityResolver fresh = new LocalityResolver(repo);
+    fresh.load();
+    assertThat(fresh.resolve("powai")).isEmpty();
+
+    fresh.reload();
+
+    assertThat(fresh.resolve("powai")).isPresent();
+    assertThat(fresh.vocabulary()).containsExactly("Powai (hiranandani)");
+  }
 }

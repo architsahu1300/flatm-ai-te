@@ -149,7 +149,10 @@ Goregaon ← "film city"; Malad ← "malad east", "mindspace"; Kurla ← "kurla 
 proportionally: 29 private, 16 shared, 16 entire, 13 looking-for-flatmate, 6 replacement) so
 localities are not empty; `FLATMATE_COUNT` stays 35. The seed remains `Random(42)`-deterministic.
 Seed facts relied on by WS1 tests ("wardrobe"/"essentials"/"flatmate" text, active listings <
-`VECTOR_LIMIT`) are preserved: 80 × ~80 % active ≈ 64 < 100.
+`VECTOR_LIMIT`) are preserved: 80 × ~80 % active ≈ 64 < 100. After inserting localities the seed
+runner calls `LocalityResolver.reload()` and `CommuteEstimator.reload()` — both caches fill in
+`@PostConstruct`, before any runner, so a freshly seeded database would otherwise be unsearchable
+until restart.
 
 ### 4.4 `SearchIntent` additions (additive, JSON-compatible)
 

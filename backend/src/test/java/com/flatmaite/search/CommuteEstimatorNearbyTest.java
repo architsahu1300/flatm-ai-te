@@ -69,4 +69,19 @@ class CommuteEstimatorNearbyTest {
     assertThat(estimator.nearestLocalities(UUID.randomUUID(), 60, 5)).isEmpty();
     assertThat(estimator.nearestLocalities(null, 60, 5)).isEmpty();
   }
+
+  @Test
+  void reload_picksUpCentroidsAddedAfterStartup() {
+    LocalityRepository repo = Mockito.mock(LocalityRepository.class);
+    Locality goregaon = locality(GOREGAON, "Goregaon", 19.1663, 72.8526);
+    Locality malad = locality(MALAD, "Malad", 19.1874, 72.8484);
+    Mockito.when(repo.findAll()).thenReturn(List.of()).thenReturn(List.of(goregaon, malad));
+    CommuteEstimator fresh = new CommuteEstimator(repo);
+    fresh.loadCentroids();
+    assertThat(fresh.minutesBetween(goregaon.getId(), malad.getId())).isNull();
+
+    fresh.reload();
+
+    assertThat(fresh.minutesBetween(goregaon.getId(), malad.getId())).isNotNull();
+  }
 }

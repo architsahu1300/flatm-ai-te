@@ -11,7 +11,6 @@ import com.flatmaite.search.SearchDtos.AiSearchResponse;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import java.util.List;
 import java.util.UUID;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,22 +39,8 @@ class LocationWideningIntegrationTest {
   @Autowired HybridRetriever retriever;
   @Autowired SearchPipeline pipeline;
   @Autowired LocalityResolver resolver;
-  @Autowired CommuteEstimator commuteEstimator;
   @Autowired LocalityRepository localities;
   @Autowired ListingQueryService listingQueryService;
-
-  /**
-   * {@link LocalityResolver} and {@link CommuteEstimator} cache the locality table via
-   * {@code @PostConstruct}, which runs during context refresh — strictly before the "seed"
-   * profile's {@code SeedRunner} ({@code ApplicationRunner}) inserts any rows into this fresh
-   * Testcontainers database. Reload both here, the same way {@code LocalityResolverTest} and
-   * {@code CommuteEstimatorNearbyTest} do after repopulating their mocked repository.
-   */
-  @BeforeEach
-  void reloadCachesAfterSeeding() {
-    resolver.load();
-    commuteEstimator.loadCentroids();
-  }
 
   private UUID idOf(String name) {
     return resolver.resolve(name).orElseThrow().localityIds().get(0);

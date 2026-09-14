@@ -66,6 +66,11 @@ public class LocalityResolver {
     }
   }
 
+  /** Re-reads the gazetteer; the seed runner calls this after inserting localities. */
+  public void reload() {
+    load();
+  }
+
   private void index(String phrase, UUID id) {
     String key = normalize(phrase);
     if (key.isEmpty()) {

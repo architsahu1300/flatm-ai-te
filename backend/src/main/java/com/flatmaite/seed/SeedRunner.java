@@ -48,6 +48,8 @@ import com.flatmaite.payment.Plan;
 import com.flatmaite.payment.PlanRepository;
 import com.flatmaite.report.Report;
 import com.flatmaite.report.ReportRepository;
+import com.flatmaite.search.CommuteEstimator;
+import com.flatmaite.search.LocalityResolver;
 import com.flatmaite.saved.SavedListing;
 import com.flatmaite.saved.SavedListingRepository;
 import com.flatmaite.saved.SavedSearch;
@@ -113,6 +115,8 @@ public class SeedRunner implements ApplicationRunner {
   private final VectorStoreWriter vectorWriter;
   private final FlatmaiteProperties props;
   private final org.springframework.jdbc.core.JdbcTemplate jdbcTemplate;
+  private final LocalityResolver localityResolver;
+  private final CommuteEstimator commuteEstimator;
 
   private final Random rng = new Random(42);
   private final Faker faker = new Faker(new Locale("en", "IND"), new Random(42));
@@ -185,6 +189,10 @@ public class SeedRunner implements ApplicationRunner {
     log.info("Seeding Flatm'AI'te (embedding provider: {})", embeddingProvider.providerName());
     writePlaceholderImages();
     List<Locality> locs = seedLocalities();
+    // both caches loaded at startup, before this runner ran — refresh them so anything else in
+    // this JVM (integration tests, a freshly seeded deployment) sees the localities just written
+    localityResolver.reload();
+    commuteEstimator.reload();
     List<Amenity> amens = seedAmenities();
     seedPlans();
     List<User> allUsers = seedUsers();

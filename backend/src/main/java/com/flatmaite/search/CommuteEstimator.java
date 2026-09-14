@@ -30,9 +30,15 @@ public class CommuteEstimator {
 
   @PostConstruct
   void loadCentroids() {
+    centroids.clear();
     for (Locality l : localities.findAll()) {
       centroids.put(l.getId(), new double[] {l.getLat(), l.getLng()});
     }
+  }
+
+  /** Re-reads the centroids; the seed runner calls this after inserting localities. */
+  public void reload() {
+    loadCentroids();
   }
 
   /** Minutes between two localities, or null if either is unknown. */
