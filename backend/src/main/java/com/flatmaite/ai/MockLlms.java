@@ -43,7 +43,7 @@ public final class MockLlms {
           .lifestyle(mergeLifestyle(prior.lifestyle(), parsed.lifestyle()))
           .commuteTo(firstNonNull(parsed.commuteTo(), prior.commuteTo()))
           .verifiedOnly(firstNonNull(parsed.verifiedOnly(), prior.verifiedOnly()))
-          .freeText(query)
+          .freeText(joinFreeText(prior.freeText(), query))
           .originalQuery(prior.originalQuery() != null ? prior.originalQuery() : query)
           .build();
     }
@@ -67,6 +67,17 @@ public final class MockLlms {
 
     private static <T> T firstNonNull(T a, T b) {
       return a != null ? a : b;
+    }
+
+    /** Residual keywords accumulate across a session; the follow-up's words are appended. */
+    private static String joinFreeText(String prior, String query) {
+      if (prior == null || prior.isBlank()) {
+        return query;
+      }
+      if (query == null || query.isBlank()) {
+        return prior;
+      }
+      return prior.trim() + " " + query.trim();
     }
 
     @Override

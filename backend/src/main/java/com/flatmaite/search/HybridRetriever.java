@@ -255,8 +255,9 @@ public class HybridRetriever {
   }
 
   /**
-   * Embedding-provider outages must not take search down — the ladder degrades to filters + FTS,
-   * and MatchScorer renormalizes semanticSim away when sims are null.
+   * Embedding-provider outages must not take search down — the vector ranking degrades to
+   * newest-first, the lexical ranking still fuses, and every candidate keeps a relevance score
+   * (with semanticHit = false).
    */
   private float[] safeEmbed(String text) {
     try {
@@ -347,12 +348,13 @@ public class HybridRetriever {
     return tokens.isEmpty() ? null : String.join(" or ", tokens);
   }
 
+  /** Embeds the user's full request — stable across a session — not the residual keyword text. */
   static String semanticText(SearchIntent intent) {
     StringBuilder sb = new StringBuilder();
-    if (intent.freeText() != null) {
-      sb.append(intent.freeText());
-    } else if (intent.originalQuery() != null) {
+    if (intent.originalQuery() != null) {
       sb.append(intent.originalQuery());
+    } else if (intent.freeText() != null) {
+      sb.append(intent.freeText());
     }
     SearchIntent.Lifestyle l = intent.lifestyleOrEmpty();
     if (Boolean.TRUE.equals(l.quiet())) sb.append(". quiet calm peaceful home no parties");

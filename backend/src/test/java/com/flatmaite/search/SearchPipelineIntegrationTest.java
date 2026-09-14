@@ -98,6 +98,8 @@ class SearchPipelineIntegrationTest {
     Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
     Map<String, Object> intent = (Map<String, Object>) data.get("intent");
     assertThat((Integer) intent.get("budgetMax")).isLessThan(25000);
+    // a budget tweak must not replace the residual free text with the word "cheaper"
+    assertThat(intent.get("freeText")).isEqualTo("Find me a room near BKC under 25k, no smokers");
     assertThat(data.get("sessionId")).isEqualTo(sessionId);
   }
 

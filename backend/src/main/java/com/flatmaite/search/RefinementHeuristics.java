@@ -3,8 +3,9 @@ package com.flatmaite.search;
 import java.util.Locale;
 
 /**
- * Zero-cost regex pre-pass for the ~10 highest-frequency refinements. Anything unmatched goes to
- * the LLM (or its mock). Returns null when no pattern applies.
+ * Zero-cost regex pre-pass for the ~10 highest-frequency refinements. A refinement adjusts
+ * structured slots only; {@code freeText} (residual keywords) is carried over from the prior
+ * intent. Anything unmatched goes to the LLM (or its mock). Returns null when no pattern applies.
  */
 public final class RefinementHeuristics {
 
@@ -21,10 +22,10 @@ public final class RefinementHeuristics {
       if (max == null) {
         return null;
       }
-      return prior.toBuilder().budgetMax((int) Math.round(max * 0.9 / 500) * 500).freeText(query).build();
+      return prior.toBuilder().budgetMax((int) Math.round(max * 0.9 / 500) * 500).build();
     }
     if (q.matches(".*\\bonly\\s+(show\\s+)?verified\\b.*") || q.matches(".*\\bverified (listings|only)\\b.*")) {
-      return prior.toBuilder().verifiedOnly(true).freeText(query).build();
+      return prior.toBuilder().verifiedOnly(true).build();
     }
     if (q.matches(".*\\b(closer|nearer)( to work)?\\b.*") && prior.commuteTo() != null) {
       int current = prior.commuteTo().maxMinutes() == null ? 45 : prior.commuteTo().maxMinutes();
@@ -32,24 +33,23 @@ public final class RefinementHeuristics {
           .commuteTo(
               new SearchIntent.CommuteTo(
                   prior.commuteTo().place(), prior.commuteTo().localityId(), Math.max(10, (int) (current * 0.8))))
-          .freeText(query)
           .build();
     }
     if (q.matches(".*\\b(show|find)( me)? flatmates?( instead)?\\b.*")) {
-      return prior.toBuilder().searchTarget(com.flatmaite.common.domain.SearchTarget.FLATMATES).freeText(query).build();
+      return prior.toBuilder().searchTarget(com.flatmaite.common.domain.SearchTarget.FLATMATES).build();
     }
     if (q.matches(".*\\b(show|find)( me)? (homes|rooms|flats|places)( instead)?\\b.*") && q.length() < 40) {
-      return prior.toBuilder().searchTarget(com.flatmaite.common.domain.SearchTarget.PROPERTIES).freeText(query).build();
+      return prior.toBuilder().searchTarget(com.flatmaite.common.domain.SearchTarget.PROPERTIES).build();
     }
     if (q.matches(".*\\bonly (fully )?furnished\\b.*") || q.equals("furnished only")) {
-      return prior.toBuilder().furnished(com.flatmaite.common.domain.Furnishing.FULLY_FURNISHED).freeText(query).build();
+      return prior.toBuilder().furnished(com.flatmaite.common.domain.Furnishing.FULLY_FURNISHED).build();
     }
     if (q.matches(".*\\bbigger budget|increase (the )?budget|can go up to\\b.*")) {
       Integer max = prior.budgetMax();
       if (max == null) {
         return null;
       }
-      return prior.toBuilder().budgetMax((int) Math.round(max * 1.15 / 500) * 500).freeText(query).build();
+      return prior.toBuilder().budgetMax((int) Math.round(max * 1.15 / 500) * 500).build();
     }
     return null;
   }
