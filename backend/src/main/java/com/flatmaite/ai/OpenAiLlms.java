@@ -80,12 +80,23 @@ public final class OpenAiLlms {
   @Slf4j
   public static class OpenAiIntentLlm implements IntentLlm {
 
+    /** Format instructions never change with the gazetteer — computed once, not per rebuild. */
+    private static final BeanOutputConverter<SearchIntent> INTENT_FORMAT_CONVERTER =
+        new BeanOutputConverter<>(SearchIntent.class);
+
     private final ChatClient chatClient;
     private final KeywordIntentParser fallback;
     private final ObjectMapper objectMapper;
     private final String modelName;
     private final String providerName;
-    private final String intentSystem;
+    private final com.flatmaite.search.LocalityResolver localityResolver;
+
+    // memoised system prompt + its token overhead, tagged with the resolver version they were
+    // built from; reload() bumps the version so a stale "Known localities" block gets rebuilt
+    // instead of living for the bean's whole lifetime. A benign race that rebuilds twice is fine.
+    private volatile long intentSystemVersion = -1;
+    private volatile String intentSystemCached;
+    private volatile int promptOverheadTokensCached;
 
     public OpenAiIntentLlm(
         ChatClient chatClient,
@@ -99,7 +110,32 @@ public final class OpenAiLlms {
       this.objectMapper = objectMapper;
       this.modelName = modelName;
       this.providerName = providerName;
-      this.intentSystem = intentSystem(localityResolver.vocabulary());
+      this.localityResolver = localityResolver;
+    }
+
+    /** Rebuilds the system prompt (and its token estimate) only when the resolver has moved on. */
+    private String intentSystemCurrent() {
+      long resolverVersion = localityResolver.version();
+      if (resolverVersion != intentSystemVersion) {
+        String built = intentSystem(localityResolver.vocabulary());
+        intentSystemCached = built;
+        promptOverheadTokensCached =
+            com.flatmaite.search.AiUsageService.estimateTokens(built)
+                + com.flatmaite.search.AiUsageService.estimateTokens(INTENT_FORMAT_CONVERTER.getFormat());
+        intentSystemVersion = resolverVersion;
+      }
+      return intentSystemCached;
+    }
+
+    /** Test-only accessor for the currently cached system prompt. */
+    String currentIntentSystem() {
+      return intentSystemCurrent();
+    }
+
+    @Override
+    public int promptOverheadTokens() {
+      intentSystemCurrent();
+      return promptOverheadTokensCached;
     }
 
     @Override
@@ -117,11 +153,11 @@ public final class OpenAiLlms {
       if (prior == null) {
         BeanOutputConverter<SearchIntent> converter = new BeanOutputConverter<>(SearchIntent.class);
         try {
-          return new Extraction(finish(call(intentSystem, query, converter, null), query, null), Mode.NONE);
+          return new Extraction(finish(call(intentSystemCurrent(), query, converter, null), query, null), Mode.NONE);
         } catch (Exception first) {
           log.warn("Intent extraction failed, attempting repair: {}", first.getMessage());
           try {
-            return new Extraction(finish(call(intentSystem, query, converter, first.getMessage()), query, null), Mode.NONE);
+            return new Extraction(finish(call(intentSystemCurrent(), query, converter, first.getMessage()), query, null), Mode.NONE);
           } catch (Exception second) {
             log.warn("Intent repair failed, using keyword fallback: {}", second.getMessage());
             return new Extraction(fallback.parse(query), Mode.NONE);

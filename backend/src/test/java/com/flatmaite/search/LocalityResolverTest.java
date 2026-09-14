@@ -146,4 +146,13 @@ class LocalityResolverTest {
     assertThat(fresh.resolve("powai")).isPresent();
     assertThat(fresh.vocabulary()).containsExactly("Powai (hiranandani)");
   }
+
+  @Test
+  void version_increasesOnReload_soDerivedCachesCanInvalidate() {
+    long v0 = resolver.version();
+
+    resolver.reload();
+
+    assertThat(resolver.version()).isGreaterThan(v0);
+  }
 }

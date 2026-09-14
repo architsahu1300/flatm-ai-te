@@ -124,7 +124,7 @@ public class SearchPipeline {
         feature,
         intentLlm.providerName(),
         intentLlm.model(),
-        AiUsageService.estimateTokens(query) + 700,
+        AiUsageService.estimateTokens(query) + intentLlm.promptOverheadTokens(),
         AiUsageService.estimateTokens(intentJson(resolved.intent())),
         false,
         success,
@@ -319,6 +319,8 @@ public class SearchPipeline {
         best = id;
       }
     }
+    // every seeded locality has a centroid, so `best` is never null in practice; if a locality
+    // ever lacks one this picks an arbitrary member of `preferred` rather than failing the search.
     return best == null ? preferred.iterator().next() : best;
   }
 

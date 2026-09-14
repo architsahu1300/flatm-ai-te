@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,23 +48,30 @@ public class LocalityResolver {
       double confidence) {}
 
   private final LocalityRepository localities;
-  private final Map<String, List<UUID>> byPhrase = new LinkedHashMap<>();
-  private final Map<UUID, String> nameById = new LinkedHashMap<>();
-  private final List<Locality> loaded = new ArrayList<>();
+  // volatile + rebuild-then-swap in load(): a concurrent scan/resolve reads one consistent
+  // generation of the gazetteer rather than racing a clear()-then-repopulate in place.
+  private volatile Map<String, List<UUID>> byPhrase = new LinkedHashMap<>();
+  private volatile Map<UUID, String> nameById = new LinkedHashMap<>();
+  private volatile List<Locality> loaded = new ArrayList<>();
+  private final AtomicLong version = new AtomicLong();
 
   @PostConstruct
   void load() {
-    byPhrase.clear();
-    nameById.clear();
-    loaded.clear();
+    Map<String, List<UUID>> newByPhrase = new LinkedHashMap<>();
+    Map<UUID, String> newNameById = new LinkedHashMap<>();
+    List<Locality> newLoaded = new ArrayList<>();
     for (Locality l : localities.findAll()) {
-      loaded.add(l);
-      nameById.put(l.getId(), l.getName());
-      index(l.getName(), l.getId());
+      newLoaded.add(l);
+      newNameById.put(l.getId(), l.getName());
+      index(newByPhrase, l.getName(), l.getId());
       for (String alias : l.getAliases()) {
-        index(alias, l.getId());
+        index(newByPhrase, alias, l.getId());
       }
     }
+    byPhrase = newByPhrase;
+    nameById = newNameById;
+    loaded = newLoaded;
+    version.incrementAndGet();
   }
 
   /** Re-reads the gazetteer; the seed runner calls this after inserting localities. */
@@ -71,7 +79,15 @@ public class LocalityResolver {
     load();
   }
 
-  private void index(String phrase, UUID id) {
+  /**
+   * Monotonically increasing, bumped at the end of every {@link #load()}/{@link #reload()} — lets
+   * a derived cache (the intent prompt's vocabulary block) detect that it is stale and rebuild.
+   */
+  public long version() {
+    return version.get();
+  }
+
+  private static void index(Map<String, List<UUID>> byPhrase, String phrase, UUID id) {
     String key = normalize(phrase);
     if (key.isEmpty()) {
       return;

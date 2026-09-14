@@ -48,6 +48,16 @@ public interface IntentLlm {
    */
   default void healthCheck() {}
 
+  /**
+   * Estimated prompt-token overhead of a call beyond the user's query — charged against the daily
+   * cost budget. The mock/heuristic paths cost nothing real, so 700 is a conservative placeholder;
+   * a provider that assembles a real system prompt should override this with the actual size so the
+   * budget guard is not silently under-counting.
+   */
+  default int promptOverheadTokens() {
+    return 700;
+  }
+
   String providerName();
 
   String model();

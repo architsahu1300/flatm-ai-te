@@ -26,14 +26,17 @@ public class CommuteEstimator {
   private static final int OVERHEAD_MIN = 8;
 
   private final LocalityRepository localities;
-  private final Map<UUID, double[]> centroids = new HashMap<>();
+  // volatile + rebuild-then-swap: a concurrent reload() must not race a nearestLocalities() call
+  // iterating the old map in place.
+  private volatile Map<UUID, double[]> centroids = new HashMap<>();
 
   @PostConstruct
   void loadCentroids() {
-    centroids.clear();
+    Map<UUID, double[]> newCentroids = new HashMap<>();
     for (Locality l : localities.findAll()) {
-      centroids.put(l.getId(), new double[] {l.getLat(), l.getLng()});
+      newCentroids.put(l.getId(), new double[] {l.getLat(), l.getLng()});
     }
+    centroids = newCentroids;
   }
 
   /** Re-reads the centroids; the seed runner calls this after inserting localities. */
