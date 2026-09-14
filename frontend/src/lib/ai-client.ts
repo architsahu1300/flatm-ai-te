@@ -170,7 +170,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "commute",
       icon: "🚇",
       label: "Commute",
-      value: `≤${intent.commuteTo.maxMinutes ?? 45} min to ${intent.commuteTo.place}`,
+      value: `≤${intent.commuteTo.maxMinutes ?? 30} min to ${intent.commuteTo.place}`,
       remove: (i) => ({ ...i, commuteTo: null }),
     });
   }

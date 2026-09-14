@@ -62,6 +62,7 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | _unset_ → Google login hidden | OAuth |
 | `AI_MOCK` | `auto` | `true`/`false` to force provider mode |
 | `AI_EXPLANATIONS_ENABLED` | `true` | Kill-switch → score-breakdown-only UI |
+| `SEARCH_NEARBY_RADIUS_MINUTES` | `25` | A named home locality also admits every locality within this many estimated minutes |
 
 Frontend: `BACKEND_URL` (default `http://localhost:8080`).
 
