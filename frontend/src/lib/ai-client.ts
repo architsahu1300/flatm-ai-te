@@ -32,6 +32,8 @@ export interface SearchIntent {
     partiesOk?: boolean | null;
   } | null;
   commuteTo?: { place: string; localityId: string | null; maxMinutes: number | null } | null;
+  excludeLocations?: { name: string; localityId: string | null }[] | null;
+  unresolvedLocations?: string[] | null;
   verifiedOnly?: boolean | null;
   freeText?: string | null;
   originalQuery?: string | null;
@@ -136,6 +138,30 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       remove: (i) => ({
         ...i,
         locations: (i.locations ?? []).filter((l) => l.name !== loc.name),
+      }),
+    });
+  }
+  for (const loc of intent.excludeLocations ?? []) {
+    chips.push({
+      key: `excl:${loc.name}`,
+      icon: "🚫",
+      label: "Not in",
+      value: loc.name,
+      remove: (i) => ({
+        ...i,
+        excludeLocations: (i.excludeLocations ?? []).filter((l) => l.name !== loc.name),
+      }),
+    });
+  }
+  for (const name of intent.unresolvedLocations ?? []) {
+    chips.push({
+      key: `unres:${name}`,
+      icon: "📍?",
+      label: "Couldn't place",
+      value: name,
+      remove: (i) => ({
+        ...i,
+        unresolvedLocations: (i.unresolvedLocations ?? []).filter((n) => n !== name),
       }),
     });
   }

@@ -28,6 +28,8 @@ public final class MockLlms {
                   ? parsed.searchTarget()
                   : firstNonNull(parsed.searchTarget(), prior.searchTarget()))
           .locations(firstNonNull(parsed.locations(), prior.locations()))
+          .excludeLocations(firstNonNull(parsed.excludeLocations(), prior.excludeLocations()))
+          .unresolvedLocations(firstNonNull(parsed.unresolvedLocations(), prior.unresolvedLocations()))
           .budgetMin(firstNonNull(parsed.budgetMin(), prior.budgetMin()))
           .budgetMax(firstNonNull(parsed.budgetMax(), prior.budgetMax()))
           .roomType(firstNonNull(parsed.roomType(), prior.roomType()))

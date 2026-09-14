@@ -13,7 +13,9 @@ import lombok.Builder;
 
 /**
  * The single contract between the LLM, SQL hard filters, the deterministic scorer and the UI's
- * editable chips. Null = "not specified". The original natural-language query is always preserved.
+ * editable chips. Null = "not specified". The original natural-language query is always
+ * preserved; excludeLocations are places to avoid and unresolvedLocations are names no resolver
+ * layer could place.
  */
 @Builder(toBuilder = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -35,6 +37,8 @@ public record SearchIntent(
     List<String> amenities,
     Lifestyle lifestyle,
     CommuteTo commuteTo,
+    List<LocationRef> excludeLocations,
+    List<String> unresolvedLocations,
     Boolean verifiedOnly,
     String freeText,
     String originalQuery) {
@@ -67,6 +71,9 @@ public record SearchIntent(
 
   /** Residual keywords accumulate across a session; bounded so the lexical query and the session JSON cannot grow without limit. */
   public static final int MAX_FREE_TEXT_CHARS = 600;
+
+  /** Commute radius when the user names a workplace without a time — replaces four scattered 45s. */
+  public static final int DEFAULT_COMMUTE_MINUTES = 30;
 
   /**
    * Appends a follow-up's words to the prior residual (blank-safe on both sides), truncating the

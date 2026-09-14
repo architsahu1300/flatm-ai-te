@@ -117,7 +117,7 @@ public class KeywordIntentParser {
         maxMinutes = Integer.parseInt(cm.group(1));
       }
       LocationRef anchor = locations.get(0);
-      commuteTo = new CommuteTo(anchor.name(), anchor.localityId(), maxMinutes == null ? 45 : maxMinutes);
+      commuteTo = new CommuteTo(anchor.name(), anchor.localityId(), maxMinutes == null ? SearchIntent.DEFAULT_COMMUTE_MINUTES : maxMinutes);
     }
 
     // --- room / property shape ---

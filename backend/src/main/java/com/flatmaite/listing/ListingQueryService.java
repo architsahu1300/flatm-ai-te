@@ -91,6 +91,11 @@ public class ListingQueryService {
       where.append(" AND p.locality_id IN (:localityIds)");
       params.put("localityIds", f.localityIds());
     }
+    if (f.excludeLocalityIds() != null && !f.excludeLocalityIds().isEmpty()) {
+      // LEFT JOIN: a listing without a property has a NULL locality and must survive the exclusion
+      where.append(" AND (p.locality_id IS NULL OR p.locality_id NOT IN (:excludeLocalityIds))");
+      params.put("excludeLocalityIds", f.excludeLocalityIds());
+    }
     if (f.budgetMin() != null) {
       where.append(" AND l.rent_monthly >= :budgetMin");
       params.put("budgetMin", f.budgetMin());

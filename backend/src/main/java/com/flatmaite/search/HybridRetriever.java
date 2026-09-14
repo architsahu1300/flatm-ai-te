@@ -168,6 +168,11 @@ public class HybridRetriever {
       where.append(" AND fp.locality_ids && CAST(:locIds AS uuid[])");
       params.put("locIds", localityIds.toArray(UUID[]::new));
     }
+    List<UUID> excludedIds = excludedLocalityIds(intent);
+    if (!excludedIds.isEmpty()) {
+      where.append(" AND NOT (fp.locality_ids && CAST(:exclIds AS uuid[]))");
+      params.put("exclIds", excludedIds.toArray(UUID[]::new));
+    }
     if (intent.genderPreference() != null && intent.genderPreference() != GenderPreference.ANY) {
       String genderValue = intent.genderPreference() == GenderPreference.FEMALE_ONLY ? "FEMALE" : "MALE";
       where.append(
@@ -277,6 +282,7 @@ public class HybridRetriever {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
     return ListingFilters.builder()
         .localityIds(admittedLocalityIds(intent))
+        .excludeLocalityIds(excludedLocalityIds(intent))
         .budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1))
         .maxDeposit(intent.maxDeposit())
         .roomType(intent.roomType())
@@ -294,35 +300,73 @@ public class HybridRetriever {
         .build();
   }
 
-  /**
-   * Preferred localities ∪ commute-radius expansion. Empty list = no locality hard filter (the
-   * location signal then only affects scoring).
-   */
-  public List<UUID> admittedLocalityIds(SearchIntent intent) {
+  /** Home localities the user named — every id of an ambiguous alias — minus exclusions. */
+  public List<UUID> requestedLocalityIds(SearchIntent intent) {
     List<UUID> ids = new ArrayList<>();
     if (intent.locations() != null) {
       for (SearchIntent.LocationRef ref : intent.locations()) {
-        UUID id = ref.localityId() != null ? ref.localityId() : firstId(localityResolver.resolve(ref.name()));
-        if (id != null && !ids.contains(id)) {
-          ids.add(id);
-        }
-      }
-    }
-    if (intent.commuteTo() != null) {
-      UUID anchor =
-          intent.commuteTo().localityId() != null
-              ? intent.commuteTo().localityId()
-              : firstId(localityResolver.resolve(intent.commuteTo().place()));
-      if (anchor != null) {
-        int maxMinutes = intent.commuteTo().maxMinutes() == null ? 45 : intent.commuteTo().maxMinutes();
-        for (UUID locality : allLocalityIds()) {
-          Integer minutes = commuteEstimator.minutesBetween(locality, anchor);
-          if (minutes != null && minutes <= maxMinutes && !ids.contains(locality)) {
-            ids.add(locality);
+        for (UUID id : idsOf(ref)) {
+          if (!ids.contains(id)) {
+            ids.add(id);
           }
         }
       }
     }
+    ids.removeAll(excludedLocalityIds(intent));
+    return ids;
+  }
+
+  public List<UUID> excludedLocalityIds(SearchIntent intent) {
+    List<UUID> ids = new ArrayList<>();
+    if (intent.excludeLocations() != null) {
+      for (SearchIntent.LocationRef ref : intent.excludeLocations()) {
+        for (UUID id : idsOf(ref)) {
+          if (!ids.contains(id)) {
+            ids.add(id);
+          }
+        }
+      }
+    }
+    return ids;
+  }
+
+  private List<UUID> idsOf(SearchIntent.LocationRef ref) {
+    if (ref.localityId() != null) {
+      return List.of(ref.localityId());
+    }
+    return localityResolver.resolve(ref.name()).map(LocalityResolver.Match::localityIds).orElse(List.of());
+  }
+
+  private UUID commuteAnchor(SearchIntent intent) {
+    if (intent.commuteTo() == null) {
+      return null;
+    }
+    if (intent.commuteTo().localityId() != null) {
+      return intent.commuteTo().localityId();
+    }
+    return localityResolver.resolve(intent.commuteTo().place()).map(m -> m.localityIds().get(0)).orElse(null);
+  }
+
+  /**
+   * Requested localities ∪ commute-radius expansion, minus exclusions. Empty list = no locality
+   * hard filter (the location signal then only affects scoring).
+   */
+  public List<UUID> admittedLocalityIds(SearchIntent intent) {
+    List<UUID> ids = new ArrayList<>(requestedLocalityIds(intent));
+    UUID anchor = commuteAnchor(intent);
+    if (anchor != null) {
+      int maxMinutes =
+          intent.commuteTo().maxMinutes() == null
+              ? SearchIntent.DEFAULT_COMMUTE_MINUTES
+              : intent.commuteTo().maxMinutes();
+      for (UUID locality : allLocalityIds()) {
+        Integer minutes = commuteEstimator.minutesBetween(locality, anchor);
+        if (minutes != null && minutes <= maxMinutes && !ids.contains(locality)) {
+          ids.add(locality);
+        }
+      }
+    }
+    ids.removeAll(excludedLocalityIds(intent));
     return ids;
   }
 
@@ -398,9 +442,5 @@ public class HybridRetriever {
     } catch (Exception e) {
       return null;
     }
-  }
-
-  private static UUID firstId(java.util.Optional<LocalityResolver.Match> match) {
-    return match.map(m -> m.localityIds().get(0)).orElse(null);
   }
 }

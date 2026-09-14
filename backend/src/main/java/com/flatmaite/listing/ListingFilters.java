@@ -17,6 +17,7 @@ import lombok.Builder;
 @Builder(toBuilder = true)
 public record ListingFilters(
     List<UUID> localityIds,
+    List<UUID> excludeLocalityIds,
     Integer budgetMin,
     Integer budgetMax,
     RoomType roomType,

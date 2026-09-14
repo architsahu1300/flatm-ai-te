@@ -59,4 +59,21 @@ class MockIntentLlmTest {
 
     assertThat(intent.freeText().length()).isLessThanOrEqualTo(SearchIntent.MAX_FREE_TEXT_CHARS);
   }
+
+  @Test
+  void refinement_carriesExclusionsAndUnresolvedNamesForward() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .budgetMax(20000)
+            .excludeLocations(List.of(new SearchIntent.LocationRef("Andheri East", null)))
+            .unresolvedLocations(List.of("Hiranandani Gardens"))
+            .originalQuery("room not in andheri near hiranandani gardens")
+            .build();
+
+    SearchIntent refined = llm().extract("with a balcony", prior);
+
+    assertThat(refined.excludeLocations()).extracting(SearchIntent.LocationRef::name).containsExactly("Andheri East");
+    assertThat(refined.unresolvedLocations()).containsExactly("Hiranandani Gardens");
+    assertThat(SearchIntent.DEFAULT_COMMUTE_MINUTES).isEqualTo(30);
+  }
 }

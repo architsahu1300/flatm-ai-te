@@ -89,7 +89,7 @@ public final class MatchScorer {
         int maxMinutes =
             intent.commuteTo() != null && intent.commuteTo().maxMinutes() != null
                 ? intent.commuteTo().maxMinutes()
-                : 45;
+                : SearchIntent.DEFAULT_COMMUTE_MINUTES;
         String place =
             intent.commuteTo() != null ? intent.commuteTo().place() : "your preferred area";
         if (c.commuteMinutes() <= 20) {

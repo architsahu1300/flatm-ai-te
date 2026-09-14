@@ -28,7 +28,7 @@ public final class RefinementHeuristics {
       return prior.toBuilder().verifiedOnly(true).build();
     }
     if (q.matches(".*\\b(closer|nearer)( to work)?\\b.*") && prior.commuteTo() != null) {
-      int current = prior.commuteTo().maxMinutes() == null ? 45 : prior.commuteTo().maxMinutes();
+      int current = prior.commuteTo().maxMinutes() == null ? SearchIntent.DEFAULT_COMMUTE_MINUTES : prior.commuteTo().maxMinutes();
       return prior.toBuilder()
           .commuteTo(
               new SearchIntent.CommuteTo(
