@@ -25,7 +25,7 @@ public class NewQueryDetector {
       Pattern.compile("\\b(forget that|forget it|start over|new search|scrap that|from scratch)\\b");
   private static final Pattern REFINEMENT_CUE =
       Pattern.compile(
-          "\\b(make it|instead|also|actually|same but|but in|rather|change it|change the|only|cheaper|closer|nearer)\\b");
+          "\\b(make it|instead|also|actually|same but|but in|rather|change it|change the|cheaper|closer|nearer)\\b");
   private static final Pattern BUDGET =
       Pattern.compile("(\\d+(?:\\.\\d+)?\\s*k\\b)|(\\d{4,7})|(\\d+(?:\\.\\d+)?\\s*(?:lakh|lac)\\b)");
   private static final Pattern BHK = Pattern.compile("\\d\\s*bhk");

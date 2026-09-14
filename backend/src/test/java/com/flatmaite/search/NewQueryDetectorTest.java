@@ -93,6 +93,15 @@ class NewQueryDetectorTest {
   }
 
   @Test
+  void onlyIsNotARefinementCue_soAFreshRequestStaysNew() {
+    // two anchors + a housing noun: a complete request, whatever "only" prefixes it
+    assertThat(detector.decide("only flats in powai 25k")).isEqualTo(NewQueryDetector.Verdict.NEW);
+    // zero anchors: still a refinement by the anchor rule, not by the word "only"
+    assertThat(detector.decide("only verified listings")).isEqualTo(NewQueryDetector.Verdict.REFINE);
+    assertThat(detector.decide("only furnished")).isEqualTo(NewQueryDetector.Verdict.REFINE);
+  }
+
+  @Test
   void oneAnchorWithANoun_isAmbiguous() {
     assertThat(detector.decide("sea view flat in powai")).isEqualTo(NewQueryDetector.Verdict.AMBIGUOUS);
     assertThat(detector.decide("flats in goregaon")).isEqualTo(NewQueryDetector.Verdict.AMBIGUOUS);
