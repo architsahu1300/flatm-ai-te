@@ -40,6 +40,9 @@ public class KeywordIntentParser {
   private static final Pattern BHK = Pattern.compile("(\\d)\\s*bhk");
   private static final Pattern COMMUTE_MIN =
       Pattern.compile("(?:within|in|under|less than)\\s*(\\d{1,3})\\s*min(?:ute)?s?\\b");
+  /** The reversed phrasing "15 min from Powai" — COMMUTE_MIN only reads cue-then-number. */
+  private static final Pattern COMMUTE_MIN_FROM =
+      Pattern.compile("\\b(\\d{1,3})\\s*min(?:ute)?s?\\s*from\\b");
 
   static final Set<String> FLOOR_CUES =
       Set.of("above", "over", "least", "minimum", "min", "from", "starting", "upwards");
@@ -92,6 +95,7 @@ public class KeywordIntentParser {
       Amount amt = amounts.get(a);
       int ti = tokenIndexAt(tokens, amt.start());
       int afterTi = tokenIndexAt(tokens, amt.end());
+      int windowStart = Math.max(Math.max(0, ti - CUE_WINDOW), windowFloor);
       List<String> before = precedingWords(tokens, ti, CUE_WINDOW, windowFloor);
       windowFloor = afterTi;
       Amount next = a + 1 < amounts.size() ? amounts.get(a + 1) : null;
@@ -114,7 +118,7 @@ public class KeywordIntentParser {
           continue;
         }
       }
-      if (isFloor(before)) {
+      if (isFloor(tokens, windowStart, before)) {
         if (budgetMin == null) {
           budgetMin = amt.value();
         }
@@ -134,6 +138,11 @@ public class KeywordIntentParser {
       Matcher cm = COMMUTE_MIN.matcher(q);
       if (cm.find()) {
         maxMinutes = Integer.parseInt(cm.group(1));
+      } else {
+        Matcher cmFrom = COMMUTE_MIN_FROM.matcher(q);
+        if (cmFrom.find()) {
+          maxMinutes = Integer.parseInt(cmFrom.group(1));
+        }
       }
       UUID anchorId = anchor.localityIds().get(0);
       commuteTo =
@@ -317,14 +326,36 @@ public class KeywordIntentParser {
     return false;
   }
 
-  private static boolean isFloor(List<String> before) {
+  /**
+   * {@code windowStart} is the token index of {@code before.get(0)}, so a cue's index in the full
+   * token stream is {@code windowStart + i} — needed to disambiguate "min"/"from" by what is
+   * actually adjacent to them, not just by membership in the window.
+   */
+  private static boolean isFloor(List<Tokens.Token> tokens, int windowStart, List<String> before) {
     if (before.contains("not")) {
       return false; // "not more than 18k" is a ceiling
     }
     if (before.contains("more") || before.contains("greater") || before.contains("higher")) {
       return true;
     }
-    return before.stream().anyMatch(FLOOR_CUES::contains);
+    for (int i = 0; i < before.size(); i++) {
+      String cue = before.get(i);
+      if (!FLOOR_CUES.contains(cue)) {
+        continue;
+      }
+      if (cue.equals("min") && precededByNumber(tokens, windowStart + i)) {
+        continue; // "20 min" — the minutes phrase COMMUTE_MIN recognises, not a minimum
+      }
+      if (cue.equals("from") && i != before.size() - 1) {
+        continue; // "from" is a floor only when the amount is the very next token after it
+      }
+      return true;
+    }
+    return false;
+  }
+
+  private static boolean precededByNumber(List<Tokens.Token> tokens, int index) {
+    return index > 0 && tokens.get(index - 1).text().chars().allMatch(Character::isDigit);
   }
 
   /**

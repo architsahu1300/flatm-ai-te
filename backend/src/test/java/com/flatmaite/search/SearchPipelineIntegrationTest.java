@@ -166,6 +166,63 @@ class SearchPipelineIntegrationTest {
     assertThat((String) data.get("note")).contains("fresh search");
   }
 
+  @Test
+  @Order(6)
+  @SuppressWarnings("unchecked")
+  void overTightFloor_offersALowerMinimumRelaxer() {
+    // max seed rent is well under 200000 — this floor admits nothing until it is relaxed
+    ResponseEntity<Map> response =
+        rest.postForEntity("/api/v1/ai/search", json(Map.of("query", "flat more than 200000")), Map.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
+    Map<String, Object> intent = (Map<String, Object>) data.get("intent");
+    assertThat(intent.get("budgetMin")).isEqualTo(200000);
+    assertThat((List<Map<String, Object>>) data.get("homes")).isEmpty();
+
+    List<Map<String, Object>> relaxers = (List<Map<String, Object>>) data.get("relaxers");
+    assertThat(relaxers).extracting(r -> r.get("label")).contains("Lower the minimum");
+  }
+
+  @Test
+  @Order(7)
+  @SuppressWarnings("unchecked")
+  void startBroaderFallback_keepsExplicitExclusions() {
+    ResponseEntity<Map> first =
+        rest.postForEntity("/api/v1/ai/search", json(Map.of("query", "flat in mumbai")), Map.class);
+    Map<String, Object> firstData = (Map<String, Object>) first.getBody().get("data");
+    String freshSessionId = (String) firstData.get("sessionId");
+    String freshCookie = first.getHeaders().getFirst(HttpHeaders.SET_COOKIE).split(";")[0];
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(HttpHeaders.COOKIE, freshCookie);
+
+    // bhk 99 admits nothing (seed tops out at 3) regardless of which single relaxer dimension is
+    // tried, so the search bottoms out at the "Start broader" fallback with an explicit exclusion.
+    Map<String, Object> excludeRef = new java.util.HashMap<>();
+    excludeRef.put("name", "Powai");
+    excludeRef.put("localityId", null);
+    Map<String, Object> impossibleIntent =
+        Map.of("bhk", Map.of("min", 99, "max", 99), "excludeLocations", List.of(excludeRef));
+
+    ResponseEntity<Map> response =
+        rest.postForEntity(
+            "/api/v1/ai/apply",
+            new HttpEntity<>(Map.of("intent", impossibleIntent, "sessionId", freshSessionId), headers),
+            Map.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
+    assertThat((List<Map<String, Object>>) data.get("homes")).isEmpty();
+    List<Map<String, Object>> relaxers = (List<Map<String, Object>>) data.get("relaxers");
+    assertThat(relaxers).extracting(r -> r.get("label")).containsExactly("Start broader");
+
+    Map<String, Object> relaxedIntent = (Map<String, Object>) relaxers.get(0).get("relaxedIntent");
+    List<Map<String, Object>> exclude = (List<Map<String, Object>>) relaxedIntent.get("excludeLocations");
+    assertThat(exclude).extracting(e -> e.get("name")).contains("Powai");
+  }
+
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

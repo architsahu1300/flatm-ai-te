@@ -174,12 +174,18 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       remove: (i) => ({ ...i, commuteTo: null }),
     });
   }
-  if (intent.budgetMax != null) {
+  if (intent.budgetMax != null || intent.budgetMin != null) {
+    const value =
+      intent.budgetMax != null && intent.budgetMin != null
+        ? `${inr(intent.budgetMin)} – ${inr(intent.budgetMax)}`
+        : intent.budgetMax != null
+          ? `≤ ${inr(intent.budgetMax)}`
+          : `≥ ${inr(intent.budgetMin!)}`;
     chips.push({
       key: "budget",
       icon: "💰",
       label: "Budget",
-      value: `≤ ${inr(intent.budgetMax)}`,
+      value,
       remove: (i) => ({ ...i, budgetMax: null, budgetMin: null }),
     });
   }

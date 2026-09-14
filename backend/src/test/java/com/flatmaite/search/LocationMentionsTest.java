@@ -60,6 +60,15 @@ class LocationMentionsTest {
   }
 
   @Test
+  void minutesFrom_isACommuteCue() {
+    // "15 min from powai" — the reversed phrasing the forward cue window does not cover
+    LocationMentions m = mentions("15 min from powai");
+
+    assertThat(m.commute()).map(LocalityResolver.Match::canonicalName).hasValue("Powai");
+    assertThat(m.home()).isEmpty();
+  }
+
+  @Test
   void negationCues_exclude() {
     assertThat(mentions("anywhere but andheri").exclude()).hasSize(1);
     assertThat(mentions("not in andheri").exclude()).hasSize(1);

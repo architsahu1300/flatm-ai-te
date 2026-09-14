@@ -436,6 +436,13 @@ public class SearchPipeline {
                 count));
       }
     }
+    if (intent.budgetMin() != null) {
+      SearchIntent relaxed = intent.toBuilder().budgetMin(null).build();
+      long count = countFor(relaxed);
+      if (count > 0) {
+        out.add(new Relaxer("Lower the minimum", "shows %d more".formatted(count), relaxed, count));
+      }
+    }
     if (Boolean.TRUE.equals(intent.verifiedOnly())) {
       SearchIntent relaxed = intent.toBuilder().verifiedOnly(false).build();
       long count = countFor(relaxed);
@@ -464,6 +471,7 @@ public class SearchPipeline {
               .searchTarget(intent.targetOrDefault())
               .locations(intent.locations())
               .commuteTo(intent.commuteTo())
+              .excludeLocations(intent.excludeLocations())
               .freeText(intent.freeText())
               .originalQuery(intent.originalQuery())
               .build();

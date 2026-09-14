@@ -78,4 +78,21 @@ class HybridRetrieverAdmissionTest {
 
     assertThat(retriever.admittedLocalityIds(intent, false)).containsExactly(bkc, bandra);
   }
+
+  @Test
+  void budgetMin_reachesFilters_withNoHeadroom_inBothModes() {
+    SearchIntent intent = homeIn(goregaon, "Goregaon").toBuilder().budgetMin(30000).build();
+
+    assertThat(retriever.toFilters(intent).budgetMin()).isEqualTo(30000);
+    assertThat(retriever.toFilters(intent, false).budgetMin()).isEqualTo(30000);
+  }
+
+  @Test
+  void budgetRange_carriesBothBounds_ceilingKeepsItsHeadroom() {
+    SearchIntent intent =
+        homeIn(goregaon, "Goregaon").toBuilder().budgetMin(20000).budgetMax(30000).build();
+
+    assertThat(retriever.toFilters(intent).budgetMin()).isEqualTo(20000);
+    assertThat(retriever.toFilters(intent).budgetMax()).isEqualTo(33000); // 10% headroom, ceiling only
+  }
 }

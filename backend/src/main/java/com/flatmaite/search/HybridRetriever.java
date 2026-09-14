@@ -295,6 +295,7 @@ public class HybridRetriever {
     return ListingFilters.builder()
         .localityIds(admittedLocalityIds(intent, widenToNearby))
         .excludeLocalityIds(excludedLocalityIds(intent))
+        .budgetMin(intent.budgetMin())
         .budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1))
         .maxDeposit(intent.maxDeposit())
         .roomType(intent.roomType())

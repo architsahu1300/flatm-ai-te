@@ -19,6 +19,7 @@ public record LocationMentions(List<Match> home, List<Match> exclude, Optional<M
   static final Set<String> COMMUTE_CUES =
       Set.of("near", "nearby", "close", "around", "next", "within", "work", "working", "office", "commute", "commuting");
   private static final int COMMUTE_WINDOW = 4;
+  private static final Set<String> MINUTES_WORDS = Set.of("min", "mins", "minute", "minutes");
 
   public static LocationMentions from(List<Tokens.Token> tokens, List<Match> matches) {
     List<Match> home = new ArrayList<>();
@@ -60,7 +61,10 @@ public record LocationMentions(List<Match> home, List<Match> exclude, Optional<M
         return true;
       }
     }
-    return false;
+    // "15 min from Powai" — a minutes phrase read backwards; the forward cue window above never
+    // sees "from" because it always looks from the match back towards a leading cue word.
+    return text(tokens, m.tokenStart() - 1).equals("from")
+        && MINUTES_WORDS.contains(text(tokens, m.tokenStart() - 2));
   }
 
   private static String text(List<Tokens.Token> tokens, int index) {

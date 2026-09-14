@@ -130,6 +130,40 @@ class KeywordIntentParserTest {
   }
 
   @Test
+  void minutesPhrase_isNotMisreadAsAMinimum() {
+    SearchIntent i = parser.parse("room within 20 min of bkc, 25k");
+
+    assertThat(i.budgetMax()).isEqualTo(25000);
+    assertThat(i.budgetMin()).isNull();
+    assertThat(i.commuteTo().place()).isEqualTo("BKC");
+    assertThat(i.commuteTo().maxMinutes()).isEqualTo(20);
+  }
+
+  @Test
+  void fromAPlace_isNotMisreadAsAFloor_whenNotAdjacentToTheAmount() {
+    SearchIntent i = parser.parse("15 min from powai for 25000");
+
+    assertThat(i.budgetMax()).isEqualTo(25000);
+    assertThat(i.budgetMin()).isNull();
+    assertThat(i.commuteTo().place()).isEqualTo("Powai");
+    assertThat(i.commuteTo().maxMinutes()).isEqualTo(15);
+  }
+
+  @Test
+  void minAndMinimum_stayFloors_whenNotAMinutesPhrase() {
+    assertThat(parser.parse("min 20k").budgetMin()).isEqualTo(20000);
+    assertThat(parser.parse("minimum 20k in andheri").budgetMin()).isEqualTo(20000);
+  }
+
+  @Test
+  void fromToRange_stillWorks() {
+    SearchIntent i = parser.parse("from 20k to 30k");
+
+    assertThat(i.budgetMin()).isEqualTo(20000);
+    assertThat(i.budgetMax()).isEqualTo(30000);
+  }
+
+  @Test
   void liveHere_workThere() {
     SearchIntent i = parser.parse("room in andheri, i work at bkc");
 
