@@ -138,7 +138,7 @@ public class SearchPipeline {
     if (intent.locations() != null) {
       resolved = new ArrayList<>();
       for (SearchIntent.LocationRef ref : intent.locations()) {
-        UUID id = ref.localityId() != null ? ref.localityId() : localityResolver.resolve(ref.name());
+        UUID id = ref.localityId() != null ? ref.localityId() : firstId(localityResolver.resolve(ref.name()));
         resolved.add(new SearchIntent.LocationRef(ref.name(), id));
       }
     }
@@ -146,7 +146,7 @@ public class SearchPipeline {
     if (commute != null && commute.localityId() == null) {
       commute =
           new SearchIntent.CommuteTo(
-              commute.place(), localityResolver.resolve(commute.place()), commute.maxMinutes());
+              commute.place(), firstId(localityResolver.resolve(commute.place())), commute.maxMinutes());
     }
     return intent.toBuilder().locations(resolved).commuteTo(commute).build();
   }
@@ -532,5 +532,9 @@ public class SearchPipeline {
     String normalized = query.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", " ");
     String priorPart = prior == null ? "" : String.valueOf(prior.hashCode());
     return EmbeddingTextComposer.sha256(normalized + "|" + priorPart);
+  }
+
+  private static UUID firstId(java.util.Optional<LocalityResolver.Match> match) {
+    return match.map(m -> m.localityIds().get(0)).orElse(null);
   }
 }

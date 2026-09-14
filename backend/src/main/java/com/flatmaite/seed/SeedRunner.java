@@ -118,7 +118,7 @@ public class SeedRunner implements ApplicationRunner {
   private final Faker faker = new Faker(new Locale("en", "IND"), new Random(42));
 
   private static final int USER_COUNT = 54;
-  private static final int LISTING_COUNT = 50;
+  private static final int LISTING_COUNT = 80;
   private static final int FLATMATE_COUNT = 35;
   private static final int IMAGE_COUNT = 15;
 
@@ -126,16 +126,44 @@ public class SeedRunner implements ApplicationRunner {
 
   // rentBand = typical private-room rent midpoint (₹/month)
   private static final LocalitySeed[] LOCALITIES = {
-    new LocalitySeed("Andheri", 19.1136, 72.8697, new String[] {"andheri east", "andheri west"}, 22000),
+    new LocalitySeed("Andheri East", 19.1136, 72.8697, new String[] {"andheri east", "andheri"}, 22000),
+    new LocalitySeed("Andheri West", 19.1364, 72.8296, new String[] {"andheri west", "andheri"}, 25000),
     new LocalitySeed("Bandra", 19.0596, 72.8295, new String[] {"bandra west", "bandra east"}, 32000),
-    new LocalitySeed("Powai", 19.1176, 72.9060, new String[] {"hiranandani"}, 24000),
-    new LocalitySeed("Lower Parel", 18.9962, 72.8330, new String[] {"parel"}, 33000),
+    new LocalitySeed("Powai", 19.1176, 72.9060, new String[] {"hiranandani", "hiranandani gardens", "iit bombay"}, 24000),
+    new LocalitySeed("Lower Parel", 18.9962, 72.8330, new String[] {"lower parel", "lp"}, 33000),
+    new LocalitySeed("Parel", 19.0090, 72.8400, new String[] {"parel"}, 30000),
     new LocalitySeed("Worli", 19.0176, 72.8172, new String[] {}, 38000),
-    new LocalitySeed("Goregaon", 19.1663, 72.8526, new String[] {"goregaon east", "goregaon west"}, 16000),
-    new LocalitySeed("Malad", 19.1874, 72.8484, new String[] {"malad west"}, 14000),
-    new LocalitySeed("BKC", 19.0653, 72.8693, new String[] {"bandra kurla complex", "bandra-kurla"}, 36000),
-    new LocalitySeed("Kurla", 19.0726, 72.8845, new String[] {"kurla west"}, 13000),
-    new LocalitySeed("Ghatkopar", 19.0790, 72.9080, new String[] {"ghatkopar east"}, 15000),
+    new LocalitySeed("Goregaon", 19.1663, 72.8526, new String[] {"goregaon east", "goregaon west", "film city"}, 16000),
+    new LocalitySeed("Malad", 19.1874, 72.8484, new String[] {"malad west", "malad east", "mindspace"}, 14000),
+    new LocalitySeed("BKC", 19.0653, 72.8693, new String[] {"bandra kurla complex", "bandra-kurla", "bandra kurla", "bkc road"}, 36000),
+    new LocalitySeed("Kurla", 19.0726, 72.8845, new String[] {"kurla west", "kurla east"}, 13000),
+    new LocalitySeed("Ghatkopar", 19.0790, 72.9080, new String[] {"ghatkopar east", "ghatkopar west"}, 15000),
+    new LocalitySeed("Marol", 19.1197, 72.8823, new String[] {"marol naka", "mahakali"}, 20000),
+    new LocalitySeed("Chakala", 19.1100, 72.8630, new String[] {"jb nagar", "j b nagar"}, 21000),
+    new LocalitySeed("Sakinaka", 19.1050, 72.8880, new String[] {"saki naka"}, 16000),
+    new LocalitySeed("Jogeshwari", 19.1360, 72.8490, new String[] {"jogeshwari east", "jogeshwari west"}, 17000),
+    new LocalitySeed("Ram Mandir", 19.1480, 72.8450, new String[] {"ram mandir road"}, 16000),
+    new LocalitySeed("Vile Parle", 19.0996, 72.8440, new String[] {"vile parle east", "vile parle west", "parle"}, 26000),
+    new LocalitySeed("Santacruz", 19.0817, 72.8414, new String[] {"santa cruz", "santacruz east", "santacruz west"}, 28000),
+    new LocalitySeed("Khar", 19.0700, 72.8340, new String[] {"khar west", "khar east"}, 32000),
+    new LocalitySeed("Juhu", 19.1075, 72.8263, new String[] {"juhu beach"}, 34000),
+    new LocalitySeed("Mahim", 19.0410, 72.8408, new String[] {}, 26000),
+    new LocalitySeed("Dadar", 19.0178, 72.8478, new String[] {"dadar east", "dadar west", "shivaji park"}, 27000),
+    new LocalitySeed("Matunga", 19.0270, 72.8553, new String[] {"matunga east", "matunga west"}, 26000),
+    new LocalitySeed("Sion", 19.0390, 72.8619, new String[] {"sion east"}, 20000),
+    new LocalitySeed("Wadala", 19.0176, 72.8562, new String[] {"wadala east"}, 22000),
+    new LocalitySeed("Chembur", 19.0522, 72.9005, new String[] {"chembur east"}, 19000),
+    new LocalitySeed("Vikhroli", 19.1080, 72.9280, new String[] {"vikhroli east", "vikhroli west"}, 18000),
+    new LocalitySeed("Kanjurmarg", 19.1283, 72.9350, new String[] {"kanjur marg"}, 17000),
+    new LocalitySeed("Bhandup", 19.1440, 72.9370, new String[] {}, 15000),
+    new LocalitySeed("Mulund", 19.1726, 72.9564, new String[] {"mulund west"}, 17000),
+    new LocalitySeed("Thane", 19.2183, 72.9781, new String[] {"thane west", "ghodbunder"}, 15000),
+    new LocalitySeed("Kandivali", 19.2045, 72.8519, new String[] {"kandivali east", "kandivali west"}, 15000),
+    new LocalitySeed("Borivali", 19.2307, 72.8567, new String[] {"borivali west", "borivali east"}, 16000),
+    new LocalitySeed("Vashi", 19.0771, 72.9987, new String[] {"navi mumbai"}, 17000),
+    new LocalitySeed("Airoli", 19.1590, 72.9986, new String[] {}, 15000),
+    new LocalitySeed("Kharghar", 19.0330, 73.0650, new String[] {}, 13000),
+    new LocalitySeed("Colaba", 18.9067, 72.8147, new String[] {"cuffe parade"}, 40000),
   };
 
   private static final String[][] AMENITY_SEED = {
@@ -430,11 +458,11 @@ public class SeedRunner implements ApplicationRunner {
     List<UUID> expectedImageIds = new ArrayList<>();
     ListingType[] types = new ListingType[LISTING_COUNT];
     int idx = 0;
-    for (int i = 0; i < 18; i++) types[idx++] = ListingType.PRIVATE_ROOM;
-    for (int i = 0; i < 10; i++) types[idx++] = ListingType.SHARED_ROOM;
-    for (int i = 0; i < 10; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
-    for (int i = 0; i < 8; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
-    for (int i = 0; i < 4; i++) types[idx++] = ListingType.REPLACEMENT;
+    for (int i = 0; i < 29; i++) types[idx++] = ListingType.PRIVATE_ROOM;
+    for (int i = 0; i < 16; i++) types[idx++] = ListingType.SHARED_ROOM;
+    for (int i = 0; i < 16; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
+    for (int i = 0; i < 13; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
+    for (int i = 0; i < 6; i++) types[idx++] = ListingType.REPLACEMENT;
 
     for (int i = 0; i < LISTING_COUNT; i++) {
       ListingType type = types[i];

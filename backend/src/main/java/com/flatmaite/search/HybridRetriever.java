@@ -302,7 +302,7 @@ public class HybridRetriever {
     List<UUID> ids = new ArrayList<>();
     if (intent.locations() != null) {
       for (SearchIntent.LocationRef ref : intent.locations()) {
-        UUID id = ref.localityId() != null ? ref.localityId() : localityResolver.resolve(ref.name());
+        UUID id = ref.localityId() != null ? ref.localityId() : firstId(localityResolver.resolve(ref.name()));
         if (id != null && !ids.contains(id)) {
           ids.add(id);
         }
@@ -312,7 +312,7 @@ public class HybridRetriever {
       UUID anchor =
           intent.commuteTo().localityId() != null
               ? intent.commuteTo().localityId()
-              : localityResolver.resolve(intent.commuteTo().place());
+              : firstId(localityResolver.resolve(intent.commuteTo().place()));
       if (anchor != null) {
         int maxMinutes = intent.commuteTo().maxMinutes() == null ? 45 : intent.commuteTo().maxMinutes();
         for (UUID locality : allLocalityIds()) {
@@ -398,5 +398,9 @@ public class HybridRetriever {
     } catch (Exception e) {
       return null;
     }
+  }
+
+  private static UUID firstId(java.util.Optional<LocalityResolver.Match> match) {
+    return match.map(m -> m.localityIds().get(0)).orElse(null);
   }
 }

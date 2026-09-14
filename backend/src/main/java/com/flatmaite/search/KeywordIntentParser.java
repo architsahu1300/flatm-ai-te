@@ -102,8 +102,10 @@ public class KeywordIntentParser {
 
     // --- locations & commute ---
     List<LocationRef> locations = new ArrayList<>();
-    for (UUID id : localityResolver.scan(q)) {
-      locations.add(new LocationRef(localityResolver.nameOf(id), id));
+    for (LocalityResolver.Match m : localityResolver.scan(q)) {
+      for (UUID id : m.localityIds()) {
+        locations.add(new LocationRef(localityResolver.nameOf(id), id));
+      }
     }
     CommuteTo commuteTo = null;
     boolean nearContext =
