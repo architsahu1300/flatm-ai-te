@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Candidate retrieval: hard SQL filters first (CTE), then two rankings inside the filtered set —
+ * Candidate retrieval: hard SQL filters first, then two rankings inside the filtered set —
  * vector similarity and full-text — merged with Reciprocal Rank Fusion. Returns ids plus a
  * {@link Retrieval} for every candidate; hydration/scoring happen above.
  */
@@ -36,7 +36,10 @@ public class HybridRetriever {
    * best candidate is 1.0 — never null, because a candidate exists only if some ranking produced
    * it. The hit flags say which rankings did, so the scorer's detail text stays honest.
    */
-  public record Retrieval(double score, boolean semanticHit, boolean lexicalHit) {}
+  public record Retrieval(double score, boolean semanticHit, boolean lexicalHit) {
+    /** Defensive value for a candidate no ranking produced; should not occur in practice. */
+    public static final Retrieval NONE = new Retrieval(0, false, false);
+  }
 
   public record Candidate(UUID id, UUID localityId, Double lat, Double lng, Retrieval retrieval) {}
 
@@ -44,6 +47,7 @@ public class HybridRetriever {
   private static final int FTS_LIMIT = 50;
   private static final Pattern STRUCTURED_TOKEN = Pattern.compile("^\\d+k?$");
   private static final Pattern NON_WORD = Pattern.compile("[^\\p{L}\\p{N}]+");
+  private static final int MAX_LEXICAL_TOKENS = 24;
 
   private final NamedParameterJdbcTemplate jdbc;
   private final EmbeddingProvider embeddingProvider;
@@ -334,6 +338,10 @@ public class HybridRetriever {
    * Turns residual free text into a websearch_to_tsquery expression that matches ANY term and
    * lets ts_rank_cd order by how many match. The default AND semantics need every word of a whole
    * sentence to appear in one title+description — for real queries, that is never.
+   *
+   * <p>Capped at {@value #MAX_LEXICAL_TOKENS} distinct terms: free text accumulates across a
+   * session, and an unbounded OR list matches the whole corpus and turns the ts_rank_cd ORDER BY
+   * into a full sort.
    */
   static String lexicalQuery(String freeText) {
     if (freeText == null) {
@@ -343,18 +351,35 @@ public class HybridRetriever {
     for (String token : NON_WORD.split(freeText.toLowerCase(Locale.ROOT))) {
       if (token.length() >= 3 && !STRUCTURED_TOKEN.matcher(token).matches()) {
         tokens.add(token);
+        if (tokens.size() == MAX_LEXICAL_TOKENS) {
+          break;
+        }
       }
     }
     return tokens.isEmpty() ? null : String.join(" or ", tokens);
   }
 
-  /** Embeds the user's full request — stable across a session — not the residual keyword text. */
+  /**
+   * Embeds the user's full request — stable across a session — plus whatever residual text was
+   * added later and is not already part of it, so refinement nuance reaches the vector side as well
+   * as the lexical one. Accumulated residuals begin with the original query; only the remainder is
+   * appended.
+   */
   static String semanticText(SearchIntent intent) {
     StringBuilder sb = new StringBuilder();
     if (intent.originalQuery() != null) {
       sb.append(intent.originalQuery());
-    } else if (intent.freeText() != null) {
-      sb.append(intent.freeText());
+    }
+    String freeText = intent.freeText();
+    if (freeText != null && !freeText.isBlank()) {
+      String base = sb.toString();
+      String extra = freeText.startsWith(base) ? freeText.substring(base.length()).trim() : freeText;
+      if (!extra.isEmpty() && !base.contains(extra)) {
+        if (sb.length() > 0) {
+          sb.append(". ");
+        }
+        sb.append(extra);
+      }
     }
     SearchIntent.Lifestyle l = intent.lifestyleOrEmpty();
     if (Boolean.TRUE.equals(l.quiet())) sb.append(". quiet calm peaceful home no parties");

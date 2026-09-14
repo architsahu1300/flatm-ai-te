@@ -65,6 +65,28 @@ public record SearchIntent(
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record CommuteTo(String place, UUID localityId, Integer maxMinutes) {}
 
+  /** Residual keywords accumulate across a session; bounded so the lexical query and the session JSON cannot grow without limit. */
+  public static final int MAX_FREE_TEXT_CHARS = 600;
+
+  /**
+   * Appends a follow-up's words to the prior residual (blank-safe on both sides), truncating the
+   * tail past {@link #MAX_FREE_TEXT_CHARS} so the earliest, richest terms are kept.
+   */
+  public static String joinFreeText(String prior, String next) {
+    String joined;
+    if (prior == null || prior.isBlank()) {
+      joined = next == null ? null : next.trim();
+    } else if (next == null || next.isBlank()) {
+      joined = prior.trim();
+    } else {
+      joined = prior.trim() + " " + next.trim();
+    }
+    if (joined != null && joined.length() > MAX_FREE_TEXT_CHARS) {
+      joined = joined.substring(0, MAX_FREE_TEXT_CHARS).trim();
+    }
+    return joined;
+  }
+
   public SearchTarget targetOrDefault() {
     return searchTarget == null ? SearchTarget.PROPERTIES : searchTarget;
   }

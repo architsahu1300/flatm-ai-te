@@ -114,12 +114,13 @@ public final class OpenAiLlms {
 
     /**
      * freeText is the LLM's residual when it gave one; otherwise the whole query on a first turn,
-     * or the prior residual on a refinement — never the refinement message itself.
+     * or the prior residual plus the follow-up's words on a refinement — so the message always
+     * reaches retrieval even when the model omits the field, and never replaces the residual.
      */
     static SearchIntent finish(SearchIntent extracted, String query, SearchIntent prior) {
       String freeText = extracted.freeText();
       if (freeText == null) {
-        freeText = prior == null ? query : prior.freeText();
+        freeText = prior == null ? query : SearchIntent.joinFreeText(prior.freeText(), query);
       }
       return extracted.toBuilder()
           .originalQuery(prior != null && prior.originalQuery() != null ? prior.originalQuery() : query)

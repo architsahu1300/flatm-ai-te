@@ -108,7 +108,7 @@ LIMIT :flimit
 
 `:lexQuery` comes from `static String lexicalQuery(String freeText)`:
 lowercase → split on `\W+` → keep tokens of length ≥ 3 → drop tokens matching `^\d+k?$`
-(budget is a structured slot) → dedupe preserving order → join with `" or "`.
+(budget is a structured slot) → dedupe preserving order → keep at most the first 24 distinct tokens (`MAX_LEXICAL_TOKENS`) → join with `" or "`.
 `websearch_to_tsquery` maps `or` to `|`, so a listing matching *any* term qualifies and
 `ts_rank_cd` orders by how well it matches. Returns `null` when no token survives; the caller
 then skips the lexical query. `websearch_to_tsquery` never throws on malformed input, which
@@ -120,7 +120,8 @@ fused order with `Retrieval` populated. `putIfAbsent` is gone.
 **`retrieveFlatmates`** gets the same lexical query against `fp.search_tsv`, reusing its
 hand-built `where`, and fuses identically. Limits stay `VECTOR_LIMIT = 100`, `FTS_LIMIT = 50`.
 
-**`semanticText(intent)`** uses `originalQuery` (falling back to `freeText`) plus the existing
+**`semanticText(intent)`** uses `originalQuery`, then appends any part of `freeText` not already
+contained in it (so residual nuance added after turn 1 reaches the embedding), then the existing
 lifestyle tag suffixes. `toFilters` and `admittedLocalityIds` are unchanged.
 
 ### 4.3 `freeText` contract
@@ -131,8 +132,11 @@ javadoc; the LLM prompt already asks for exactly this). Three implementations vi
 | Where | Today | After |
 |---|---|---|
 | `RefinementHeuristics.apply` | `.freeText(query)` | keep `prior.freeText()` |
-| `MockIntentLlm.extract`, refinement branch | `.freeText(query)` | `join(prior.freeText(), query)` (blank-safe, single space) |
-| `OpenAiIntentLlm.finish` when the LLM left `freeText` null | `query` | `prior == null ? query : prior.freeText()` |
+| `MockIntentLlm.extract`, refinement branch | `.freeText(query)` | `SearchIntent.joinFreeText(prior.freeText(), query)` |
+| `OpenAiIntentLlm.finish` when the LLM left `freeText` null | `query` | `prior == null ? query : SearchIntent.joinFreeText(prior.freeText(), query)` |
+
+`SearchIntent.joinFreeText` is blank-safe and caps the result at `MAX_FREE_TEXT_CHARS = 600`, so
+accumulated residuals — and client-supplied intents replayed via `/apply` — stay bounded.
 
 `KeywordIntentParser.parse` (first turn, whole query) is unchanged: with OR semantics and
 ranking, a full sentence is an acceptable lexical query. `originalQuery` is already preserved
@@ -160,7 +164,10 @@ Detail text by source:
 | ✓ | ✓ | Matches your description on both wording and meaning | same |
 | ✓ | — | Description matches what you asked for | Their profile matches your description |
 | — | ✓ | Mentions the specific things you asked for | Their profile mentions what you asked for |
-| — | — | Newest listings shown — semantic matching unavailable | Recently active profiles shown |
+| — | — | *(null — nothing true to claim; never cited)* | *(null — nothing true to claim; never cited)* |
+
+`semanticHit == false` also covers a listing whose own embedding is missing, so no detail text
+may imply a provider outage.
 
 `concernDetails` excludes `"relevance"` where it excluded `"semantic"`. `finish()` is
 untouched. Because every candidate now carries a score, there is no component to skip and no
@@ -214,3 +221,11 @@ commit exhibits the "missing evidence wins" behaviour:
 
 **Modified:** `HybridRetriever`, `MatchScorer`, `SearchPipeline`, `RefinementHeuristics`,
 `ai/MockLlms`, `ai/OpenAiLlms`, `MatchScorerTest`, `SearchPipelineIntegrationTest`.
+
+## 8. Post-review amendments (2026-09-14)
+
+The whole-branch review found three spec-level gaps, fixed in the same branch: the neither-hit
+relevance detail over-claimed (now null, §4.4); the lexical query and accumulated `freeText` were
+unbounded (now capped, §4.2/§4.3); residual text added after the first turn never reached the
+embedding (now appended, §4.2). The `originalQuery` reset on an LLM "replace" turn is a
+pre-existing arbiter conflict between `NewQueryDetector` and `REFINE_SYSTEM` and is deferred to WS2.

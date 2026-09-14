@@ -48,4 +48,15 @@ class MockIntentLlmTest {
 
     assertThat(refined.freeText()).isEqualTo("with a balcony");
   }
+
+  @Test
+  void refinement_capsAccumulatedFreeText() {
+    MockLlms.MockIntentLlm llm = llm();
+    SearchIntent intent = llm.extract("quiet private room under 25k", null);
+    for (int i = 0; i < 40; i++) {
+      intent = llm.extract("with a balcony and a view of the sea please", intent);
+    }
+
+    assertThat(intent.freeText().length()).isLessThanOrEqualTo(SearchIntent.MAX_FREE_TEXT_CHARS);
+  }
 }

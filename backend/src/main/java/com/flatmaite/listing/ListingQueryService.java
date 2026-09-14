@@ -81,7 +81,7 @@ public class ListingQueryService {
 
   /**
    * Builds the WHERE fragment for active-listing retrieval. Mutates {@code params}. Shared with the
-   * AI pipeline (which appends vector ordering on top).
+   * AI pipeline (which adds vector and full-text ordering on top).
    */
   public static String buildWhere(ListingFilters f, Map<String, Object> params) {
     StringBuilder where =

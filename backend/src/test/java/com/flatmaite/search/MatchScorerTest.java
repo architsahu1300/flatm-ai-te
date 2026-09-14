@@ -105,7 +105,7 @@ class MatchScorerTest {
     MatchScorer.Component relevance = component(scored, "relevance");
     assertThat(relevance.weight()).isEqualTo(0.15);
     assertThat(relevance.score()).isEqualTo(0.5);
-    assertThat(relevance.detail()).isEqualTo("Newest listings shown — semantic matching unavailable");
+    assertThat(relevance.detail()).isNull();
   }
 
   @Test
@@ -180,7 +180,18 @@ class MatchScorerTest {
     assertThat(MatchScorer.flatmateRelevanceDetail(new Retrieval(1, false, true)))
         .isEqualTo("Their profile mentions what you asked for");
     assertThat(MatchScorer.flatmateRelevanceDetail(new Retrieval(1, false, false)))
-        .isEqualTo("Recently active profiles shown");
+        .isNull();
+  }
+
+  @Test
+  void listingRelevanceDetail_matchesSpec() {
+    assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, true, true)))
+        .isEqualTo("Matches your description on both wording and meaning");
+    assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, true, false)))
+        .isEqualTo("Description matches what you asked for");
+    assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, false, true)))
+        .isEqualTo("Mentions the specific things you asked for");
+    assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, false, false))).isNull();
   }
 
   private static MatchScorer.Component component(MatchScorer.Scored scored, String name) {

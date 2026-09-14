@@ -8,10 +8,28 @@ import org.junit.jupiter.api.Test;
 class SemanticTextTest {
 
   @Test
-  void originalQueryWins_evenWhenFreeTextDiffers() {
-    // the old code embedded freeText, which after a refinement was the single word "cheaper"
+  void originalQueryLeads_andDistinctResidualFollows() {
     SearchIntent intent =
-        SearchIntent.builder().originalQuery("quiet room near BKC").freeText("cheaper").build();
+        SearchIntent.builder().originalQuery("quiet room near BKC").freeText("sea facing").build();
+
+    assertThat(HybridRetriever.semanticText(intent)).isEqualTo("quiet room near BKC. sea facing");
+  }
+
+  @Test
+  void accumulatedResidual_appendsOnlyTheRemainder() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .originalQuery("quiet room near BKC")
+            .freeText("quiet room near BKC with a balcony")
+            .build();
+
+    assertThat(HybridRetriever.semanticText(intent)).isEqualTo("quiet room near BKC. with a balcony");
+  }
+
+  @Test
+  void identicalResidual_isNotDuplicated() {
+    SearchIntent intent =
+        SearchIntent.builder().originalQuery("quiet room near BKC").freeText("quiet room near BKC").build();
 
     assertThat(HybridRetriever.semanticText(intent)).isEqualTo("quiet room near BKC");
   }

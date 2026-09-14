@@ -368,6 +368,12 @@ public final class MatchScorer {
     return hits.isEmpty() ? "Compared against what you asked for" : String.join("; ", hits);
   }
 
+  /**
+   * Detail text for the relevance component, stated only when a ranking actually matched the
+   * candidate. With neither hit there is nothing true to say — {@code semanticHit == false} also
+   * covers a listing whose own embedding is missing, not just a provider outage — and a null detail
+   * is never cited by the explainer (see {@link #positiveDetails}).
+   */
   static String listingRelevanceDetail(HybridRetriever.Retrieval r) {
     if (r.semanticHit() && r.lexicalHit()) {
       return "Matches your description on both wording and meaning";
@@ -378,7 +384,7 @@ public final class MatchScorer {
     if (r.lexicalHit()) {
       return "Mentions the specific things you asked for";
     }
-    return "Newest listings shown — semantic matching unavailable";
+    return null;
   }
 
   static String flatmateRelevanceDetail(HybridRetriever.Retrieval r) {
@@ -391,7 +397,7 @@ public final class MatchScorer {
     if (r.lexicalHit()) {
       return "Their profile mentions what you asked for";
     }
-    return "Recently active profiles shown";
+    return null;
   }
 
   // ------------------------------------------------------------------ shared

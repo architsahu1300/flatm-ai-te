@@ -80,8 +80,8 @@ class HybridRetrieverIntegrationTest {
         out.stream().filter(c -> c.retrieval().lexicalHit()).map(Candidate::id).toList();
 
     assertThat(lexicalIds).isNotEmpty();
-    // fewer active seed listings than VECTOR_LIMIT → every lexical hit is also a vector hit, and
-    // RRF places anything in both rankings ahead of anything in one
+    // at seed scale every active listing is inside VECTOR_LIMIT, so each lexical hit is also a
+    // vector hit and RRF ranks it ahead of vector-only candidates (not a general property)
     assertThat(out.get(0).retrieval().lexicalHit()).isTrue();
     List<Listing> hydrated = listingQueryService.hydrate(lexicalIds);
     assertThat(hydrated)

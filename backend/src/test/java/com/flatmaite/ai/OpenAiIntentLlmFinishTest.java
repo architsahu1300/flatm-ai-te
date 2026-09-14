@@ -18,7 +18,7 @@ class OpenAiIntentLlmFinishTest {
   }
 
   @Test
-  void refinement_nullFreeText_keepsPriorResidual_notTheTweak() {
+  void refinement_nullFreeText_appendsMessageToPriorResidual() {
     SearchIntent prior =
         SearchIntent.builder()
             .freeText("balcony sea view")
@@ -26,9 +26,9 @@ class OpenAiIntentLlmFinishTest {
             .build();
     SearchIntent extracted = SearchIntent.builder().budgetMax(20000).build();
 
-    SearchIntent out = OpenAiLlms.OpenAiIntentLlm.finish(extracted, "cheaper", prior);
+    SearchIntent out = OpenAiLlms.OpenAiIntentLlm.finish(extracted, "near a metro station", prior);
 
-    assertThat(out.freeText()).isEqualTo("balcony sea view");
+    assertThat(out.freeText()).isEqualTo("balcony sea view near a metro station");
     assertThat(out.originalQuery()).isEqualTo("room with balcony sea view");
   }
 

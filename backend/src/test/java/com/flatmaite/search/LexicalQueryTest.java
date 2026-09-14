@@ -35,4 +35,17 @@ class LexicalQueryTest {
     assertThat(HybridRetriever.lexicalQuery("Sea-facing!! \"Terrace\", (near) metro:"))
         .isEqualTo("sea or facing or terrace or near or metro");
   }
+
+  @Test
+  void capsAtTwentyFourDistinctTokens() {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 1; i <= 30; i++) {
+      sb.append("term").append(i).append(' ');
+    }
+
+    String query = HybridRetriever.lexicalQuery(sb.toString());
+
+    assertThat(query.split(" or ")).hasSize(24);
+    assertThat(query).startsWith("term1 or term2").endsWith("term24");
+  }
 }
