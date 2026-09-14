@@ -90,6 +90,29 @@ class HybridRetrieverIntegrationTest {
   }
 
   @Test
+  void listings_multiTermQuery_matchesAnyTerm_notAll() {
+    // "wardrobe" appears only in FULLY_FURNISHED seed descriptions and "essentials" only in
+    // SEMI_FURNISHED ones — never both in one listing. The old AND semantics returned nothing
+    // for this query; OR semantics must surface listings of both kinds.
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .originalQuery("room with a wardrobe or at least the essentials")
+            .freeText("wardrobe essentials")
+            .build();
+
+    List<Candidate> out = retriever.retrieveListings(intent);
+    List<UUID> lexicalIds =
+        out.stream().filter(c -> c.retrieval().lexicalHit()).map(Candidate::id).toList();
+    List<Listing> hydrated = listingQueryService.hydrate(lexicalIds);
+
+    assertThat(hydrated)
+        .extracting(Listing::getFurnishing)
+        .contains(Furnishing.FULLY_FURNISHED, Furnishing.SEMI_FURNISHED)
+        .doesNotContain(Furnishing.UNFURNISHED);
+  }
+
+  @Test
   void flatmates_lexicalHeadlineTerm_firesAndRanksFirst() {
     // "flatmate" appears only in the headlines of seed profiles that already have a flat
     SearchIntent intent =
