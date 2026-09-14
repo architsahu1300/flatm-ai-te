@@ -120,6 +120,52 @@ class SearchPipelineIntegrationTest {
     assertThat((List<?>) data.get("flatmates")).isNotEmpty();
   }
 
+  @Test
+  @Order(4)
+  @SuppressWarnings("unchecked")
+  void ambiguousFollowUp_staysARefinement_whenTheModelHasNoOpinion() {
+    // one anchor + a housing noun → AMBIGUOUS; the mock offers no mode → the detector's default (REFINE)
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(HttpHeaders.COOKIE, anonCookie);
+    ResponseEntity<Map> response =
+        rest.postForEntity(
+            "/api/v1/ai/refine",
+            new HttpEntity<>(Map.of("query", "flats in powai", "sessionId", sessionId), headers),
+            Map.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
+    Map<String, Object> intent = (Map<String, Object>) data.get("intent");
+    // budget from the earlier turns survives, the locality is added
+    assertThat((Integer) intent.get("budgetMax")).isLessThan(25000);
+    List<Map<String, Object>> locations = (List<Map<String, Object>>) intent.get("locations");
+    assertThat(locations).extracting(l -> l.get("name")).contains("Powai");
+    assertThat(data.get("note")).isNull();
+  }
+
+  @Test
+  @Order(5)
+  @SuppressWarnings("unchecked")
+  void freshCue_startsOver_andSaysSo() {
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(HttpHeaders.COOKIE, anonCookie);
+    ResponseEntity<Map> response =
+        rest.postForEntity(
+            "/api/v1/ai/refine",
+            new HttpEntity<>(
+                Map.of("query", "forget that, single sharing room in goregaon 20k", "sessionId", sessionId), headers),
+            Map.class);
+
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
+    Map<String, Object> intent = (Map<String, Object>) data.get("intent");
+    assertThat(intent.get("budgetMax")).isEqualTo(20000);
+    assertThat(intent.get("commuteTo")).isNull();
+    assertThat((String) data.get("note")).contains("fresh search");
+  }
+
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

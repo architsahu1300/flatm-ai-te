@@ -1,42 +1,74 @@
 package com.flatmaite.search;
 
+import java.util.Locale;
 import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
- * Decides whether a follow-up message continues the current search or starts a new one.
- *
- * <p>Everything typed into an active session used to be merged with the prior intent, so a complete
- * new request ("single sharing room chahiye powai me budget 40k hai") silently inherited whatever
- * the previous search had set — most damagingly the old locality, which produces zero results and
- * makes the search look broken when widening the area then reveals obvious matches.
- *
- * <p>The rule counts independent anchors. Real refinements lean on the prior intent and carry at
- * most one ("cheaper", "make it 30k", "same in Andheri"); a self-contained request carries several.
+ * The one referee for "is this follow-up a new search or a tweak of the current one". Getting it
+ * wrong one way strands users on constraints they never asked for; the other way wipes out what
+ * they built up. Lexical rules decide the clear cases; the controller consults the model's opinion
+ * only for {@link Verdict#AMBIGUOUS}.
  */
 @Component
 @RequiredArgsConstructor
 public class NewQueryDetector {
 
-  private static final int SELF_CONTAINED_ANCHORS = 2;
+  public enum Verdict {
+    NEW,
+    REFINE,
+    AMBIGUOUS
+  }
 
+  private static final Pattern FRESH_CUE =
+      Pattern.compile("\\b(forget that|forget it|start over|new search|scrap that|from scratch)\\b");
+  private static final Pattern REFINEMENT_CUE =
+      Pattern.compile(
+          "\\b(make it|instead|also|actually|same but|but in|rather|change it|change the|only|cheaper|closer|nearer)\\b");
   private static final Pattern BUDGET =
       Pattern.compile("(\\d+(?:\\.\\d+)?\\s*k\\b)|(\\d{4,7})|(\\d+(?:\\.\\d+)?\\s*(?:lakh|lac)\\b)");
   private static final Pattern BHK = Pattern.compile("\\d\\s*bhk");
   private static final Pattern HOUSING_NOUN =
-      Pattern.compile("\\b(flatmate|roommate|pg|paying guest|apartment|flat|room|studio|1rk)\\b");
+      Pattern.compile("\\b(flatmate|roommate|pg|paying guest|apartment|flat|flats|room|rooms|studio|1rk)\\b");
 
   private final LocalityResolver localityResolver;
 
-  /** True when the message stands on its own and should replace the session's intent. */
-  public boolean isSelfContained(String query) {
+  public Verdict decide(String query) {
     if (query == null || query.isBlank()) {
-      return false;
+      return Verdict.REFINE;
     }
-    String q = query.toLowerCase(java.util.Locale.ROOT);
+    String q = query.toLowerCase(Locale.ROOT);
+    if (FRESH_CUE.matcher(q).find()) {
+      return Verdict.NEW;
+    }
+    int anchors = anchors(q);
+    if (anchors >= 3) {
+      return Verdict.NEW;
+    }
+    if (REFINEMENT_CUE.matcher(q).find()) {
+      return Verdict.REFINE;
+    }
+    if (anchors >= 2 && HOUSING_NOUN.matcher(q).find()) {
+      return Verdict.NEW;
+    }
+    if (anchors == 0) {
+      return Verdict.REFINE;
+    }
+    return Verdict.AMBIGUOUS;
+  }
+
+  /** A request the detector alone rules NEW. */
+  public boolean isSelfContained(String query) {
+    return decide(query) == Verdict.NEW;
+  }
+
+  /** Independent anchors: a confidently recognised locality, a budget, an occupancy word, a BHK. */
+  private int anchors(String q) {
     int anchors = 0;
-    if (!localityResolver.scan(q).isEmpty()) {
+    boolean confidentLocality =
+        localityResolver.scan(q).stream().anyMatch(m -> m.confidence() >= LocalityResolver.CONFIDENT);
+    if (confidentLocality) {
       anchors++;
     }
     if (BUDGET.matcher(q).find()) {
@@ -48,11 +80,6 @@ public class NewQueryDetector {
     if (BHK.matcher(q).find()) {
       anchors++;
     }
-    // a housing noun alone proves nothing, but it corroborates the anchors above
-    if (anchors >= SELF_CONTAINED_ANCHORS && HOUSING_NOUN.matcher(q).find()) {
-      return true;
-    }
-    // three hard anchors are self-contained even without an explicit noun
-    return anchors >= 3;
+    return anchors;
   }
 }

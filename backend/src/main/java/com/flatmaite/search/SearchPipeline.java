@@ -76,7 +76,7 @@ public class SearchPipeline {
   private final ObjectMapper objectMapper;
   private final FlatmaiteProperties props;
 
-  private final Cache<String, SearchIntent> intentCache =
+  private final Cache<String, IntentLlm.Extraction> intentCache =
       Caffeine.newBuilder().maximumSize(5_000).expireAfterWrite(Duration.ofHours(24)).build();
 
   /** Ranked homes plus whether any came from outside the requested localities. */
@@ -84,7 +84,7 @@ public class SearchPipeline {
 
   // ------------------------------------------------------------- intent
 
-  public SearchIntent extractIntent(String query, SearchIntent prior, UUID userId, String anonKey) {
+  public IntentLlm.Extraction extractIntent(String query, SearchIntent prior, UUID userId, String anonKey) {
     long start = System.currentTimeMillis();
     AiFeature feature = prior == null ? AiFeature.INTENT_EXTRACTION : AiFeature.REFINEMENT;
 
@@ -93,12 +93,12 @@ public class SearchPipeline {
     if (heuristic != null) {
       usageService.log(userId, anonKey, feature, "heuristic", "regex", 0, 0, true, true,
           System.currentTimeMillis() - start, null);
-      return resolveLocalities(heuristic);
+      return new IntentLlm.Extraction(resolveLocalities(heuristic), IntentLlm.Mode.NONE);
     }
 
     // 2) cache
     String cacheKey = cacheKey(query, prior);
-    SearchIntent cached = intentCache.getIfPresent(cacheKey);
+    IntentLlm.Extraction cached = intentCache.getIfPresent(cacheKey);
     if (cached != null) {
       usageService.log(userId, anonKey, feature, intentLlm.providerName(), intentLlm.model(), 0, 0, true, true,
           System.currentTimeMillis() - start, cacheKey);
@@ -106,16 +106,17 @@ public class SearchPipeline {
     }
 
     // 3) LLM (or its mock) with internal repair + keyword fallback
-    SearchIntent extracted;
+    IntentLlm.Extraction extracted;
     boolean success = true;
     try {
-      extracted = intentLlm.extract(query, prior);
+      extracted = intentLlm.extractWithMode(query, prior);
     } catch (Exception e) {
       log.warn("Intent extraction hard-failed, degrading to keyword parse", e);
-      extracted = keywordParser.parse(query);
+      extracted = new IntentLlm.Extraction(keywordParser.parse(query), IntentLlm.Mode.NONE);
       success = false;
     }
-    SearchIntent resolved = resolveLocalities(extracted);
+    IntentLlm.Extraction resolved =
+        new IntentLlm.Extraction(resolveLocalities(extracted.intent()), extracted.mode());
     intentCache.put(cacheKey, resolved);
     usageService.log(
         userId,
@@ -124,7 +125,7 @@ public class SearchPipeline {
         intentLlm.providerName(),
         intentLlm.model(),
         AiUsageService.estimateTokens(query) + 700,
-        AiUsageService.estimateTokens(intentJson(resolved)),
+        AiUsageService.estimateTokens(intentJson(resolved.intent())),
         false,
         success,
         System.currentTimeMillis() - start,
