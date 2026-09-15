@@ -899,6 +899,16 @@
       "prior": {"case": "basics-2bhk-powai"},
       "mustPass": true,
       "expectVerdict": "AMBIGUOUS",
+      "scoreIntent": false,
+      "expect": {}
+    },
+    {
+      "id": "ref-also-not-in-prior",
+      "tags": ["refinement", "exclusion"],
+      "query": "also not in powai",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
       "expect": {
         "searchTarget": "PROPERTIES",
         "roomType": "ENTIRE",
