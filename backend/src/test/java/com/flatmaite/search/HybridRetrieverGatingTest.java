@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.common.domain.Furnishing;
 import com.flatmaite.common.domain.RoomType;
+import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.LocalityRepository;
 import com.flatmaite.search.SearchIntent.CommuteTo;
@@ -218,5 +219,21 @@ class HybridRetrieverGatingTest {
 
     assertThat(filters.localityIds()).isEmpty(); // the guessed area filters nothing
     assertThat(filters.excludeLocalityIds()).containsExactly(SeedLocalities.id("Kurla")); // the promise holds
+  }
+
+  @Test
+  void theFlatmatePathIgnoresGating_becauseNothingThereRanksByLocation() {
+    SearchIntent soft =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.FLATMATES)
+            .locations(List.of(new LocationRef("Powai", SeedLocalities.id("Powai"))))
+            .confidence(Map.of("locations", 0.58))
+            .build();
+
+    // the listing path demotes a fuzzy locality to a ranking preference...
+    assertThat(retriever.toFilters(soft).localityIds()).isEmpty();
+    // ...while the flatmate path keeps filtering, since scoreFlatmate has no location component
+    assertThat(retriever.admittedLocalityIds(soft.toBuilder().confidence(null).build(), 25))
+        .contains(SeedLocalities.id("Powai"));
   }
 }

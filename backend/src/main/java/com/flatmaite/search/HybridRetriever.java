@@ -171,7 +171,10 @@ public class HybridRetriever {
       where.append(" AND (fp.budget_min IS NULL OR fp.budget_min <= :budgetCap)");
       params.put("budgetCap", (int) (intent.budgetMax() * 1.2));
     }
-    List<UUID> localityIds = admittedLocalityIds(intent);
+    // Gating trades a filter for a ranking preference — but scoreFlatmate has no location
+    // component, so a soft locality here would be deleted rather than demoted. Where there is
+    // nothing to rank with, every slot stays a filter.
+    List<UUID> localityIds = admittedLocalityIds(intent.toBuilder().confidence(null).build());
     if (!localityIds.isEmpty()) {
       where.append(" AND fp.locality_ids && CAST(:locIds AS uuid[])");
       params.put("locIds", localityIds.toArray(UUID[]::new));

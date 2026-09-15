@@ -165,6 +165,8 @@ rank — it takes the five newest rows that match and sends them. A soft slot in
 not demoted, and a saved Powai search whose `locations` graded 0.58 would alert on every new listing in Mumbai.
 Saving a search is the same gesture `/apply` represents, so it is treated as the same endorsement.
 
+The same rule governs flatmate retrieval and saved-search alerts: gating trades a filter for a ranking preference, so where a path has no ranking counterpart — `scoreFlatmate` has no location component, and the alert runner does not rank at all — every slot stays a filter.
+
 ### 4.5 Scoring a soft slot (`MatchScorer`)
 
 A soft slot that an existing component already represents needs no new term — dropping it from the `WHERE` is
