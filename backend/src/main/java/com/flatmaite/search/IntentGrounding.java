@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -324,7 +323,36 @@ public final class IntentGrounding {
     return slug.toLowerCase(Locale.ROOT).replace('_', ' ').replace('-', ' ');
   }
 
-  private static final Map<String, Pattern> PATTERNS = new ConcurrentHashMap<>();
+  /**
+   * The cue tables above are fixed and small, so every one of their patterns is compiled once, here,
+   * at class init. Nothing else is cached.
+   *
+   * <p>The other values reaching {@link #containsWord} are amenity slugs and listing-type names —
+   * the LLM writes those, and a user's free text steers the LLM. Caching them meant a static map
+   * that grew a compiled {@code Pattern} per distinct externally-supplied string and never released
+   * one, for the life of the JVM. Recompiling a {@code \b…\b} pattern over a slug costs far less
+   * than keeping it forever.
+   */
+  private static final Map<String, Pattern> CUE_PATTERNS = cuePatterns();
+
+  private static Map<String, Pattern> cuePatterns() {
+    List<String> cues = new ArrayList<>();
+    GENDER_CUES.values().forEach(words -> cues.addAll(List.of(words)));
+    LIFESTYLE_CUES.values().forEach(words -> cues.addAll(List.of(words)));
+    cues.addAll(List.of(COUPLE_CUES));
+    cues.addAll(List.of(VERIFIED_CUES));
+    Map<String, Pattern> out = new LinkedHashMap<>();
+    for (String cue : cues) {
+      if (cue != null && !cue.isBlank()) {
+        out.computeIfAbsent(cue, IntentGrounding::wholeWord);
+      }
+    }
+    return Map.copyOf(out);
+  }
+
+  private static Pattern wholeWord(String word) {
+    return Pattern.compile("\\b" + Pattern.quote(word) + "\\b");
+  }
 
   /** A value (an amenity slug, a listing type, a cue phrase) must appear as a whole word — "ac" is
    * not "accommodation", "men" is not "apartment", "part" is not "apartment" either. */
@@ -336,7 +364,8 @@ public final class IntentGrounding {
       if (w == null || w.isBlank()) {
         continue;
       }
-      if (PATTERNS.computeIfAbsent(w, k -> Pattern.compile("\\b" + Pattern.quote(k) + "\\b")).matcher(q).find()) {
+      Pattern pattern = CUE_PATTERNS.get(w);
+      if ((pattern == null ? wholeWord(w) : pattern).matcher(q).find()) {
         return true;
       }
     }

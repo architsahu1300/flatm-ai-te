@@ -88,5 +88,8 @@ class OpenAiLlmsPromptTest {
     assertThat(system).contains("confidence");
     assertThat(system).contains("1.0 when the user states it outright");
     assertThat(system).contains("0.5 when you inferred it");
+    // The one sentence that keeps the scale about the user rather than the model. Without it a
+    // confident model rates its own guesses 1.0, and every guess becomes a hard SQL filter again.
+    assertThat(system).contains("Rate the user's words, not your certainty about your own JSON.");
   }
 }
