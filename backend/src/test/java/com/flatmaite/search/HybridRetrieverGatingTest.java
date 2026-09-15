@@ -138,4 +138,12 @@ class HybridRetrieverGatingTest {
     int wide = retriever.toFiltersWithRadius(intent, 45).localityIds().size();
     assertThat(wide).isGreaterThan(normal);
   }
+
+  @Test
+  void moveInDateIsRankedByAvailability_soItIsNotAPreferenceSlot() {
+    SearchIntent intent =
+        SearchIntent.builder().moveInDate("2026-10-01").confidence(Map.of("moveInDate", 0.5)).build();
+    assertThat(ConfidenceGate.softSlots(intent)).containsExactly("moveInDate");
+    assertThat(ConfidenceGate.preferenceSlots(intent)).isEmpty();
+  }
 }

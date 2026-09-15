@@ -27,6 +27,15 @@ public final class MatchScorer {
   /** Location score for anything admitted from the surrounding radius never drops below this. */
   public static final double MIN_LOCATION_SCORE = 0.3;
 
+  /**
+   * Preference slots this path can actually compare against a listing. {@code bhk} and
+   * {@code amenities} are not reachable from {@link Listing} here (no loaded property or amenity
+   * association), so they are neither credited nor penalised — counting them as satisfied would
+   * dilute a real miss, and counting them as missed would defame a listing we never checked.
+   */
+  private static final Set<String> CHECKABLE_PREFERENCES =
+      Set.of("roomType", "furnished", "listingTypes", "genderPreference", "couplesOk");
+
   public record Component(String component, double weight, double score, String detail) {}
 
   public record Scored(int matchScore, List<Component> breakdown) {}
@@ -175,14 +184,15 @@ public final class MatchScorer {
 
     // preferences (.15) — slots the reader inferred rather than read. They no longer filter, so they
     // rank here instead: a listing that misses every one of them still appears, just lower.
-    List<String> preferenceSlots = ConfidenceGate.preferenceSlots(intent);
-    if (!preferenceSlots.isEmpty()) {
+    List<String> checkable =
+        ConfidenceGate.preferenceSlots(intent).stream().filter(CHECKABLE_PREFERENCES::contains).toList();
+    if (!checkable.isEmpty()) {
       List<String> met = new ArrayList<>();
       List<String> missed = new ArrayList<>();
-      for (String slot : preferenceSlots) {
+      for (String slot : checkable) {
         (satisfies(intent, l, slot) ? met : missed).add(ConfidenceGate.label(slot));
       }
-      double score = met.size() / (double) preferenceSlots.size();
+      double score = met.size() / (double) checkable.size();
       String detail =
           missed.isEmpty()
               ? "Matches your preferred %s".formatted(String.join(", ", met))
@@ -194,11 +204,9 @@ public final class MatchScorer {
   }
 
   /**
-   * Does this listing satisfy a soft slot? Unknown or unobservable slots count as satisfied — never
-   * penalise a listing for something this path cannot check. {@code bhk} and {@code amenities} are
-   * not reachable from {@link Listing} on this path (no loaded {@code Property}/association), and
-   * {@code moveInDate} is already ranked by the unconditional {@code availability} component above,
-   * so scoring it again here would double-count the same signal.
+   * Does this listing satisfy a soft slot? Only called with slots from {@link #CHECKABLE_PREFERENCES},
+   * which filters out {@code bhk}, {@code amenities}, and any others this path cannot observe. The
+   * uncheckable slots are excluded before this is called, so we never penalise what we cannot check.
    */
   private static boolean satisfies(SearchIntent intent, Listing l, String slot) {
     return switch (slot) {
@@ -208,8 +216,7 @@ public final class MatchScorer {
       case "genderPreference" -> l.getPreferredGender() == GenderPreference.ANY
           || l.getPreferredGender() == intent.genderPreference();
       case "couplesOk" -> !Boolean.TRUE.equals(intent.couplesOk()) || l.isCouplesAllowed();
-      case "bhk", "amenities", "moveInDate" -> true; // not observable on this path — never penalised
-      default -> true;
+      default -> true; // safety net, but only {@code CHECKABLE_PREFERENCES} should reach here
     };
   }
 

@@ -266,6 +266,36 @@ class MatchScorerTest {
         .isEqualTo(0.5);
   }
 
+  @Test
+  void anUnobservablePreferenceDoesNotSoftenARealMiss() {
+    // roomType is checkable and wrong; bhk cannot be checked on this path and must not count as met
+    SearchIntent intent =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .bhk(new SearchIntent.BhkRange(2, 2))
+            .confidence(java.util.Map.of("roomType", 0.5, "bhk", 0.5))
+            .build();
+
+    MatchScorer.Scored scored = MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.PRIVATE));
+
+    assertThat(component(scored, "preferences").score()).isEqualTo(0.0);
+    assertThat(component(scored, "preferences").detail()).doesNotContain("size");
+  }
+
+  @Test
+  void noPreferencesComponentWhenNothingSoftIsCheckable() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .bhk(new SearchIntent.BhkRange(2, 2))
+            .amenities(java.util.List.of("gym"))
+            .confidence(java.util.Map.of("bhk", 0.5, "amenities", 0.5))
+            .build();
+
+    assertThat(MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.ENTIRE)).breakdown())
+        .extracting(MatchScorer.Component::component)
+        .doesNotContain("preferences");
+  }
+
   private Listing listingWithRoomType(RoomType roomType, Furnishing furnishing) {
     Listing l =
         Listing.builder()

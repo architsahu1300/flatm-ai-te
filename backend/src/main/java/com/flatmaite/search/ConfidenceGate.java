@@ -19,9 +19,17 @@ public final class ConfidenceGate {
   public static final double HARD_THRESHOLD = 0.75;
   public static final Set<String> ALWAYS_HARD = Set.of("excludeLocations", "verifiedOnly");
 
-  /** Soft slots an existing score component already ranks — dropping the filter is enough. */
+  /**
+   * Soft slots an existing score component already ranks — dropping the filter is enough.
+   * <ul>
+   * <li>{@code budgetMin}, {@code budgetMax}, {@code maxDeposit} → {@code budgetFit}
+   * <li>{@code locations}, {@code commuteTo}, {@code commuteTo.maxMinutes} → {@code location}
+   * <li>{@code lifestyle} → {@code lifestyle}
+   * <li>{@code moveInDate} → {@code availability}
+   * </ul>
+   */
   public static final Set<String> SCORED_ELSEWHERE =
-      Set.of("budgetMin", "budgetMax", "maxDeposit", "locations", "commuteTo", "commuteTo.maxMinutes", "lifestyle");
+      Set.of("budgetMin", "budgetMax", "maxDeposit", "locations", "commuteTo", "commuteTo.maxMinutes", "lifestyle", "moveInDate");
 
   private ConfidenceGate() {}
 
