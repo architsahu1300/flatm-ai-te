@@ -141,7 +141,8 @@ class SearchPipelineIntegrationTest {
     assertThat((Integer) intent.get("budgetMax")).isLessThan(25000);
     List<Map<String, Object>> locations = (List<Map<String, Object>>) intent.get("locations");
     assertThat(locations).extracting(l -> l.get("name")).contains("Powai");
-    assertThat(data.get("note")).isNull();
+    // a real refinement never carries the "started fresh" note; it may still name soft preferences
+    assertThat((String) data.get("note")).doesNotContain("fresh search");
   }
 
   @Test

@@ -96,17 +96,19 @@ public class AiSearchController {
     if (body.sessionId() == null || body.intent() == null) {
       throw ApiException.badRequest("invalid_request", "sessionId and intent are required");
     }
+    // The user has seen these chips and pressed apply — from here they are filters, not guesses.
+    SearchIntent endorsed = body.intent().toBuilder().confidence(null).build();
     AuthPrincipal viewer = CurrentUser.orNull();
     UUID userId = viewer == null ? null : viewer.userId();
     String anonKey = anonKey(req, res, userId);
     rateLimit(userId, anonKey);
 
     AiSearchSession session = sessions.requireOwned(body.sessionId(), userId, anonKey);
-    AiSearchResponse result = pipeline.search(body.intent(), userId, anonKey, session.getId());
+    AiSearchResponse result = pipeline.search(endorsed, userId, anonKey, session.getId());
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
     result.flatmates().forEach(r -> resultIds.add(r.flatmate().id()));
-    sessions.update(session, body.intent(), "(edited requirements)", resultIds);
+    sessions.update(session, endorsed, "(edited requirements)", resultIds);
     return ResponseEntity.ok(Map.of("data", result));
   }
 

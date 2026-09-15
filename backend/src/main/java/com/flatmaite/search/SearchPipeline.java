@@ -33,6 +33,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -41,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -228,6 +230,14 @@ public class SearchPipeline {
     if (homes.includesNearby()) {
       String nearby = "Also showing nearby areas within ~%d min.".formatted(homes.radiusMinutes());
       finalNote = note == null ? nearby : note + " " + nearby;
+    }
+
+    List<String> soft = ConfidenceGate.softSlots(intent);
+    if (!soft.isEmpty()) {
+      String preferences =
+          "Some of these are preferences, not filters: %s."
+              .formatted(soft.stream().map(ConfidenceGate::label).collect(Collectors.joining(", ")));
+      finalNote = finalNote == null ? preferences : finalNote + " " + preferences;
     }
 
     return new SearchDtos.AiSearchResponse(
@@ -465,9 +475,18 @@ public class SearchPipeline {
 
   // ------------------------------------------------------------- relaxers
 
-  /** "No results" is never a dead end — offer one-click constraint relaxations with real counts. */
+  /** A candidate relaxer paired with the slot it relaxes, so the ladder can be sorted by confidence. */
+  private record RelaxerCandidate(Relaxer relaxer, String slot) {}
+
+  /**
+   * "No results" is never a dead end — offer one-click constraint relaxations with real counts.
+   * Offered in ascending order of the reader's confidence in the slot each relaxer relaxes: the
+   * constraint the reader was least sure of is the one the user will miss least. Ties (equal
+   * confidence, including the common case where every slot is a hard 1.0) break by the order the
+   * candidates were considered, via a stable sort.
+   */
   private List<Relaxer> computeRelaxers(SearchIntent intent) {
-    List<Relaxer> out = new ArrayList<>();
+    List<RelaxerCandidate> candidates = new ArrayList<>();
     if (intent.budgetMax() != null) {
       SearchIntent relaxed = intent.toBuilder().budgetMax((int) (intent.budgetMax() * 1.2)).build();
       long count = countFor(relaxed);
@@ -482,42 +501,58 @@ public class SearchPipeline {
         }
       }
       if (count > 0) {
-        out.add(
-            new Relaxer(
-                "Raise budget to ₹%,d".formatted(relaxed.budgetMax()),
-                "shows %d option%s".formatted(count, count == 1 ? "" : "s"),
-                relaxed,
-                count));
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer(
+                    "Raise budget to ₹%,d".formatted(relaxed.budgetMax()),
+                    "shows %d option%s".formatted(count, count == 1 ? "" : "s"),
+                    relaxed,
+                    count),
+                "budgetMax"));
       }
     }
     if (intent.budgetMin() != null) {
       SearchIntent relaxed = intent.toBuilder().budgetMin(null).build();
       long count = countFor(relaxed);
       if (count > 0) {
-        out.add(new Relaxer("Lower the minimum", "shows %d more".formatted(count), relaxed, count));
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer("Lower the minimum", "shows %d more".formatted(count), relaxed, count),
+                "budgetMin"));
       }
     }
     if (Boolean.TRUE.equals(intent.verifiedOnly())) {
       SearchIntent relaxed = intent.toBuilder().verifiedOnly(false).build();
       long count = countFor(relaxed);
       if (count > 0) {
-        out.add(new Relaxer("Include unverified listings", "shows %d more".formatted(count), relaxed, count));
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer("Include unverified listings", "shows %d more".formatted(count), relaxed, count),
+                "verifiedOnly"));
       }
     }
     if (intent.lifestyle() != null) {
       SearchIntent relaxed = intent.toBuilder().lifestyle(null).build();
       long count = countFor(relaxed);
       if (count > 0) {
-        out.add(new Relaxer("Relax lifestyle filters", "shows %d more".formatted(count), relaxed, count));
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer("Relax lifestyle filters", "shows %d more".formatted(count), relaxed, count),
+                "lifestyle"));
       }
     }
     if ((intent.locations() != null && !intent.locations().isEmpty()) || intent.commuteTo() != null) {
       SearchIntent relaxed = intent.toBuilder().locations(null).commuteTo(null).build();
       long count = countFor(relaxed);
       if (count > 0) {
-        out.add(new Relaxer("Search all of Mumbai", "shows %d more".formatted(count), relaxed, count));
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer("Search all of Mumbai", "shows %d more".formatted(count), relaxed, count),
+                "locations"));
       }
     }
+    candidates.sort(Comparator.comparingDouble(c -> intent.confidenceOf(c.slot())));
+    List<Relaxer> out = new ArrayList<>(candidates.stream().map(RelaxerCandidate::relaxer).toList());
     if (out.isEmpty()) {
       // constraints compound — offer one honest broad reset, keeping only the location
       SearchIntent broad =

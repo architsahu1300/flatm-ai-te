@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.flatmaite.ai.AiSearchSession;
 import com.flatmaite.ai.IntentLlm;
+import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.ratelimit.RateLimiter;
 import java.util.List;
 import java.util.UUID;
@@ -44,6 +45,7 @@ class AiSearchControllerTest {
 
     when(rateLimiter.tryAcquire(anyString(), anyInt(), anyInt())).thenReturn(true);
     when(pipeline.search(any(), any(), any(), any(), any())).thenReturn(dummyResponse());
+    when(pipeline.search(any(), any(), any(), any())).thenReturn(dummyResponse());
   }
 
   private static SearchDtos.AiSearchResponse dummyResponse() {
@@ -82,5 +84,26 @@ class AiSearchControllerTest {
     verify(pipeline).search(searchIntentCaptor.capture(), any(), any(), any(), noteCaptor.capture());
     assertThat(searchIntentCaptor.getValue()).isEqualTo(freshIntent);
     assertThat(noteCaptor.getValue()).isEqualTo(IntentArbiter.FRESH_NOTE);
+  }
+
+  @Test
+  void applyingChipsEndorsesEverySlot_soNothingStaysAPreference() {
+    UUID sessionId = UUID.randomUUID();
+    AiSearchSession session = mockSession(sessionId);
+    when(sessions.requireOwned(eq(sessionId), any(), any())).thenReturn(session);
+    SearchIntent edited =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .confidence(java.util.Map.of("roomType", 0.5))
+            .build();
+
+    controller.apply(
+        new AiSearchController.ApplyIntentRequest(sessionId, edited),
+        new MockHttpServletRequest(),
+        new MockHttpServletResponse());
+
+    ArgumentCaptor<SearchIntent> captor = ArgumentCaptor.forClass(SearchIntent.class);
+    verify(pipeline).search(captor.capture(), any(), any(), any());
+    assertThat(captor.getValue().confidenceOf("roomType")).isEqualTo(1.0);
   }
 }
