@@ -1,7 +1,6 @@
 package com.flatmaite.search;
 
 import com.flatmaite.ai.AiSearchSession;
-import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.common.ratelimit.RateLimiter;
 import com.flatmaite.common.security.AuthPrincipal;
 import com.flatmaite.common.security.CurrentUser;
@@ -34,14 +33,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiSearchController {
 
   private static final String ANON_COOKIE = "fm_anon";
-  static final String FRESH_NOTE =
-      "Started a fresh search — this read as a new request, not a tweak of the last one.";
 
   private final SearchPipeline pipeline;
   private final SearchSessionService sessions;
   private final AiUsageService usage;
   private final RateLimiter rateLimiter;
-  private final NewQueryDetector newQueryDetector;
+  private final IntentArbiter arbiter;
 
   @PostMapping("/search")
   public ResponseEntity<Map<String, Object>> search(
@@ -60,26 +57,10 @@ public class AiSearchController {
       prior = sessions.intentOf(session);
     }
 
-    // One referee: the detector rules the clear cases; only for an ambiguous follow-up does the
-    // model's read of the message (its `mode`) break the tie. A new request must not inherit the
-    // previous search's constraints — a stale locality silently zeroes out results.
-    NewQueryDetector.Verdict verdict =
-        prior == null ? NewQueryDetector.Verdict.NEW : newQueryDetector.decide(body.query());
-    String note = null;
-    if (prior != null && verdict == NewQueryDetector.Verdict.NEW) {
-      prior = null;
-      note = FRESH_NOTE;
-    }
-    IntentLlm.Extraction extraction = pipeline.extractIntent(body.query(), prior, userId, anonKey);
-    if (prior != null
-        && verdict == NewQueryDetector.Verdict.AMBIGUOUS
-        && extraction.mode() == IntentLlm.Mode.NEW) {
-      // the model overruled the detector's tie-break — by design this bills and calls the model a
-      // second time for one request, re-extracting with no prior instead of reusing a stale merge.
-      note = FRESH_NOTE;
-      extraction = pipeline.extractIntent(body.query(), null, userId, anonKey);
-    }
-    SearchIntent intent = extraction.intent();
+    IntentArbiter.Decision decision =
+        arbiter.decide(body.query(), prior, (q, p) -> pipeline.extractIntent(q, p, userId, anonKey));
+    SearchIntent intent = decision.intent();
+    String note = decision.note();
     if (session == null) {
       session = sessions.start(userId, anonKey, intent, body.query());
     }
