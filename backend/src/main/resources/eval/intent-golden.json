@@ -1,0 +1,1051 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "basics-2bhk-powai",
+      "tags": ["basics"],
+      "query": "2bhk in powai under 40k",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000
+      }
+    },
+    {
+      "id": "basics-private-goregaon",
+      "tags": ["basics"],
+      "query": "private room in goregaon",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Goregaon"],
+        "roomType": "PRIVATE"
+      }
+    },
+    {
+      "id": "basics-flatmate-andheri",
+      "tags": ["basics"],
+      "query": "looking for a flatmate in andheri",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "FLATMATES",
+        "locations": ["Andheri East", "Andheri West"]
+      }
+    },
+    {
+      "id": "basics-1rk-bandra",
+      "tags": ["basics"],
+      "query": "1rk in bandra",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Bandra"],
+        "roomType": "ENTIRE"
+      }
+    },
+    {
+      "id": "basics-studio-malad",
+      "tags": ["basics"],
+      "query": "studio apartment in malad under 20000",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Malad"],
+        "roomType": "ENTIRE",
+        "budgetMax": 20000
+      }
+    },
+    {
+      "id": "basics-furnished-1bhk",
+      "tags": ["basics"],
+      "query": "fully furnished 1bhk in kandivali",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Kandivali"],
+        "bhk": {"min": 1, "max": 1},
+        "furnished": "FULLY_FURNISHED"
+      }
+    },
+    {
+      "id": "basics-semi-chembur",
+      "tags": ["basics"],
+      "query": "semi furnished room in chembur",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Chembur"],
+        "furnished": "SEMI_FURNISHED"
+      }
+    },
+    {
+      "id": "basics-double-sharing-bkc",
+      "tags": ["basics", "commute"],
+      "query": "double sharing room near bkc 15k",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "BKC", "maxMinutes": 30},
+        "roomType": "SHARED",
+        "budgetMax": 15000
+      }
+    },
+    {
+      "id": "basics-pg-girls-thane",
+      "tags": ["basics", "known-gap"],
+      "query": "pg in thane for girls",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Thane"],
+        "roomType": "SHARED",
+        "genderPreference": "FEMALE_ONLY"
+      }
+    },
+    {
+      "id": "basics-single-pg-vashi",
+      "tags": ["basics"],
+      "query": "single room pg in vashi",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Vashi"],
+        "roomType": "PRIVATE"
+      }
+    },
+    {
+      "id": "budget-under-k",
+      "tags": ["budget"],
+      "query": "room in kurla under 12k",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Kurla"],
+        "budgetMax": 12000
+      }
+    },
+    {
+      "id": "budget-floor-more-than",
+      "tags": ["budget"],
+      "query": "flat in andheri more than 30000",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Andheri East", "Andheri West"],
+        "budgetMin": 30000
+      }
+    },
+    {
+      "id": "budget-range-between",
+      "tags": ["budget", "commute"],
+      "query": "between 20k and 30k near dadar",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Dadar", "maxMinutes": 30},
+        "budgetMin": 20000,
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "budget-range-from-to",
+      "tags": ["budget"],
+      "query": "from 20k to 30k in ghatkopar",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Ghatkopar"],
+        "budgetMin": 20000,
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "budget-spelled-lakh",
+      "tags": ["budget"],
+      "query": "one and a half lakh flat in worli",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Worli"],
+        "budgetMax": 150000
+      }
+    },
+    {
+      "id": "budget-lakh-numeric",
+      "tags": ["budget"],
+      "query": "2 lakh budget apartment in juhu",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Juhu"],
+        "budgetMax": 200000
+      }
+    },
+    {
+      "id": "budget-deposit-vs-rent",
+      "tags": ["budget"],
+      "query": "2 lakh deposit, 30k rent in powai",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"],
+        "maxDeposit": 200000,
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "budget-after-commute",
+      "tags": ["budget", "commute"],
+      "query": "room within 20 min of bkc, 25k",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "commuteTo": {"place": "BKC", "maxMinutes": 20},
+        "budgetMax": 25000
+      }
+    },
+    {
+      "id": "budget-after-place",
+      "tags": ["budget", "commute"],
+      "query": "15 min from powai for 25000",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Powai", "maxMinutes": 15},
+        "budgetMax": 25000
+      }
+    },
+    {
+      "id": "budget-pincode-not-budget",
+      "tags": ["budget", "locality"],
+      "query": "1bhk in andheri east 400069",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Andheri East"],
+        "bhk": {"min": 1, "max": 1}
+      }
+    },
+    {
+      "id": "budget-minimum",
+      "tags": ["budget"],
+      "query": "minimum 25k private room in bandra",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Bandra"],
+        "roomType": "PRIVATE",
+        "budgetMin": 25000
+      }
+    },
+    {
+      "id": "budget-tak-hinglish",
+      "tags": ["budget", "hinglish"],
+      "query": "andheri me 1bhk 30k tak",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Andheri East", "Andheri West"],
+        "bhk": {"min": 1, "max": 1},
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "budget-rs-format",
+      "tags": ["budget"],
+      "query": "rs. 18,000 room in sion",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Sion"],
+        "budgetMax": 18000
+      }
+    },
+    {
+      "id": "budget-not-above",
+      "tags": ["budget"],
+      "query": "not above 30000 in mulund",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Mulund"],
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "loc-bkc-full",
+      "tags": ["locality"],
+      "query": "flat in bandra kurla complex",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["BKC"]
+      }
+    },
+    {
+      "id": "loc-bkc-short",
+      "tags": ["locality"],
+      "query": "1bhk in bkc",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["BKC"],
+        "bhk": {"min": 1, "max": 1}
+      }
+    },
+    {
+      "id": "loc-fuzzy-powaii",
+      "tags": ["locality"],
+      "query": "flats in powaii",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"]
+      }
+    },
+    {
+      "id": "loc-mansion-not-sion",
+      "tags": ["locality"],
+      "query": "2bhk in a mansion in worli",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Worli"],
+        "bhk": {"min": 2, "max": 2}
+      }
+    },
+    {
+      "id": "loc-andheri-ambiguous",
+      "tags": ["locality"],
+      "query": "room in andheri",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Andheri East", "Andheri West"]
+      }
+    },
+    {
+      "id": "loc-andheri-east",
+      "tags": ["locality"],
+      "query": "room in andheri east",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Andheri East"]
+      }
+    },
+    {
+      "id": "loc-lower-parel",
+      "tags": ["locality"],
+      "query": "2bhk in lower parel",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Lower Parel"],
+        "bhk": {"min": 2, "max": 2}
+      }
+    },
+    {
+      "id": "loc-parel",
+      "tags": ["locality"],
+      "query": "2bhk in parel",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Parel"],
+        "bhk": {"min": 2, "max": 2}
+      }
+    },
+    {
+      "id": "loc-two-places",
+      "tags": ["locality"],
+      "query": "private room in powai or vikhroli",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai", "Vikhroli"],
+        "roomType": "PRIVATE"
+      }
+    },
+    {
+      "id": "loc-alias-hiranandani",
+      "tags": ["locality"],
+      "query": "flat in hiranandani",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"]
+      }
+    },
+    {
+      "id": "loc-alias-navi-mumbai",
+      "tags": ["locality", "known-gap"],
+      "query": "pg in navi mumbai",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Vashi"],
+        "roomType": "SHARED"
+      }
+    },
+    {
+      "id": "loc-unknown-wakad",
+      "tags": ["locality", "known-gap"],
+      "query": "1bhk in wakad",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "bhk": {"min": 1, "max": 1},
+        "unresolvedLocations": ["wakad"]
+      }
+    },
+    {
+      "id": "loc-film-city-commute",
+      "tags": ["locality", "commute"],
+      "query": "room near film city",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "commuteTo": {"place": "Goregaon", "maxMinutes": 30}
+      }
+    },
+    {
+      "id": "loc-ram-mandir",
+      "tags": ["locality"],
+      "query": "single sharing in ram mandir",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Ram Mandir"],
+        "roomType": "PRIVATE"
+      }
+    },
+    {
+      "id": "excl-not-in",
+      "tags": ["exclusion"],
+      "query": "2bhk not in powai",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "bhk": {"min": 2, "max": 2},
+        "excludeLocations": ["Powai"]
+      }
+    },
+    {
+      "id": "excl-anywhere-but",
+      "tags": ["exclusion"],
+      "query": "private room anywhere but goregaon",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "excludeLocations": ["Goregaon"]
+      }
+    },
+    {
+      "id": "excl-nahi-hinglish",
+      "tags": ["exclusion", "hinglish", "known-gap"],
+      "query": "andheri nahi, malad chalega",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "excludeLocations": ["Andheri East", "Andheri West"],
+        "locations": ["Malad"]
+      }
+    },
+    {
+      "id": "excl-except",
+      "tags": ["exclusion"],
+      "query": "any locality except bandra under 30k",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "excludeLocations": ["Bandra"],
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "excl-no-smokers-is-lifestyle",
+      "tags": ["exclusion", "lifestyle"],
+      "query": "no smokers in andheri",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Andheri East", "Andheri West"],
+        "lifestyle": {"smoking": "NO_SMOKERS"}
+      }
+    },
+    {
+      "id": "excl-mixed",
+      "tags": ["exclusion"],
+      "query": "room in powai or vikhroli but not kanjurmarg",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Powai", "Vikhroli"],
+        "excludeLocations": ["Kanjurmarg"]
+      }
+    },
+    {
+      "id": "commute-near",
+      "tags": ["commute"],
+      "query": "room near bkc",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "commuteTo": {"place": "BKC", "maxMinutes": 30}
+      }
+    },
+    {
+      "id": "commute-office-in",
+      "tags": ["commute"],
+      "query": "office in lower parel, need a 1bhk",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "commuteTo": {"place": "Lower Parel", "maxMinutes": 30},
+        "bhk": {"min": 1, "max": 1}
+      }
+    },
+    {
+      "id": "commute-within-mins",
+      "tags": ["commute"],
+      "query": "within 30 mins of dadar",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Dadar", "maxMinutes": 30}
+      }
+    },
+    {
+      "id": "commute-work-at",
+      "tags": ["commute"],
+      "query": "i work at powai, looking for a private room",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Powai", "maxMinutes": 30},
+        "roomType": "PRIVATE"
+      }
+    },
+    {
+      "id": "commute-close-to",
+      "tags": ["commute", "budget"],
+      "query": "close to marol under 20k",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Marol", "maxMinutes": 30},
+        "budgetMax": 20000
+      }
+    },
+    {
+      "id": "commute-reversed-from",
+      "tags": ["commute"],
+      "query": "10 min from kurla station",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "commuteTo": {"place": "Kurla", "maxMinutes": 10}
+      }
+    },
+    {
+      "id": "commute-home-plus-office",
+      "tags": ["commute", "locality"],
+      "query": "room in andheri, office in bkc",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "PRIVATE",
+        "locations": ["Andheri East", "Andheri West"],
+        "commuteTo": {"place": "BKC", "maxMinutes": 30}
+      }
+    },
+    {
+      "id": "commute-station-is-home",
+      "tags": ["commute", "locality"],
+      "query": "2 min from the station in vile parle",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Vile Parle"]
+      }
+    },
+    {
+      "id": "life-nonsmoker-flatmate",
+      "tags": ["lifestyle"],
+      "query": "non-smoker flatmate in powai",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "FLATMATES",
+        "locations": ["Powai"],
+        "lifestyle": {"smoking": "NO_SMOKERS"}
+      }
+    },
+    {
+      "id": "life-veg",
+      "tags": ["lifestyle"],
+      "query": "veg only flat in matunga",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Matunga"],
+        "lifestyle": {"diet": "VEGETARIAN"}
+      }
+    },
+    {
+      "id": "life-pets",
+      "tags": ["lifestyle"],
+      "query": "pet friendly 1bhk in bandra",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Bandra"],
+        "bhk": {"min": 1, "max": 1},
+        "lifestyle": {"pets": "PET_FRIENDLY"}
+      }
+    },
+    {
+      "id": "life-female-flatmate",
+      "tags": ["lifestyle"],
+      "query": "female flatmate wanted in khar",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "FLATMATES",
+        "locations": ["Khar"],
+        "genderPreference": "FEMALE_ONLY"
+      }
+    },
+    {
+      "id": "life-couples",
+      "tags": ["lifestyle", "known-gap"],
+      "query": "couple friendly flat in goregaon",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Goregaon"],
+        "couplesOk": true
+      }
+    },
+    {
+      "id": "life-amenities",
+      "tags": ["lifestyle", "known-gap"],
+      "query": "2bhk with gym and parking in thane",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Thane"],
+        "bhk": {"min": 2, "max": 2},
+        "amenities": ["gym", "parking"]
+      }
+    },
+    {
+      "id": "life-verified",
+      "tags": ["lifestyle"],
+      "query": "only verified listings in powai",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"],
+        "verifiedOnly": true
+      }
+    },
+    {
+      "id": "life-quiet-flatmates",
+      "tags": ["lifestyle"],
+      "query": "quiet flatmates, no parties, in chembur",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "FLATMATES",
+        "locations": ["Chembur"],
+        "lifestyle": {"quiet": true}
+      }
+    },
+    {
+      "id": "hi-single-sharing",
+      "tags": ["hinglish"],
+      "query": "Single sharing room chahiye powai me budget 40k hai",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"],
+        "roomType": "PRIVATE",
+        "budgetMax": 40000
+      }
+    },
+    {
+      "id": "hi-ke-andar",
+      "tags": ["hinglish", "budget"],
+      "query": "2bhk chahiye malad west mein 25k ke andar",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Malad"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 25000
+      }
+    },
+    {
+      "id": "hi-flatmate-ladki",
+      "tags": ["hinglish", "lifestyle", "known-gap"],
+      "query": "flatmate chahiye andheri east me, ladki",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "FLATMATES",
+        "locations": ["Andheri East"],
+        "genderPreference": "FEMALE_ONLY"
+      }
+    },
+    {
+      "id": "hi-paying-guest",
+      "tags": ["hinglish", "known-gap"],
+      "query": "paying guest chahiye borivali me 10k",
+      "prior": null,
+      "mustPass": false,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Borivali"],
+        "roomType": "SHARED",
+        "budgetMax": 10000
+      }
+    },
+    {
+      "id": "ref-make-it",
+      "tags": ["refinement"],
+      "query": "make it 30k",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "ref-same-but-in",
+      "tags": ["refinement"],
+      "query": "same but in andheri",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Andheri East", "Andheri West"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000
+      }
+    },
+    {
+      "id": "ref-not-in-prior",
+      "tags": ["refinement", "exclusion"],
+      "query": "not in powai",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "AMBIGUOUS",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "excludeLocations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000
+      }
+    },
+    {
+      "id": "ref-forget-that",
+      "tags": ["refinement"],
+      "query": "forget that, single sharing room in goregaon 20k",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "NEW",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Goregaon"],
+        "roomType": "PRIVATE",
+        "budgetMax": 20000
+      }
+    },
+    {
+      "id": "ref-fresh-three-anchors",
+      "tags": ["refinement"],
+      "query": "2bhk in andheri for 60k",
+      "prior": {"case": "basics-private-goregaon"},
+      "mustPass": true,
+      "expectVerdict": "NEW",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Andheri East", "Andheri West"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 60000
+      }
+    },
+    {
+      "id": "ref-only-verified",
+      "tags": ["refinement"],
+      "query": "only verified listings",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000,
+        "verifiedOnly": true
+      }
+    },
+    {
+      "id": "ref-add-furnished",
+      "tags": ["refinement"],
+      "query": "fully furnished",
+      "prior": {"case": "basics-private-goregaon"},
+      "mustPass": false,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Goregaon"],
+        "roomType": "PRIVATE",
+        "furnished": "FULLY_FURNISHED"
+      }
+    },
+    {
+      "id": "ref-no-anchor-lifestyle",
+      "tags": ["refinement", "lifestyle"],
+      "query": "no smokers please",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": false,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000,
+        "lifestyle": {"smoking": "NO_SMOKERS"}
+      }
+    },
+    {
+      "id": "ref-actually-two-anchors",
+      "tags": ["refinement"],
+      "query": "actually make it andheri and 30k",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "roomType": "ENTIRE",
+        "locations": ["Andheri East", "Andheri West"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "ref-ambiguous-one-anchor",
+      "tags": ["refinement", "arbiter"],
+      "query": "flats in goregaon",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "AMBIGUOUS",
+      "scoreIntent": false,
+      "expect": {}
+    },
+    {
+      "id": "ref-closer-to-work",
+      "tags": ["refinement", "arbiter"],
+      "query": "closer to work",
+      "prior": {"case": "basics-double-sharing-bkc"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "scoreIntent": false,
+      "expect": {}
+    },
+    {
+      "id": "arb-three-anchors-with-cue",
+      "tags": ["arbiter"],
+      "query": "only single sharing room in powai 40k",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "NEW",
+      "scoreIntent": false,
+      "expect": {}
+    },
+    {
+      "id": "arb-fuzzy-not-an-anchor",
+      "tags": ["arbiter"],
+      "query": "flats in powaii",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "REFINE",
+      "scoreIntent": false,
+      "expect": {}
+    },
+    {
+      "id": "arb-start-over",
+      "tags": ["arbiter"],
+      "query": "start over: 1bhk near bkc",
+      "prior": {"case": "basics-2bhk-powai"},
+      "mustPass": true,
+      "expectVerdict": "NEW",
+      "scoreIntent": false,
+      "expect": {}
+    }
+  ]
+}

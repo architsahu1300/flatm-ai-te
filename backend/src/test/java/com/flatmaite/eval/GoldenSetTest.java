@@ -130,6 +130,24 @@ class GoldenSetTest {
   }
 
   @Test
+  void theRealGoldenSet_loads_andIsBigEnough() {
+    GoldenSet set = GoldenSet.load();
+    assertThat(set.version()).isEqualTo(1);
+    assertThat(set.cases()).hasSizeGreaterThanOrEqualTo(70);
+    assertThat(set.cases().stream().filter(GoldenCase::mustPass).count()).isGreaterThanOrEqualTo(30);
+  }
+
+  @Test
+  void theRealGoldenSet_everyCaseHasATag_andStatesSearchTargetWhenScoringIntent() {
+    for (GoldenCase c : GoldenSet.load().cases()) {
+      assertThat(c.tags()).as(c.id()).isNotEmpty();
+      if (c.scoreIntent()) {
+        assertThat(c.expected().searchTarget()).as(c.id() + " must state searchTarget").isNotNull();
+      }
+    }
+  }
+
+  @Test
   void badEnumInsideExpect_namesTheCase() {
     String json = """
         {"version":1,"cases":[

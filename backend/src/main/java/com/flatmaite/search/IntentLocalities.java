@@ -17,11 +17,11 @@ import java.util.UUID;
  * {@code unresolvedLocations} and stays in {@code freeText} so lexical and semantic retrieval
  * still see it. Never guesses by substring.
  */
-final class IntentLocalities {
+public final class IntentLocalities {
 
   private IntentLocalities() {}
 
-  static SearchIntent resolve(SearchIntent intent, LocalityResolver resolver) {
+  public static SearchIntent resolve(SearchIntent intent, LocalityResolver resolver) {
     if (intent.locations() == null
         && intent.excludeLocations() == null
         && intent.commuteTo() == null
