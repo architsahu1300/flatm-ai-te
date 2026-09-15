@@ -95,4 +95,48 @@ class ThinResultRescueTest {
   void anIntentWithNothingToRelax_hasNoLadder() {
     assertThat(RescueLadder.rungs(SearchIntent.builder().build(), 45)).isEmpty();
   }
+
+  @Test
+  void aWiderRingReasonNeverClaimsADistanceItDoesNotHave() {
+    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45, "further out");
+
+    String unresolved =
+        SearchPipeline.nearMissReason(ring, null, "your area", false, SearchIntent.builder().build());
+
+    assertThat(unresolved).isEqualTo("Outside your preferred areas");
+    assertThat(unresolved).doesNotContain("null");
+  }
+
+  @Test
+  void aWiderRingReasonReadsToForACommuteAndFromForAHomeArea() {
+    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45, "further out");
+    SearchIntent empty = SearchIntent.builder().build();
+
+    assertThat(SearchPipeline.nearMissReason(ring, 12, "BKC", true, empty)).isEqualTo("~12 min to BKC");
+    assertThat(SearchPipeline.nearMissReason(ring, 38, "Goregaon", false, empty)).isEqualTo("~38 min from Goregaon");
+  }
+
+  @Test
+  void aDroppedSlotReasonNamesTheSlotAndTheValueTheUserAskedFor() {
+    SearchIntent intent = SearchIntent.builder().roomType(RoomType.ENTIRE).build();
+    RescueLadder.Rung rung = new RescueLadder.Rung("roomType", intent, null, "room type");
+
+    assertThat(SearchPipeline.nearMissReason(rung, null, "your area", false, intent))
+        .contains("room type")
+        .contains("you asked for");
+  }
+
+  @Test
+  void aDroppedLifestyleReasonNamesTheFacetsThatWereSet() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .lifestyle(SearchIntent.Lifestyle.builder().smoking("NO_SMOKERS").diet("VEGETARIAN").build())
+            .build();
+    RescueLadder.Rung rung = new RescueLadder.Rung("lifestyle", intent, null, "lifestyle");
+
+    String reason = SearchPipeline.nearMissReason(rung, null, "your area", false, intent);
+
+    assertThat(reason).contains("no smokers").contains("vegetarian");
+    assertThat(reason).doesNotContain("your lifestyle preferences");
+  }
 }

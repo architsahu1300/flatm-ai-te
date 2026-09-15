@@ -1749,7 +1749,7 @@ Saved-search alerts never reach `searchHomes`, so they are unaffected; assert th
 
 - [ ] **Step 6: Run the tests**
 
-Run: `./mvnw -q test -Dtest=ThinResultRescueTest` → 7 pass.
+Run: `./mvnw -q test -Dtest=ThinResultRescueTest` → 11 pass.
 Run: `./mvnw -q test -Dtest=SearchPipelineIntegrationTest,LocationWideningIntegrationTest` (Docker) → 8 + 4 pass.
 
 - [ ] **Step 7: Commit**
@@ -1806,7 +1806,7 @@ And under the AI/search section, one paragraph: what confidence gating does (sta
 
 - [ ] **Step 4: Full verification**
 
-Run `./mvnw verify` from `backend/` (Docker up) — every class green. Expected new/changed counts: `SearchIntentConfidenceTest` 6, `IntentGroundingTest` 23, `SearchPipelineConfidenceTest` 11, `HybridRetrieverGatingTest` 10, `ThinResultRescueTest` 7, `MatchScorerTest` 17, `MockIntentLlmTest` 6, `OpenAiLlmsPromptTest` 6, `AiSearchControllerTest` 2, `SearchPipelineIntegrationTest` 8; **`IntentGoldenTest` 2 and every other WS1–WS3 class unchanged**. Report the summary `Tests run:` line and `BUILD SUCCESS`.
+Run `./mvnw verify` from `backend/` (Docker up) — every class green. Expected new/changed counts: `SearchIntentConfidenceTest` 6, `IntentGroundingTest` 23, `SearchPipelineConfidenceTest` 11, `HybridRetrieverGatingTest` 10, `ThinResultRescueTest` 11, `MatchScorerTest` 17, `MockIntentLlmTest` 6, `OpenAiLlmsPromptTest` 6, `AiSearchControllerTest` 2, `SearchPipelineIntegrationTest` 8; **`IntentGoldenTest` 2 and every other WS1–WS3 class unchanged**. Report the summary `Tests run:` line and `BUILD SUCCESS`.
 
 Run `npx tsc --noEmit` from `frontend/` — clean.
 

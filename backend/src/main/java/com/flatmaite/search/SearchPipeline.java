@@ -469,11 +469,7 @@ public class SearchPipeline {
             rung == null
                 // defensive: every nearMiss row is introduced by some rung; never let a bug here 500 a search
                 ? "Nearby option"
-                : rung.slot() == null
-                    // wider-ring rung: reuse the same commute estimate already computed for the row
-                    ? "~%d min from %s".formatted(r.commute(), r.anchorName())
-                    : "%s — you asked for %s"
-                        .formatted(ConfidenceGate.label(rung.slot()), droppedValueText(intent, rung.slot()));
+                : nearMissReason(rung, r.commute(), r.anchorName(), commuteIntent, intent);
       }
       out.add(
           new AiResult(
@@ -490,6 +486,22 @@ public class SearchPipeline {
               nearMissReason));
     }
     return new Homes(out, includesNearby, radius, exactCount, rescueSummary);
+  }
+
+  /**
+   * Why this listing is on the page although it does not match the search. Shown to users verbatim,
+   * so it states only what we actually know: a distance only when one was measured, and the slot we
+   * gave up otherwise.
+   */
+  static String nearMissReason(
+      RescueLadder.Rung rung, Integer commuteMinutes, String anchorName, boolean commuteIntent, SearchIntent intent) {
+    if (rung.slot() == null) {
+      if (commuteMinutes == null) {
+        return "Outside your preferred areas";
+      }
+      return "~%d min %s %s".formatted(commuteMinutes, commuteIntent ? "to" : "from", anchorName);
+    }
+    return "%s — you asked for %s".formatted(ConfidenceGate.label(rung.slot()), droppedValueText(intent, rung.slot()));
   }
 
   /** Human-readable rendering of the original value a rescue rung gave up, for the near-miss reason. */
@@ -513,11 +525,29 @@ public class SearchPipeline {
                   .collect(Collectors.joining(", "));
       case "furnished" -> humanizeEnum(original.furnished());
       case "bhk" -> bhkText(original.bhk());
-      case "moveInDate" -> original.moveInDate();
+      case "moveInDate" -> humanizeDate(original.moveInDate());
       case "genderPreference" -> humanizeEnum(original.genderPreference());
       case "couplesOk" -> Boolean.TRUE.equals(original.couplesOk()) ? "couples ok" : "no couples";
       case "amenities" -> original.amenities() == null ? "" : String.join(", ", original.amenities());
-      case "lifestyle" -> "your lifestyle preferences";
+      case "lifestyle" -> {
+        SearchIntent.Lifestyle l = original.lifestyleOrEmpty();
+        List<String> facets = new ArrayList<>();
+        if ("NO_SMOKERS".equals(l.smoking())) {
+          facets.add("no smokers");
+        } else if (l.smoking() != null) {
+          facets.add("smoking");
+        }
+        if (l.diet() != null) {
+          facets.add(l.diet().toLowerCase(Locale.ROOT).replace('_', ' '));
+        }
+        if (l.pets() != null) {
+          facets.add(l.pets().toLowerCase(Locale.ROOT).replace('_', ' '));
+        }
+        if (Boolean.TRUE.equals(l.quiet())) {
+          facets.add("quiet");
+        }
+        yield facets.isEmpty() ? "your lifestyle preferences" : String.join(", ", facets);
+      }
       case "commuteTo", "commuteTo.maxMinutes" ->
           original.commuteTo() == null ? "" : original.commuteTo().place();
       default -> "";
@@ -542,6 +572,20 @@ public class SearchPipeline {
       return "up to " + bhk.max() + " BHK";
     }
     return "";
+  }
+
+  private static String humanizeDate(String isoDate) {
+    if (isoDate == null || isoDate.isEmpty()) {
+      return "";
+    }
+    try {
+      java.time.LocalDate date = java.time.LocalDate.parse(isoDate);
+      java.time.format.DateTimeFormatter formatter =
+          java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ROOT);
+      return date.format(formatter);
+    } catch (Exception e) {
+      return isoDate;
+    }
   }
 
   /** The requested locality this candidate is closest to (by the commute estimate). */
