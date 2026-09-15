@@ -112,4 +112,18 @@ class LocationWideningIntegrationTest {
     assertThat(nearby).allSatisfy(h -> assertThat(h.commuteLabel()).contains("min from " + name));
     assertThat(r.note()).contains("nearby areas within ~25 min");
   }
+
+  @Test
+  void aGuessedAreaIsNotDescribedAsANearbyRing_becauseTheSearchWasCityWide() {
+    String name = anchoredLocality();
+    SearchIntent guessed =
+        homeIn(name).toBuilder().confidence(java.util.Map.of("locations", 0.5)).build();
+
+    AiSearchResponse r = pipeline.search(guessed, null, null, UUID.randomUUID());
+
+    // nothing narrowed the query to a ring, so "within ~25 min" would be a claim about these rows
+    // that the query never made true — the preferences sentence is what says something honest here
+    assertThat(r.note()).doesNotContain("nearby areas within");
+    assertThat(r.note()).contains("preferences, not filters").contains("area");
+  }
 }

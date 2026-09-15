@@ -7,6 +7,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -138,5 +139,111 @@ class ThinResultRescueTest {
 
     assertThat(reason).contains("no smokers").contains("vegetarian");
     assertThat(reason).doesNotContain("your lifestyle preferences");
+  }
+
+  // ---- walking the ladder: the control logic, without a database ----
+
+  private static final SearchIntent ANY = SearchIntent.builder().build();
+
+  private static RescueLadder.Rung rung(String slot, Integer radius, String reason) {
+    return new RescueLadder.Rung(slot, ANY, radius, reason);
+  }
+
+  private static HybridRetriever.Candidate candidate(UUID id) {
+    return new HybridRetriever.Candidate(id, null, null, null, HybridRetriever.Retrieval.NONE);
+  }
+
+  /** A rung that yields the listings named, by id. */
+  private static List<HybridRetriever.Candidate> found(UUID... ids) {
+    return java.util.Arrays.stream(ids).map(ThinResultRescueTest::candidate).toList();
+  }
+
+  @Test
+  void aRungThatFindsNothingNew_isSkippedAndNeverNamedInTheSummary() {
+    UUID already = UUID.randomUUID();
+    UUID fresh = UUID.randomUUID();
+    List<RescueLadder.Rung> rungs =
+        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget"));
+
+    SearchPipeline.Rescue walk =
+        SearchPipeline.walkLadder(
+            rungs,
+            Set.of(already),
+            6,
+            25,
+            (r, radius) -> "further out".equals(r.reason()) ? found(already) : found(fresh));
+
+    // rung 1 re-found only what we already had, so it contributed nothing and is not a reason
+    assertThat(walk.reasons()).containsExactly("budget");
+    assertThat(walk.added()).containsOnlyKeys(fresh);
+    // and the rung index still counts every rung walked, so the second rung is rung 2
+    assertThat(walk.rungOf()).containsEntry(fresh, 2);
+    assertThat(walk.widerRingRadiusMinutes()).isNull();
+  }
+
+  @Test
+  void theWalkStopsAsSoonAsThePageIsNoLongerThin() {
+    List<UUID> ids = java.util.stream.Stream.generate(UUID::randomUUID).limit(6).toList();
+    List<RescueLadder.Rung> rungs =
+        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget"));
+    List<String> asked = new java.util.ArrayList<>();
+
+    SearchPipeline.Rescue walk =
+        SearchPipeline.walkLadder(
+            rungs,
+            Set.of(ids.get(0), ids.get(1)),
+            4,
+            25,
+            (r, radius) -> {
+              asked.add(r.reason());
+              return found(ids.get(2), ids.get(3), ids.get(4));
+            });
+
+    // the first rung took the count from 2 to 5, past the minimum of 4 — the second is never tried
+    assertThat(asked).containsExactly("further out");
+    assertThat(walk.reasons()).containsExactly("further out");
+    assertThat(walk.widerRingRadiusMinutes()).isEqualTo(45);
+  }
+
+  @Test
+  void anExhaustedLadderReturnsWhatItHas_ratherThanFailing() {
+    UUID already = UUID.randomUUID();
+    UUID one = UUID.randomUUID();
+    List<RescueLadder.Rung> rungs = List.of(rung("budgetMax", null, "budget"), rung("roomType", null, "room type"));
+
+    SearchPipeline.Rescue walk =
+        SearchPipeline.walkLadder(
+            rungs, Set.of(already), 6, 25, (r, radius) -> "budget".equals(r.reason()) ? found(one) : found());
+
+    // both rungs were walked, the page is still short of 6, and the one find survives
+    assertThat(walk.added()).containsOnlyKeys(one);
+    assertThat(walk.reasons()).containsExactly("budget");
+  }
+
+  @Test
+  void aRungWithNoRadiusOfItsOwn_retrievesAtTheConfiguredNearbyRadius() {
+    List<Integer> radii = new java.util.ArrayList<>();
+
+    SearchPipeline.walkLadder(
+        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget")),
+        Set.of(),
+        99,
+        25,
+        (r, radius) -> {
+          radii.add(radius);
+          return found(UUID.randomUUID());
+        });
+
+    assertThat(radii).containsExactly(45, 25);
+  }
+
+  @Test
+  void anEmptyLadderAddsNothing() {
+    SearchPipeline.Rescue walk =
+        SearchPipeline.walkLadder(List.of(), Set.of(), 6, 25, (r, radius) -> found(UUID.randomUUID()));
+
+    assertThat(walk.added()).isEmpty();
+    assertThat(walk.reasons()).isEmpty();
+    assertThat(walk.widerRingRadiusMinutes()).isNull();
   }
 }

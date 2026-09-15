@@ -94,6 +94,72 @@ public class SearchPipeline {
       int exactCount,
       String rescueSummary) {}
 
+  /**
+   * What walking the rescue ladder added on top of the exact page: the new candidates, which rung
+   * introduced each (1-based, matching the ladder's own order), the reasons to show for the rungs
+   * that actually contributed, and the radius of the wider-ring rung when it was one of them —
+   * which is then the honest radius to name in the "nearby areas" note.
+   */
+  record Rescue(
+      Map<UUID, Candidate> added,
+      Map<UUID, Integer> rungOf,
+      Map<UUID, RescueLadder.Rung> rungMeta,
+      List<String> reasons,
+      Integer widerRingRadiusMinutes) {
+
+    static Rescue none() {
+      return new Rescue(Map.of(), Map.of(), Map.of(), List.of(), null);
+    }
+  }
+
+  /**
+   * Walks the rescue ladder until the page is no longer thin. Three rules live here and nowhere
+   * else, which is why this takes its retrieval as a function and can be tested without a database:
+   * a rung that finds nothing new is skipped silently and never named in the summary, the walk
+   * stops the moment {@code minResults} distinct listings are in hand, and an exhausted ladder
+   * simply returns what it managed to find.
+   *
+   * <p>{@code alreadyFound} is the exact (rung 0) page; it is copied, never mutated.
+   */
+  static Rescue walkLadder(
+      List<RescueLadder.Rung> rungs,
+      Set<UUID> alreadyFound,
+      int minResults,
+      int defaultRadiusMinutes,
+      java.util.function.BiFunction<RescueLadder.Rung, Integer, List<Candidate>> retrieve) {
+    Map<UUID, Candidate> added = new LinkedHashMap<>();
+    Map<UUID, Integer> rungOf = new LinkedHashMap<>();
+    Map<UUID, RescueLadder.Rung> rungMeta = new LinkedHashMap<>();
+    List<String> reasons = new ArrayList<>();
+    Set<UUID> seen = new HashSet<>(alreadyFound);
+    Integer widerRingRadius = null;
+    int rungIndex = 1;
+    for (RescueLadder.Rung rung : rungs) {
+      if (seen.size() >= minResults) {
+        break;
+      }
+      int rungRadius = rung.radiusMinutes() == null ? defaultRadiusMinutes : rung.radiusMinutes();
+      boolean addedAny = false;
+      for (Candidate c : retrieve.apply(rung, rungRadius)) {
+        if (seen.add(c.id())) {
+          added.put(c.id(), c);
+          rungOf.put(c.id(), rungIndex);
+          rungMeta.put(c.id(), rung);
+          addedAny = true;
+        }
+      }
+      // a rung that finds nothing new is skipped silently — the ladder keeps going
+      if (addedAny) {
+        reasons.add(rung.reason());
+        if (rung.slot() == null) {
+          widerRingRadius = rungRadius;
+        }
+      }
+      rungIndex++;
+    }
+    return new Rescue(added, rungOf, rungMeta, reasons, widerRingRadius);
+  }
+
   // ------------------------------------------------------------- intent
 
   public IntentLlm.Extraction extractIntent(String query, SearchIntent prior, UUID userId, String anonKey) {
@@ -310,35 +376,20 @@ public class SearchPipeline {
     // Thin page: walk the ladder, collecting new ids per rung, stopping as soon as we have enough
     // or the ladder runs out. Retrieval per rung is the only repeated cost — hydration and scoring
     // below run exactly once over the union.
-    List<String> rescueReasons = new ArrayList<>();
+    Rescue rescue = Rescue.none();
     if (rungOf.size() < props.getSearch().getMinResults()) {
-      List<RescueLadder.Rung> rungs =
-          RescueLadder.rungs(intent, props.getSearch().getRescueRadiusMinutes());
-      int rungIndex = 1;
-      for (RescueLadder.Rung rung : rungs) {
-        if (rungOf.size() >= props.getSearch().getMinResults()) {
-          break;
-        }
-        int rungRadius =
-            rung.radiusMinutes() == null
-                ? props.getSearch().getNearbyRadiusMinutes()
-                : rung.radiusMinutes();
-        boolean addedAny = false;
-        for (Candidate c : retriever.retrieveListings(rung.intent(), rungRadius)) {
-          if (!rungOf.containsKey(c.id())) {
-            byId.put(c.id(), c);
-            rungOf.put(c.id(), rungIndex);
-            rungMeta.put(c.id(), rung);
-            addedAny = true;
-          }
-        }
-        // a rung that finds nothing new is skipped silently — the ladder keeps going
-        if (addedAny) {
-          rescueReasons.add(rung.reason());
-        }
-        rungIndex++;
-      }
+      rescue =
+          walkLadder(
+              RescueLadder.rungs(intent, props.getSearch().getRescueRadiusMinutes()),
+              rungOf.keySet(),
+              props.getSearch().getMinResults(),
+              props.getSearch().getNearbyRadiusMinutes(),
+              (rung, rungRadius) -> retriever.retrieveListings(rung.intent(), rungRadius));
+      byId.putAll(rescue.added());
+      rungOf.putAll(rescue.rungOf());
+      rungMeta.putAll(rescue.rungMeta());
     }
+    List<String> rescueReasons = rescue.reasons();
 
     if (byId.isEmpty()) {
       return new Homes(List.of(), false, 0, 0, null);
@@ -429,8 +480,18 @@ public class SearchPipeline {
         Comparator.comparingInt(Row::rung)
             .thenComparing(Comparator.comparingInt((Row r) -> r.scored().matchScore()).reversed()));
     List<Row> top = rows.stream().limit(RESULT_LIMIT).toList();
+    // "Also showing nearby areas within ~N min" is a claim about where these rows came from, so it
+    // is only said when it is true. A soft `locations` puts no locality in the WHERE at all, so the
+    // page is Mumbai-wide and no radius describes it — the "preferences, not filters" sentence
+    // covers that case and says something the query actually made true. And when the wider-ring
+    // rung fired, the rows came from *its* radius, not the configured one.
     boolean includesNearby =
-        !commuteIntent && !preferred.isEmpty() && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
+        ConfidenceGate.isHard(intent, "locations")
+            && !commuteIntent
+            && !preferred.isEmpty()
+            && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
+    int nearbyRadius =
+        rescue.widerRingRadiusMinutes() == null ? radius : rescue.widerRingRadiusMinutes();
 
     long llmStart = System.currentTimeMillis();
     Map<UUID, Explanation> explanations =
@@ -485,7 +546,7 @@ public class SearchPipeline {
               nearMiss,
               nearMissReason));
     }
-    return new Homes(out, includesNearby, radius, exactCount, rescueSummary);
+    return new Homes(out, includesNearby, nearbyRadius, exactCount, rescueSummary);
   }
 
   /**
