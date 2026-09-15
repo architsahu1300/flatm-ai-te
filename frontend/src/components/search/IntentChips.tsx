@@ -39,8 +39,10 @@ export function IntentChips({
       {chips.map((chip, i) => (
         <span
           key={chip.key}
+          title={chip.soft ? "A preference, not a filter — say it outright to require it" : undefined}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-chip border border-border bg-surface py-1 pl-2.5 pr-1.5 text-[13px] shadow-sm transition-all duration-200",
+            chip.soft && "border-dashed bg-surface-2 text-text-muted",
             i < revealed ? "scale-100 opacity-100" : "scale-90 opacity-0",
           )}
         >

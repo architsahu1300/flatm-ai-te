@@ -63,6 +63,8 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 | `AI_MOCK` | `auto` | `true`/`false` to force provider mode |
 | `AI_EXPLANATIONS_ENABLED` | `true` | Kill-switch → score-breakdown-only UI |
 | `SEARCH_NEARBY_RADIUS_MINUTES` | `25` | A named home locality also admits every locality within this many estimated minutes |
+| `SEARCH_MIN_RESULTS` | `6` | Below this many homes, nearby and near-miss options are added automatically |
+| `SEARCH_RESCUE_RADIUS_MINUTES` | `45` | The wider ring the top-up reaches for before it drops any filter |
 | `EVAL_PACE_MS` | `4500` | Eval profile only — delay between provider calls |
 | `EVAL_TAGS` / `EVAL_LIMIT` | all / `0` | Eval profile only — run a subset of the golden set |
 | `EVAL_ALLOW_MOCK` | `false` | Eval profile only — allow the mock provider (runner smoke test) |
@@ -84,6 +86,15 @@ multi-turn follow-ups). The build fails if any must-pass case fails, the case pa
 0.85, or `locations` / `budgetMax` / `roomType` slot accuracy drops below 0.90. Cases tagged
 `known-gap` are reported but not counted. Read `docs/eval/README.md` before interpreting a
 live run — two known key artefacts are listed there.
+
+Confidence gating keeps a slot the user actually stated (`"2bhk in Powai"`) a hard SQL filter,
+while a slot the reader only inferred (a guessed `roomType`, a defaulted commute radius) becomes a
+ranking preference instead — it never deletes a listing, it only ranks matching ones higher. The
+UI marks the difference: a soft chip's value is prefixed with `≈`. Two slots are never softened no
+matter how low their confidence — `excludeLocations` and `verifiedOnly` — because excluding an area
+or promising verified-only listings has to hold exactly as stated. When the page still comes back
+thin, an automatic rescue tops it up with nearby and near-miss results, each one marked and labelled
+with the reason it's there rather than left for the user to discover.
 
 Run the same set through the real model (never gates; paced for Gemini's free tier):
 

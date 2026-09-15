@@ -35,6 +35,7 @@ export interface SearchIntent {
   excludeLocations?: { name: string; localityId: string | null }[] | null;
   unresolvedLocations?: string[] | null;
   verifiedOnly?: boolean | null;
+  confidence?: Record<string, number> | null;
   freeText?: string | null;
   originalQuery?: string | null;
 }
@@ -56,6 +57,8 @@ export interface AiResult {
   commuteLabel: string | null;
   home: ListingCard | null;
   flatmate: FlatmateCard | null;
+  nearMiss?: boolean | null;
+  nearMissReason?: string | null;
 }
 
 export interface Relaxer {
@@ -112,10 +115,24 @@ export interface IntentChip {
   icon: string;
   label: string;
   value: string;
+  soft?: boolean;
   remove: (intent: SearchIntent) => SearchIntent;
 }
 
+const HARD_THRESHOLD = 0.75;
+const ALWAYS_HARD = new Set(["excludeLocations", "verifiedOnly"]);
+
+/** A slot the reader inferred rather than read: it ranks results, it does not filter them. */
+export function isSoft(intent: SearchIntent, slot: string): boolean {
+  if (ALWAYS_HARD.has(slot)) return false;
+  return (intent.confidence?.[slot] ?? 1) < HARD_THRESHOLD;
+}
+
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
+
+/** Applies the ≈-prefix + soft flag to a chip's value when its backing slot is a preference, not a filter. */
+const withSoftness = (intent: SearchIntent, slot: string, value: string): { value: string; soft?: boolean } =>
+  isSoft(intent, slot) ? { value: `≈ ${value}`, soft: true } : { value };
 
 export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
   const chips: IntentChip[] = [];
@@ -134,7 +151,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: `loc:${loc.name}`,
       icon: "📍",
       label: "Location",
-      value: loc.name,
+      ...withSoftness(intent, "locations", loc.name),
       remove: (i) => ({
         ...i,
         locations: (i.locations ?? []).filter((l) => l.name !== loc.name),
@@ -170,7 +187,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "commute",
       icon: "🚇",
       label: "Commute",
-      value: `≤${intent.commuteTo.maxMinutes ?? 30} min to ${intent.commuteTo.place}`,
+      ...withSoftness(intent, "commuteTo", `≤${intent.commuteTo.maxMinutes ?? 30} min to ${intent.commuteTo.place}`),
       remove: (i) => ({ ...i, commuteTo: null }),
     });
   }
@@ -185,7 +202,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "budget",
       icon: "💰",
       label: "Budget",
-      value,
+      ...withSoftness(intent, "budgetMax", value),
       remove: (i) => ({ ...i, budgetMax: null, budgetMin: null }),
     });
   }
@@ -194,7 +211,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "deposit",
       icon: "🔐",
       label: "Deposit",
-      value: `≤ ${inr(intent.maxDeposit)}`,
+      ...withSoftness(intent, "maxDeposit", `≤ ${inr(intent.maxDeposit)}`),
       remove: (i) => ({ ...i, maxDeposit: null }),
     });
   }
@@ -204,7 +221,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "room",
       icon: "🛏",
       label: "Room",
-      value: labels[intent.roomType],
+      ...withSoftness(intent, "roomType", labels[intent.roomType]),
       remove: (i) => ({ ...i, roomType: null }),
     });
   }
@@ -213,7 +230,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       intent.bhk.min === intent.bhk.max
         ? `${intent.bhk.min} BHK`
         : `${intent.bhk.min ?? "?"}–${intent.bhk.max ?? "?"} BHK`;
-    chips.push({ key: "bhk", icon: "🏢", label: "Size", value: v, remove: (i) => ({ ...i, bhk: null }) });
+    chips.push({ key: "bhk", icon: "🏢", label: "Size", ...withSoftness(intent, "bhk", v), remove: (i) => ({ ...i, bhk: null }) });
   }
   if (intent.furnished) {
     const labels = {
@@ -225,7 +242,7 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "furnished",
       icon: "🛋",
       label: "Furnishing",
-      value: labels[intent.furnished],
+      ...withSoftness(intent, "furnished", labels[intent.furnished]),
       remove: (i) => ({ ...i, furnished: null }),
     });
   }
@@ -234,7 +251,11 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "movein",
       icon: "📅",
       label: "Move-in",
-      value: new Date(intent.moveInDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" }),
+      ...withSoftness(
+        intent,
+        "moveInDate",
+        new Date(intent.moveInDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" }),
+      ),
       remove: (i) => ({ ...i, moveInDate: null }),
     });
   }
@@ -259,7 +280,11 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "gender",
       icon: "👤",
       label: "Preference",
-      value: intent.genderPreference === "FEMALE_ONLY" ? "Female only" : "Male only",
+      ...withSoftness(
+        intent,
+        "genderPreference",
+        intent.genderPreference === "FEMALE_ONLY" ? "Female only" : "Male only",
+      ),
       remove: (i) => ({ ...i, genderPreference: null }),
     });
   }

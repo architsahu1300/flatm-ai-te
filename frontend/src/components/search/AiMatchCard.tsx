@@ -126,6 +126,11 @@ export function AiMatchCard({
                   🚇 {result.commuteLabel}
                 </span>
               )}
+              {result.nearMiss && (
+                <Badge variant="warning" className="mt-1.5">
+                  {result.nearMissReason ?? "Near miss"}
+                </Badge>
+              )}
             </div>
             {/* home cards show the ring over the photo on mobile — avoid a second one */}
             <div className={cn("shrink-0", result.home && "hidden sm:block")}>
