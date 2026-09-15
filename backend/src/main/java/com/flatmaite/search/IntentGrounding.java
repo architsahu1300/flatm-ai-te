@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,7 +95,7 @@ public final class IntentGrounding {
     if (intent.listingTypes() != null && !intent.listingTypes().isEmpty()) {
       boolean all =
           intent.listingTypes().stream()
-              .allMatch(t -> q.contains(t.name().toLowerCase(Locale.ROOT).replace('_', ' ')));
+              .allMatch(t -> containsWordBoundary(q, t.name().toLowerCase(Locale.ROOT).replace('_', ' ')));
       out.put("listingTypes", all ? STATED : INFERRED);
     }
     if (intent.furnished() != null) {
@@ -116,7 +116,7 @@ public final class IntentGrounding {
       out.put("couplesOk", containsAny(q, COUPLE_CUES) ? STATED : INFERRED);
     }
     if (intent.amenities() != null && !intent.amenities().isEmpty()) {
-      boolean all = intent.amenities().stream().allMatch(a -> q.contains(a.toLowerCase(Locale.ROOT)));
+      boolean all = intent.amenities().stream().allMatch(a -> containsWordBoundary(q, a.toLowerCase(Locale.ROOT)));
       out.put("amenities", all ? STATED : INFERRED);
     }
     if (intent.lifestyle() != null) {
@@ -232,21 +232,31 @@ public final class IntentGrounding {
     }
     Matcher words = NumberWords.NUMBER_RUN.matcher(q);
     while (words.find()) {
-      OptionalInt value = NumberWords.parse(words.group());
+      java.util.OptionalInt value = NumberWords.parse(words.group());
       value.ifPresent(out::add);
     }
     return Set.copyOf(out);
   }
 
+  /** Cues are word-prefixes on purpose ("smok" covers smoking/smoker) — but a prefix must begin a
+   * word, or "apartment" would ground a gender preference and "carpet" a pet policy. */
   private static boolean containsAny(String q, String[] cues) {
     if (cues == null) {
       return false;
     }
     for (String cue : cues) {
-      if (q.contains(cue)) {
+      if (CUE_CACHE.computeIfAbsent(cue, c -> Pattern.compile("\\b" + Pattern.quote(c))).matcher(q).find()) {
         return true;
       }
     }
     return false;
   }
+
+  /** Check if a word-phrase appears at a word boundary in the query. */
+  private static boolean containsWordBoundary(String q, String phrase) {
+    return WORD_BOUNDARY_CACHE.computeIfAbsent(phrase, p -> Pattern.compile("\\b" + Pattern.quote(p))).matcher(q).find();
+  }
+
+  private static final Map<String, Pattern> CUE_CACHE = new ConcurrentHashMap<>();
+  private static final Map<String, Pattern> WORD_BOUNDARY_CACHE = new ConcurrentHashMap<>();
 }

@@ -198,4 +198,42 @@ class IntentGroundingTest {
     assertThat(score(SearchIntent.builder().maxDeposit(200000).build(), "2 lakh deposit, 30k rent"))
         .containsEntry("maxDeposit", IntentGrounding.STATED);
   }
+
+  @Test
+  void aCueInsideALongerWordDoesNotGroundAnything() {
+    // "apartment" contains "part" (parties) and "men" (MALE_ONLY); "carpet" contains "pet"
+    SearchIntent intent =
+        SearchIntent.builder()
+            .genderPreference(GenderPreference.MALE_ONLY)
+            .lifestyle(SearchIntent.Lifestyle.builder().partiesOk(true).pets("PET_FRIENDLY").build())
+            .build();
+
+    Map<String, Double> graded = score(intent, "2bhk apartment in powai with a carpet area of 600 sqft");
+
+    assertThat(graded).containsEntry("genderPreference", IntentGrounding.INFERRED);
+    assertThat(graded).containsEntry("lifestyle", IntentGrounding.INFERRED);
+  }
+
+  @Test
+  void aRealCueStillGroundsWhenItStartsAWord() {
+    assertThat(
+            score(
+                SearchIntent.builder()
+                    .lifestyle(SearchIntent.Lifestyle.builder().smoking("NO_SMOKERS").build())
+                    .build(),
+                "no smokers please"))
+        .containsEntry("lifestyle", IntentGrounding.STATED);
+    assertThat(
+            score(
+                SearchIntent.builder().genderPreference(GenderPreference.FEMALE_ONLY).build(),
+                "women only pg in thane"))
+        .containsEntry("genderPreference", IntentGrounding.STATED);
+    assertThat(
+            score(
+                SearchIntent.builder()
+                    .lifestyle(SearchIntent.Lifestyle.builder().diet("VEGETARIAN").build())
+                    .build(),
+                "vegetarian household"))
+        .containsEntry("lifestyle", IntentGrounding.STATED);
+  }
 }
