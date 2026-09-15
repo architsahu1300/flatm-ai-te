@@ -130,9 +130,24 @@ export function isSoft(intent: SearchIntent, slot: string): boolean {
 
 const inr = (n: number) => `₹${n.toLocaleString("en-IN")}`;
 
-/** Applies the ≈-prefix + soft flag to a chip's value when its backing slot is a preference, not a filter. */
-const withSoftness = (intent: SearchIntent, slot: string, value: string): { value: string; soft?: boolean } =>
-  isSoft(intent, slot) ? { value: `≈ ${value}`, soft: true } : { value };
+/**
+ * Applies the ≈-prefix + soft flag to a chip's value when its backing slot is a preference, not a
+ * filter.
+ *
+ * A chip that renders more than one slot passes all of them and is soft when any of them is — the
+ * commute chip shows the workplace *and* the travel time, the budget chip shows both bounds, and
+ * the chip is the only place the user finds out which of the values printed on it is actually
+ * being enforced. Marking it hard while one half is a guess is the lie this whole feature exists
+ * to stop telling.
+ */
+const withSoftness = (
+  intent: SearchIntent,
+  slot: string | string[],
+  value: string,
+): { value: string; soft?: boolean } =>
+  (Array.isArray(slot) ? slot : [slot]).some((s) => isSoft(intent, s))
+    ? { value: `≈ ${value}`, soft: true }
+    : { value };
 
 export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
   const chips: IntentChip[] = [];
@@ -187,7 +202,12 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
       key: "commute",
       icon: "🚇",
       label: "Commute",
-      ...withSoftness(intent, "commuteTo", `≤${intent.commuteTo.maxMinutes ?? 30} min to ${intent.commuteTo.place}`),
+      // the radius is the number on the chip, and it is graded apart from the workplace
+      ...withSoftness(
+        intent,
+        ["commuteTo", "commuteTo.maxMinutes"],
+        `≤${intent.commuteTo.maxMinutes ?? 30} min to ${intent.commuteTo.place}`,
+      ),
       remove: (i) => ({ ...i, commuteTo: null }),
     });
   }
@@ -198,11 +218,16 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
         : intent.budgetMax != null
           ? `≤ ${inr(intent.budgetMax)}`
           : `≥ ${inr(intent.budgetMin!)}`;
+    // one chip, up to two bounds: a "more than 30k" search has no budgetMax to be graded at all
+    const bounds = [
+      ...(intent.budgetMin != null ? ["budgetMin"] : []),
+      ...(intent.budgetMax != null ? ["budgetMax"] : []),
+    ];
     chips.push({
       key: "budget",
       icon: "💰",
       label: "Budget",
-      ...withSoftness(intent, "budgetMax", value),
+      ...withSoftness(intent, bounds, value),
       remove: (i) => ({ ...i, budgetMax: null, budgetMin: null }),
     });
   }
@@ -260,12 +285,13 @@ export function chipsFromIntent(intent: SearchIntent): IntentChip[] {
     });
   }
   const l = intent.lifestyle ?? {};
+  // all seven lifestyle chips back the one `lifestyle` slot, so they are soft or hard together
   const lifestyleChip = (key: string, icon: string, value: string, patch: Partial<NonNullable<SearchIntent["lifestyle"]>>) =>
     chips.push({
       key: `life:${key}`,
       icon,
       label: "Lifestyle",
-      value,
+      ...withSoftness(intent, "lifestyle", value),
       remove: (i) => ({ ...i, lifestyle: { ...(i.lifestyle ?? {}), ...patch } }),
     });
   if (l.quiet) lifestyleChip("quiet", "🤫", "Quiet home", { quiet: null });
