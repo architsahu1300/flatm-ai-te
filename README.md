@@ -82,9 +82,15 @@ Every `./mvnw verify` runs `IntentGoldenTest`: the keyword parser and the new-vs
 against `backend/src/main/resources/eval/intent-golden.json` (≈ 75 real-shaped queries, including
 multi-turn follow-ups). The build fails if any must-pass case fails, the case pass rate drops below
 0.85, or `locations` / `budgetMax` / `roomType` slot accuracy drops below 0.90. Cases tagged
-`known-gap` are reported but not counted. Read `docs/eval/README.md` before interpreting a live run — two known key artefacts are listed there.
+`known-gap` are reported but not counted. Read `docs/eval/README.md` before interpreting a
+live run — two known key artefacts are listed there.
 
 Run the same set through the real model (never gates; paced for Gemini's free tier):
+
+The eval resolves localities from the database, so refresh it first: from the repo root
+`docker compose down -v && docker compose up -d`, then
+`cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=seed`. An older local seed
+silently distorts the locality slots.
 
 ```bash
 cd backend && FM_AI_PROVIDER=google-genai GEMINI_API_KEY=… ./mvnw spring-boot:run -Dspring-boot.run.profiles=eval
