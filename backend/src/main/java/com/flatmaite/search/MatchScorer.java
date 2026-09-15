@@ -1,6 +1,7 @@
 package com.flatmaite.search;
 
 import com.flatmaite.common.domain.Diet;
+import com.flatmaite.common.domain.GenderPreference;
 import com.flatmaite.common.domain.SocialStyle;
 import com.flatmaite.flatmate.FlatmateProfile;
 import com.flatmaite.listing.Listing;
@@ -172,7 +173,48 @@ public final class MatchScorer {
       }
     }
 
+    // preferences (.15) — slots the reader inferred rather than read. They no longer filter, so they
+    // rank here instead: a listing that misses every one of them still appears, just lower.
+    List<String> preferenceSlots = ConfidenceGate.preferenceSlots(intent);
+    if (!preferenceSlots.isEmpty()) {
+      List<String> met = new ArrayList<>();
+      List<String> missed = new ArrayList<>();
+      for (String slot : preferenceSlots) {
+        (satisfies(intent, l, slot) ? met : missed).add(ConfidenceGate.label(slot));
+      }
+      double score = met.size() / (double) preferenceSlots.size();
+      String detail =
+          missed.isEmpty()
+              ? "Matches your preferred %s".formatted(String.join(", ", met))
+              : "%s — a preference, not a requirement".formatted(capitalize(String.join(", ", missed)));
+      parts.add(new Component("preferences", 0.15, score, detail));
+    }
+
     return finish(parts);
+  }
+
+  /**
+   * Does this listing satisfy a soft slot? Unknown or unobservable slots count as satisfied — never
+   * penalise a listing for something this path cannot check. {@code bhk} and {@code amenities} are
+   * not reachable from {@link Listing} on this path (no loaded {@code Property}/association), and
+   * {@code moveInDate} is already ranked by the unconditional {@code availability} component above,
+   * so scoring it again here would double-count the same signal.
+   */
+  private static boolean satisfies(SearchIntent intent, Listing l, String slot) {
+    return switch (slot) {
+      case "roomType" -> l.getRoomType() == intent.roomType();
+      case "furnished" -> l.getFurnishing() == intent.furnished();
+      case "listingTypes" -> intent.listingTypes().contains(l.getType());
+      case "genderPreference" -> l.getPreferredGender() == GenderPreference.ANY
+          || l.getPreferredGender() == intent.genderPreference();
+      case "couplesOk" -> !Boolean.TRUE.equals(intent.couplesOk()) || l.isCouplesAllowed();
+      case "bhk", "amenities", "moveInDate" -> true; // not observable on this path — never penalised
+      default -> true;
+    };
+  }
+
+  private static String capitalize(String s) {
+    return s.isEmpty() ? s : Character.toUpperCase(s.charAt(0)) + s.substring(1);
   }
 
   private static List<Component> listingLifestyleFacets(Lifestyle wants, Listing l) {

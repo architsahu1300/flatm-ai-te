@@ -3,6 +3,7 @@ package com.flatmaite.search;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 
+import com.flatmaite.common.domain.Furnishing;
 import com.flatmaite.common.domain.ListingType;
 import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
@@ -214,6 +215,79 @@ class MatchScorerTest {
     assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, false, true)))
         .isEqualTo("Mentions the specific things you asked for");
     assertThat(MatchScorer.listingRelevanceDetail(new Retrieval(1, false, false))).isNull();
+  }
+
+  @Test
+  void aSoftPreferenceRanksInsteadOfFiltering() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .confidence(java.util.Map.of("roomType", 0.5))
+            .build();
+
+    MatchScorer.Scored matching = MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.ENTIRE));
+    MatchScorer.Scored missing = MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.PRIVATE));
+
+    assertThat(component(matching, "preferences").score()).isEqualTo(1.0);
+    assertThat(component(matching, "preferences").weight()).isEqualTo(0.15);
+    assertThat(component(matching, "preferences").detail()).contains("Matches your preferred room type");
+    assertThat(component(missing, "preferences").score()).isEqualTo(0.0);
+    assertThat(component(missing, "preferences").detail()).contains("a preference, not a requirement");
+    assertThat(missing.matchScore()).isLessThan(matching.matchScore());
+  }
+
+  @Test
+  void noPreferencesComponentWhenEverySlotIsHard() {
+    SearchIntent intent = SearchIntent.builder().roomType(RoomType.ENTIRE).build();
+    assertThat(MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.ENTIRE)).breakdown())
+        .extracting(MatchScorer.Component::component)
+        .doesNotContain("preferences");
+  }
+
+  @Test
+  void slotsAnExistingComponentAlreadyScores_getNoPreferencesComponent() {
+    SearchIntent intent =
+        SearchIntent.builder().budgetMax(30000).confidence(java.util.Map.of("budgetMax", 0.5)).build();
+    assertThat(MatchScorer.scoreListing(intent, candidateWithRoomType(RoomType.ENTIRE)).breakdown())
+        .extracting(MatchScorer.Component::component)
+        .doesNotContain("preferences");
+  }
+
+  @Test
+  void severalSoftPreferencesScoreAsAFraction() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .furnished(Furnishing.FULLY_FURNISHED)
+            .confidence(java.util.Map.of("roomType", 0.5, "furnished", 0.5))
+            .build();
+    // the candidate is ENTIRE but semi-furnished → one of two satisfied
+    assertThat(component(MatchScorer.scoreListing(intent, semiFurnishedEntire()), "preferences").score())
+        .isEqualTo(0.5);
+  }
+
+  private Listing listingWithRoomType(RoomType roomType, Furnishing furnishing) {
+    Listing l =
+        Listing.builder()
+            .listerId(UUID.randomUUID())
+            .type(ListingType.PRIVATE_ROOM)
+            .roomType(roomType)
+            .furnishing(furnishing)
+            .title("Room")
+            .rentMonthly(20000)
+            .availableFrom(LocalDate.now().plusDays(10))
+            .qualityScore(0.8f)
+            .build();
+    l.setUpdatedAt(Instant.now());
+    return l;
+  }
+
+  private ListingCandidate candidateWithRoomType(RoomType roomType) {
+    return candidate(listingWithRoomType(roomType, Furnishing.UNFURNISHED), true, null, SEMANTIC_TOP);
+  }
+
+  private ListingCandidate semiFurnishedEntire() {
+    return candidate(listingWithRoomType(RoomType.ENTIRE, Furnishing.SEMI_FURNISHED), true, null, SEMANTIC_TOP);
   }
 
   private static MatchScorer.Component component(MatchScorer.Scored scored, String name) {
