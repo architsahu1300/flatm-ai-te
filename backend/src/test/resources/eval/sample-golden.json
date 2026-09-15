@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "sample-first",
+      "tags": ["basics"],
+      "query": "2bhk in powai under 40k",
+      "prior": null,
+      "mustPass": true,
+      "expectVerdict": null,
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 40000
+      }
+    },
+    {
+      "id": "sample-followup",
+      "tags": ["refinement"],
+      "query": "make it 30k",
+      "prior": {"case": "sample-first"},
+      "mustPass": false,
+      "expectVerdict": "REFINE",
+      "expect": {
+        "searchTarget": "PROPERTIES",
+        "locations": ["Powai"],
+        "bhk": {"min": 2, "max": 2},
+        "budgetMax": 30000
+      }
+    },
+    {
+      "id": "sample-verdict-only",
+      "tags": ["arbiter", "known-gap"],
+      "query": "flats in goregaon",
+      "prior": {"case": "sample-first"},
+      "mustPass": false,
+      "expectVerdict": "AMBIGUOUS",
+      "scoreIntent": false,
+      "expect": {}
+    }
+  ]
+}
