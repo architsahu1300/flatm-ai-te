@@ -108,8 +108,9 @@ Must-pass: every case that mirrors an existing unit test (≈ 25) plus the arbit
 ### 4.3 Core (`com.flatmaite.eval`, main code, no Spring dependencies except Jackson)
 
 - `GoldenCase` (record: id, tags, query, priorCaseId, mustPass, expectVerdict, `SearchIntent expected`) and
-  `GoldenSet.load()` — reads the classpath JSON with the app's `ObjectMapper`; validates unique ids and that every
-  `prior.case` names an earlier case; `expected` is built as a `SearchIntent` (omitted slots null).
+  `GoldenSet.load()` — reads the classpath JSON with a private `ObjectMapper` (the core has no Spring
+  dependency); validates unique ids and that every `prior.case` names an earlier case; `expected` is built as a
+  `SearchIntent` (omitted slots null).
 - `IntentComparator.compare(expected, actual, nameOf)` → `List<SlotResult>`; `nameOf` maps a `LocationRef` to
   its canonical name (from `LocalityResolver.nameOf`, or the ref's own name when unresolved).
 - `IntentArbiter` (new `@Component` in `search`): `Decision decide(String query, SearchIntent prior,
@@ -140,8 +141,9 @@ the assertion message. Target: < 1 s. Also `GoldenSetTest` (file loads; ids uniq
   between provider calls; a provider exception is recorded as the case's failure (`error` field), not a crash.
   Optional `EVAL_TAGS=budget,commute` filter and `EVAL_LIMIT=n`.
 - Output: table on stdout; `backend/target/eval/<provider>-<model>-<yyyyMMdd-HHmmss>.json` (report + run
-  metadata: provider, model, case count, elapsed, calls, errors, and the provider's reported token usage when
-  the ChatClient response exposes it, next to `promptOverheadTokens()` for comparison). Exit code 0.
+  metadata: provider, model, case count, elapsed, calls, errors, and `promptOverheadTokens()` (the estimate);
+  provider-reported usage needs `OpenAiLlms` to read `ChatResponse` metadata, which WS3 freezes — deferred to
+  WS4). Exit code 0.
 - Command (run by Archit; the assistant reads the output):
   `cd backend && FM_AI_PROVIDER=google-genai GEMINI_API_KEY=… ./mvnw spring-boot:run -Dspring-boot.run.profiles=eval`
 
@@ -157,7 +159,7 @@ assert ≥ 35 localities and the WS2 admission behaviour).
 - README: "Intent eval" section — the offline gate, the live command, the env knobs, where reports land.
 - `docs/eval/README.md`: how to add a case, what "omitted slot = expected null" means, how to mark must-pass.
 - `docs/eval/<date>-<provider>-<model>.md`: summary of the first live run (pass rate, per-slot table, verdict
-  accuracy, token usage vs estimate, notable failures) — written after Archit's run.
+  accuracy, estimated prompt tokens (real usage deferred to WS4), notable failures) — written after Archit's run.
 
 ### 4.8 Degradation
 
