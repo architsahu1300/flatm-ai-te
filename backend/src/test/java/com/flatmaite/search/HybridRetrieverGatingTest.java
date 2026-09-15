@@ -7,6 +7,7 @@ import com.flatmaite.common.domain.Furnishing;
 import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import com.flatmaite.seed.SeedLocalities;
 import java.util.List;
@@ -145,5 +146,77 @@ class HybridRetrieverGatingTest {
         SearchIntent.builder().moveInDate("2026-10-01").confidence(Map.of("moveInDate", 0.5)).build();
     assertThat(ConfidenceGate.softSlots(intent)).containsExactly("moveInDate");
     assertThat(ConfidenceGate.preferenceSlots(intent)).isEmpty();
+  }
+
+  // ---- the commute ring is gated apart from the home-locality ring ----
+
+  @Test
+  void aGuessedCommuteRadiusDoesNotNarrowTheSearch() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .commuteTo(new CommuteTo("BKC", SeedLocalities.id("BKC"), 30))
+            .confidence(Map.of("commuteTo", 1.0, "commuteTo.maxMinutes", 0.5))
+            .build();
+    assertThat(retriever.toFilters(intent).localityIds()).isEmpty();
+  }
+
+  @Test
+  void aStatedCommuteRadiusStillNarrowsTheSearch() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .commuteTo(new CommuteTo("BKC", SeedLocalities.id("BKC"), 20))
+            .confidence(Map.of("commuteTo", 1.0, "commuteTo.maxMinutes", 1.0))
+            .build();
+    assertThat(retriever.toFilters(intent).localityIds()).isNotEmpty();
+  }
+
+  @Test
+  void aFuzzyHomeAreaDoesNotDiscardAStatedCommuteRing() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", SeedLocalities.id("Powai"))))
+            .commuteTo(new CommuteTo("BKC", SeedLocalities.id("BKC"), 20))
+            .confidence(Map.of("locations", 0.58, "commuteTo", 1.0, "commuteTo.maxMinutes", 1.0))
+            .build();
+
+    List<UUID> admitted = retriever.toFilters(intent).localityIds();
+
+    assertThat(admitted).isNotEmpty();
+    assertThat(admitted).contains(SeedLocalities.id("BKC"));
+  }
+
+  @Test
+  void aSoftCommuteAnchorFiltersNothing() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .commuteTo(new CommuteTo("BKC", SeedLocalities.id("BKC"), 20))
+            .confidence(Map.of("commuteTo", 0.5, "commuteTo.maxMinutes", 1.0))
+            .build();
+    assertThat(retriever.toFilters(intent).localityIds()).isEmpty();
+  }
+
+  @Test
+  void anUnstatedCommuteRadiusIsNotPresent_soItIsNeverASoftSlotOfItsOwn() {
+    SearchIntent noRadius =
+        SearchIntent.builder().commuteTo(new CommuteTo("BKC", SeedLocalities.id("BKC"), null)).build();
+    assertThat(ConfidenceGate.isPresent(noRadius, "commuteTo")).isTrue();
+    assertThat(ConfidenceGate.isPresent(noRadius, "commuteTo.maxMinutes")).isFalse();
+    // and with no radius to enforce there is no ring, whatever the anchor's grade
+    assertThat(retriever.toFilters(noRadius).localityIds()).isEmpty();
+  }
+
+  @Test
+  void anExclusionStillApplies_whenTheHomeAreaIsOnlyAGuess() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", SeedLocalities.id("Powai"))))
+            .excludeLocations(List.of(new LocationRef("Kurla", SeedLocalities.id("Kurla"))))
+            .confidence(Map.of("locations", 0.5, "excludeLocations", 0.1))
+            .build();
+
+    ListingFilters filters = retriever.toFilters(intent);
+
+    assertThat(filters.localityIds()).isEmpty(); // the guessed area filters nothing
+    assertThat(filters.excludeLocalityIds()).containsExactly(SeedLocalities.id("Kurla")); // the promise holds
   }
 }

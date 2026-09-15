@@ -304,10 +304,10 @@ public class HybridRetriever {
    */
   public ListingFilters toFiltersWithRadius(SearchIntent intent, Integer radiusMinutes) {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
-    boolean hardLocations = ConfidenceGate.isHard(intent, "locations");
     ListingFilters.ListingFiltersBuilder b =
         ListingFilters.builder()
-            .localityIds(hardLocations ? admittedLocalityIds(intent, radiusMinutes) : List.of())
+            // admittedLocalityIds gates its two rings itself; an empty list is "no locality filter"
+            .localityIds(admittedLocalityIds(intent, radiusMinutes))
             .excludeLocalityIds(excludedLocalityIds(intent));
     if (ConfidenceGate.isHard(intent, "budgetMin")) {
       b.budgetMin(intent.budgetMin());
@@ -409,29 +409,42 @@ public class HybridRetriever {
 
   /**
    * Requested localities; plus everything within {@code radiusMinutes} of each (when non-null);
-   * plus the commute radius when a workplace is named; minus exclusions. Requested ids come first,
-   * then by minutes. Empty list = no locality hard filter.
+   * plus the commute ring when a workplace and a travel time were both stated; minus exclusions.
+   * Requested ids come first, then by minutes. Empty list = no locality hard filter.
+   *
+   * <p>The two rings are gated separately because they are two separate claims by the user, and
+   * collapsing them behind one gate fails in both directions: a home area the reader only guessed
+   * would delete rows, and a fuzzy home area would throw away a commute the user stated outright.
+   * So each ring is admitted only when its own slot is hard.
+   *
+   * <p>A commute radius nobody stated is skipped rather than defaulted. {@code "room near bkc"}
+   * names no travel time, so {@link SearchIntent#DEFAULT_COMMUTE_MINUTES} is our guess, and a guess
+   * must not delete a listing 35 minutes from BKC. Nothing is lost but the {@code AND}: the
+   * {@code location} score component and the per-result commute label both still measure distance
+   * to the anchor, so near-by homes still rank first — they are simply no longer the only ones.
+   *
+   * <p>Exclusions are removed however the positive side was graded: they are {@code ALWAYS_HARD}.
    */
   public List<UUID> admittedLocalityIds(SearchIntent intent, Integer radiusMinutes) {
-    List<UUID> requested = requestedLocalityIds(intent);
     Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
-    LinkedHashSet<UUID> admitted = new LinkedHashSet<>(requested);
+    LinkedHashSet<UUID> admitted = new LinkedHashSet<>();
     Map<UUID, Integer> nearbyMinutes = new HashMap<>();
-    if (radiusMinutes != null) {
-      for (UUID id : requested) {
-        for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusMinutes, Integer.MAX_VALUE)) {
-          nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+    if (ConfidenceGate.isHard(intent, "locations")) {
+      List<UUID> requested = requestedLocalityIds(intent);
+      admitted.addAll(requested);
+      if (radiusMinutes != null) {
+        for (UUID id : requested) {
+          for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusMinutes, Integer.MAX_VALUE)) {
+            nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+          }
         }
       }
     }
-    UUID anchor = commuteAnchor(intent);
+    Integer commuteMinutes = enforceableCommuteMinutes(intent);
+    UUID anchor = commuteMinutes == null ? null : commuteAnchor(intent);
     if (anchor != null) {
-      int maxMinutes =
-          intent.commuteTo().maxMinutes() == null
-              ? SearchIntent.DEFAULT_COMMUTE_MINUTES
-              : intent.commuteTo().maxMinutes();
       nearbyMinutes.merge(anchor, 0, Math::min);
-      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, maxMinutes, Integer.MAX_VALUE)) {
+      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, commuteMinutes, Integer.MAX_VALUE)) {
         nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
       }
     }
@@ -440,6 +453,20 @@ public class HybridRetriever {
         .forEach(e -> admitted.add(e.getKey()));
     admitted.removeAll(excluded);
     return new ArrayList<>(admitted);
+  }
+
+  /**
+   * How wide the commute ring may be enforced, or null when it may not be enforced at all: the
+   * anchor is only inferred, or no radius was ever stated. Both halves must hold — a workplace the
+   * user named tells us nothing about how far they are willing to travel.
+   */
+  private static Integer enforceableCommuteMinutes(SearchIntent intent) {
+    if (!ConfidenceGate.isHard(intent, "commuteTo")
+        || !ConfidenceGate.isPresent(intent, "commuteTo.maxMinutes")
+        || !ConfidenceGate.isHard(intent, "commuteTo.maxMinutes")) {
+      return null;
+    }
+    return intent.commuteTo().maxMinutes();
   }
 
   /**

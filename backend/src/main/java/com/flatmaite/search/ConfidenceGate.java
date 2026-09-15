@@ -70,7 +70,9 @@ public final class ConfidenceGate {
       case "couplesOk" -> intent.couplesOk() != null;
       case "amenities" -> intent.amenities() != null && !intent.amenities().isEmpty();
       case "lifestyle" -> intent.lifestyle() != null;
-      case "commuteTo", "commuteTo.maxMinutes" -> intent.commuteTo() != null;
+      case "commuteTo" -> intent.commuteTo() != null;
+      // a radius nobody gave us is not a constraint to grade: the anchor is present, the ring is not
+      case "commuteTo.maxMinutes" -> intent.commuteTo() != null && intent.commuteTo().maxMinutes() != null;
       case "verifiedOnly" -> intent.verifiedOnly() != null;
       default -> false;
     };
