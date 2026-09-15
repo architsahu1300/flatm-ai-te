@@ -141,9 +141,13 @@ class SearchPipelineIntegrationTest {
     assertThat((Integer) intent.get("budgetMax")).isLessThan(25000);
     List<Map<String, Object>> locations = (List<Map<String, Object>>) intent.get("locations");
     assertThat(locations).extracting(l -> l.get("name")).contains("Powai");
-    // the fix: budget/locality/room-type etc. were stated in earlier turns and are carried forward
-    // as hard grades even though this turn's words don't repeat them, so no soft slots remain here
-    assertThat(data.get("note")).isNull();
+    // A refinement never carries the fresh-search note. It does name the commute radius as a
+    // preference: no turn ever stated a minute count, so ~30 min is our default, not the user's word.
+    String note = (String) data.get("note");
+    assertThat(note).doesNotContain("fresh search");
+    assertThat(note).contains("preferences, not filters").contains("commute time");
+    // And it does NOT name budget as a preference, because "show me cheaper" commanded it:
+    assertThat(note).doesNotContain("budget");
   }
 
   @Test

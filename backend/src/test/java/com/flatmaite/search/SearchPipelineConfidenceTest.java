@@ -136,4 +136,22 @@ class SearchPipelineConfidenceTest {
                 SearchIntent.builder().build(), SearchIntent.builder().build(), graded))
         .isEqualTo(graded);
   }
+
+  @Test
+  void aHeuristicRefinementKeepsThePriorGrades_becauseTheUserCommandedIt() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .budgetMax(40000)
+            .locations(java.util.List.of(new SearchIntent.LocationRef("Powai", null)))
+            .confidence(Map.of("budgetMax", 1.0, "locations", 1.0))
+            .build();
+
+    // the pipeline's heuristic branch hands on the prior's map untouched, whatever the new number is
+    SearchIntent heuristic = prior.toBuilder().budgetMax(36000).build();
+    SearchIntent carried =
+        heuristic.toBuilder().confidence(prior.confidence()).build();
+
+    assertThat(carried.confidenceOf("budgetMax")).isEqualTo(1.0);
+    assertThat(carried.confidenceOf("locations")).isEqualTo(1.0);
+  }
 }

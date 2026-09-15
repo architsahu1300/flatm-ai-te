@@ -96,9 +96,14 @@ public class SearchPipeline {
     if (heuristic != null) {
       usageService.log(userId, anonKey, feature, "heuristic", "regex", 0, 0, true, true,
           System.currentTimeMillis() - start, null);
-      return new IntentLlm.Extraction(
-          withConfidence(resolveLocalities(heuristic), query, prior, localityResolver),
-          IntentLlm.Mode.NONE);
+      // A heuristic refinement is an explicit instruction ("cheaper", "only verified"), and it
+      // changes exactly the slot instructed. The new number is our arithmetic, not the user's word,
+      // so grading it against the query would demote the clearest thing they said. Carry the grades
+      // the conversation already earned.
+      SearchIntent resolved = resolveLocalities(heuristic);
+      SearchIntent carried =
+          resolved.toBuilder().confidence(prior == null ? null : prior.confidence()).build();
+      return new IntentLlm.Extraction(carried, IntentLlm.Mode.NONE);
     }
 
     // 2) cache
