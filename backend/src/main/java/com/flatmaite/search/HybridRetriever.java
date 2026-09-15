@@ -171,9 +171,10 @@ public class HybridRetriever {
       where.append(" AND (fp.budget_min IS NULL OR fp.budget_min <= :budgetCap)");
       params.put("budgetCap", (int) (intent.budgetMax() * 1.2));
     }
-    // Gating trades a filter for a ranking preference — but scoreFlatmate has no location
-    // component, so a soft locality here would be deleted rather than demoted. Where there is
-    // nothing to rank with, every slot stays a filter.
+    // Gating trades a filter for a ranking preference, but scoreFlatmate ranks locality only as a
+    // coarse set overlap (0.15, no distance decay) — a flatmate one locality away and one across
+    // the city score alike. Dropping the filter here would widen to all of Mumbai with nothing
+    // pulling the nearer ones up, so every slot stays a filter on this path.
     List<UUID> localityIds = admittedLocalityIds(intent.toBuilder().confidence(null).build());
     if (!localityIds.isEmpty()) {
       where.append(" AND fp.locality_ids && CAST(:locIds AS uuid[])");
