@@ -64,7 +64,8 @@ classpath). Top level `{ "version": 1, "cases": [ ... ] }`. A case:
 - `prior`: `null` for a first turn, or `{ "case": "<id of an earlier case>" }` — the prior intent is that case's
   **expected** intent (provider-independent), so refine quality is measured on its own.
 - `expectVerdict`: `NEW | REFINE | AMBIGUOUS` for follow-ups where the arbiter's verdict is part of the
-  expectation; `null` = not scored.
+  expectation; `null` = not scored. `scoreIntent: false` (default `true`) grades only the verdict — used
+  for AMBIGUOUS follow-ups, whose resulting intent legitimately differs by which way the tie broke.
 - `expect` lists every scored slot the case cares about; **an omitted scored slot is expected to be null/empty**,
   so a hallucinated constraint fails the case.
 - Scored slots (§4.2): `searchTarget`, `locations`, `excludeLocations`, `unresolvedLocations`, `commuteTo`
@@ -101,6 +102,8 @@ Must-pass: every case that mirrors an existing unit test (≈ 25) plus the arbit
   `mustPass` failures listed by id.
 - Offline gate thresholds (constants in `EvalThresholds`): all must-pass cases pass; case pass rate ≥ **0.85**;
   slot accuracy ≥ **0.90** for `locations`, `budgetMax`, `roomType`. Live: thresholds reported, never enforced.
+- Cases tagged `known-gap` (a documented keyword-parser limitation) are excluded from every offline aggregate
+  and threshold, listed separately in the report, and can never be `mustPass`. The live run still grades them.
 
 ### 4.3 Core (`com.flatmaite.eval`, main code, no Spring dependencies except Jackson)
 
