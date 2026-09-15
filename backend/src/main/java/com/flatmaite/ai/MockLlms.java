@@ -45,6 +45,7 @@ public final class MockLlms {
           .lifestyle(mergeLifestyle(prior.lifestyle(), parsed.lifestyle()))
           .commuteTo(firstNonNull(parsed.commuteTo(), prior.commuteTo()))
           .verifiedOnly(firstNonNull(parsed.verifiedOnly(), prior.verifiedOnly()))
+          .confidence(SearchIntent.mergeConfidence(prior.confidence(), parsed.confidence()))
           .freeText(SearchIntent.joinFreeText(prior.freeText(), query))
           .originalQuery(prior.originalQuery() != null ? prior.originalQuery() : query)
           .build();

@@ -76,4 +76,18 @@ class MockIntentLlmTest {
     assertThat(refined.unresolvedLocations()).containsExactly("Hiranandani Gardens");
     assertThat(SearchIntent.DEFAULT_COMMUTE_MINUTES).isEqualTo(30);
   }
+
+  @Test
+  void refinementKeepsThePriorsConfidenceForUntouchedSlots() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .budgetMax(40000)
+            .roomType(com.flatmaite.common.domain.RoomType.PRIVATE)
+            .confidence(java.util.Map.of("roomType", 0.5, "budgetMax", 1.0))
+            .build();
+
+    SearchIntent merged = llm().extract("make it 30k", prior);
+
+    assertThat(merged.confidenceOf("roomType")).isEqualTo(0.5);
+  }
 }

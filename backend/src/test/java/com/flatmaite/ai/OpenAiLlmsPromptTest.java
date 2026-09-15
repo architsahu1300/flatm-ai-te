@@ -81,4 +81,12 @@ class OpenAiLlmsPromptTest {
 
     assertThat(llm.currentIntentSystem()).contains("Chembur");
   }
+
+  @Test
+  void theIntentPromptAsksTheModelToRateWhatTheUserActuallySaid() {
+    String system = OpenAiLlms.intentSystem(List.of("Powai", "BKC"));
+    assertThat(system).contains("confidence");
+    assertThat(system).contains("1.0 when the user states it outright");
+    assertThat(system).contains("0.5 when you inferred it");
+  }
 }

@@ -33,6 +33,10 @@ public final class OpenAiLlms {
       - commuteTo: set when they mention working somewhere or wanting to be near/within X minutes of a place.
       - lifestyle.smoking: NO_SMOKERS when they don't want smokers. lifestyle.quiet: true when they want a calm/quiet home or no party house.
       - freeText: any residual nuance not captured by structured fields.
+      - Also return "confidence": an object mapping each field you filled to how directly the user's words
+        state it — 1.0 when the user states it outright, 0.75 when their words imply it, 0.5 when you inferred it
+        from context or convention. Rate the user's words, not your certainty about your own JSON. Omit the
+        object entirely if unsure.
       """
           + com.flatmaite.search.RentalVocabulary.GLOSSARY;
 
