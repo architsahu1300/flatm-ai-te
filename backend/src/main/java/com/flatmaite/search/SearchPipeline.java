@@ -82,8 +82,17 @@ public class SearchPipeline {
   private final Cache<String, IntentLlm.Extraction> intentCache =
       Caffeine.newBuilder().maximumSize(5_000).expireAfterWrite(Duration.ofHours(24)).build();
 
-  /** Ranked homes plus whether any came from outside the requested localities. */
-  private record Homes(List<AiResult> results, boolean includesNearby, int radiusMinutes) {}
+  /**
+   * Ranked homes plus whether any came from outside the requested localities, and — when the
+   * exact-match page came back thin — how many of {@code results} are exact ({@code exactCount})
+   * and which rescue rungs topped it up ({@code rescueSummary}, null when the ladder never fired).
+   */
+  private record Homes(
+      List<AiResult> results,
+      boolean includesNearby,
+      int radiusMinutes,
+      int exactCount,
+      String rescueSummary) {}
 
   // ------------------------------------------------------------- intent
 
@@ -242,7 +251,7 @@ public class SearchPipeline {
 
     Homes homes =
         target == SearchTarget.FLATMATES
-            ? new Homes(List.of(), false, 0)
+            ? new Homes(List.of(), false, 0, 0, null)
             : searchHomes(intent, intentHash, viewerId, anonKey);
     List<AiResult> flatmates =
         target == SearchTarget.PROPERTIES ? List.of() : searchFlatmates(intent, intentHash, viewerId, anonKey);
@@ -256,6 +265,18 @@ public class SearchPipeline {
     if (homes.includesNearby()) {
       String nearby = "Also showing nearby areas within ~%d min.".formatted(homes.radiusMinutes());
       finalNote = note == null ? nearby : note + " " + nearby;
+    }
+
+    if (homes.rescueSummary() != null) {
+      String rescue =
+          "Only %d exact %s — added %d nearby option%s (%s)."
+              .formatted(
+                  homes.exactCount(),
+                  homes.exactCount() == 1 ? "match" : "matches",
+                  homes.results().size() - homes.exactCount(),
+                  homes.results().size() - homes.exactCount() == 1 ? "" : "s",
+                  homes.rescueSummary());
+      finalNote = finalNote == null ? rescue : finalNote + " " + rescue;
     }
 
     List<String> soft = ConfidenceGate.softSlots(intent);
@@ -277,12 +298,51 @@ public class SearchPipeline {
   }
 
   private Homes searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
-    List<Candidate> candidates = retriever.retrieveListings(intent);
-    if (candidates.isEmpty()) {
-      return new Homes(List.of(), false, 0);
-    }
+    // rung 0 = the exact, hard-filtered page, retrieved exactly as before.
     Map<UUID, Candidate> byId = new LinkedHashMap<>();
-    candidates.forEach(c -> byId.put(c.id(), c));
+    Map<UUID, Integer> rungOf = new LinkedHashMap<>();
+    Map<UUID, RescueLadder.Rung> rungMeta = new LinkedHashMap<>();
+    for (Candidate c : retriever.retrieveListings(intent)) {
+      byId.putIfAbsent(c.id(), c);
+      rungOf.putIfAbsent(c.id(), 0);
+    }
+
+    // Thin page: walk the ladder, collecting new ids per rung, stopping as soon as we have enough
+    // or the ladder runs out. Retrieval per rung is the only repeated cost — hydration and scoring
+    // below run exactly once over the union.
+    List<String> rescueReasons = new ArrayList<>();
+    if (rungOf.size() < props.getSearch().getMinResults()) {
+      List<RescueLadder.Rung> rungs =
+          RescueLadder.rungs(intent, props.getSearch().getRescueRadiusMinutes());
+      int rungIndex = 1;
+      for (RescueLadder.Rung rung : rungs) {
+        if (rungOf.size() >= props.getSearch().getMinResults()) {
+          break;
+        }
+        int rungRadius =
+            rung.radiusMinutes() == null
+                ? props.getSearch().getNearbyRadiusMinutes()
+                : rung.radiusMinutes();
+        boolean addedAny = false;
+        for (Candidate c : retriever.retrieveListings(rung.intent(), rungRadius)) {
+          if (!rungOf.containsKey(c.id())) {
+            byId.put(c.id(), c);
+            rungOf.put(c.id(), rungIndex);
+            rungMeta.put(c.id(), rung);
+            addedAny = true;
+          }
+        }
+        // a rung that finds nothing new is skipped silently — the ladder keeps going
+        if (addedAny) {
+          rescueReasons.add(rung.reason());
+        }
+        rungIndex++;
+      }
+    }
+
+    if (byId.isEmpty()) {
+      return new Homes(List.of(), false, 0, 0, null);
+    }
     List<Listing> hydrated = listingQueryService.hydrate(new ArrayList<>(byId.keySet()));
 
     // batch verification + user flags for listers
@@ -308,7 +368,14 @@ public class SearchPipeline {
                 : intent.commuteTo().maxMinutes())
             : props.getSearch().getNearbyRadiusMinutes();
 
-    record Row(Listing listing, Candidate candidate, Scored scored, Integer commute, String anchorName, boolean inPreferred) {}
+    record Row(
+        Listing listing,
+        Candidate candidate,
+        Scored scored,
+        Integer commute,
+        String anchorName,
+        boolean inPreferred,
+        int rung) {}
     List<Row> rows = new ArrayList<>();
     for (Listing l : hydrated) {
       Candidate c = byId.get(l.getId());
@@ -345,9 +412,22 @@ public class SearchPipeline {
               commuteIntent,
               radius,
               inPreferred);
-      rows.add(new Row(l, c, MatchScorer.scoreListing(intent, candidate), commuteMinutes, anchorName, inPreferred));
+      rows.add(
+          new Row(
+              l,
+              c,
+              MatchScorer.scoreListing(intent, candidate),
+              commuteMinutes,
+              anchorName,
+              inPreferred,
+              rungOf.getOrDefault(l.getId(), 0)));
     }
-    rows.sort((a, b) -> Integer.compare(b.scored().matchScore(), a.scored().matchScore()));
+    // Absolute sort, not score-based: every exact (rung 0) row outranks every near miss, whatever
+    // the scores. Within a group: score descending as the page does today; near misses additionally
+    // by rung ascending (rung 0 ties are broken by score alone, since every exact row shares rung 0).
+    rows.sort(
+        Comparator.comparingInt(Row::rung)
+            .thenComparing(Comparator.comparingInt((Row r) -> r.scored().matchScore()).reversed()));
     List<Row> top = rows.stream().limit(RESULT_LIMIT).toList();
     boolean includesNearby =
         !commuteIntent && !preferred.isEmpty() && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
@@ -370,6 +450,9 @@ public class SearchPipeline {
     Map<UUID, com.flatmaite.listing.ListingDtos.CardResponse> cards = new HashMap<>();
     listingAssembler.toCards(top.stream().map(Row::listing).toList()).forEach(card -> cards.put(card.id(), card));
 
+    int exactCount = (int) top.stream().filter(r -> r.rung() == 0).count();
+    String rescueSummary = rescueReasons.isEmpty() ? null : String.join(", ", rescueReasons);
+
     List<AiResult> out = new ArrayList<>();
     for (Row r : top) {
       Explanation e = explanations.get(r.listing().getId());
@@ -378,6 +461,20 @@ public class SearchPipeline {
           r.commute() == null || (!commuteIntent && r.inPreferred())
               ? null
               : "~%d min %s %s (estimate)".formatted(r.commute(), commuteIntent ? "to" : "from", r.anchorName());
+      boolean nearMiss = r.rung() > 0;
+      String nearMissReason = null;
+      if (nearMiss) {
+        RescueLadder.Rung rung = rungMeta.get(r.listing().getId());
+        nearMissReason =
+            rung == null
+                // defensive: every nearMiss row is introduced by some rung; never let a bug here 500 a search
+                ? "Nearby option"
+                : rung.slot() == null
+                    // wider-ring rung: reuse the same commute estimate already computed for the row
+                    ? "~%d min from %s".formatted(r.commute(), r.anchorName())
+                    : "%s — you asked for %s"
+                        .formatted(ConfidenceGate.label(rung.slot()), droppedValueText(intent, rung.slot()));
+      }
       out.add(
           new AiResult(
               "home",
@@ -388,9 +485,63 @@ public class SearchPipeline {
               label == null ? null : r.commute(),
               label,
               cards.get(r.listing().getId()),
-              null));
+              null,
+              nearMiss,
+              nearMissReason));
     }
-    return new Homes(out, includesNearby, radius);
+    return new Homes(out, includesNearby, radius, exactCount, rescueSummary);
+  }
+
+  /** Human-readable rendering of the original value a rescue rung gave up, for the near-miss reason. */
+  private static String droppedValueText(SearchIntent original, String slot) {
+    return switch (slot) {
+      case "locations" ->
+          original.locations() == null
+              ? ""
+              : original.locations().stream()
+                  .map(SearchIntent.LocationRef::name)
+                  .collect(Collectors.joining(", "));
+      case "budgetMin" -> "₹%,d".formatted(original.budgetMin());
+      case "budgetMax" -> "₹%,d".formatted(original.budgetMax());
+      case "maxDeposit" -> "₹%,d".formatted(original.maxDeposit());
+      case "roomType" -> humanizeEnum(original.roomType());
+      case "listingTypes" ->
+          original.listingTypes() == null
+              ? ""
+              : original.listingTypes().stream()
+                  .map(SearchPipeline::humanizeEnum)
+                  .collect(Collectors.joining(", "));
+      case "furnished" -> humanizeEnum(original.furnished());
+      case "bhk" -> bhkText(original.bhk());
+      case "moveInDate" -> original.moveInDate();
+      case "genderPreference" -> humanizeEnum(original.genderPreference());
+      case "couplesOk" -> Boolean.TRUE.equals(original.couplesOk()) ? "couples ok" : "no couples";
+      case "amenities" -> original.amenities() == null ? "" : String.join(", ", original.amenities());
+      case "lifestyle" -> "your lifestyle preferences";
+      case "commuteTo", "commuteTo.maxMinutes" ->
+          original.commuteTo() == null ? "" : original.commuteTo().place();
+      default -> "";
+    };
+  }
+
+  private static String humanizeEnum(Enum<?> e) {
+    return e == null ? "" : e.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+  }
+
+  private static String bhkText(SearchIntent.BhkRange bhk) {
+    if (bhk == null) {
+      return "";
+    }
+    if (bhk.min() != null && bhk.max() != null) {
+      return bhk.min().equals(bhk.max()) ? bhk.min() + " BHK" : bhk.min() + "-" + bhk.max() + " BHK";
+    }
+    if (bhk.min() != null) {
+      return bhk.min() + "+ BHK";
+    }
+    if (bhk.max() != null) {
+      return "up to " + bhk.max() + " BHK";
+    }
+    return "";
   }
 
   /** The requested locality this candidate is closest to (by the commute estimate). */
@@ -494,7 +645,9 @@ public class SearchPipeline {
               null,
               null,
               null,
-              cards.get(r.fp().getId())));
+              cards.get(r.fp().getId()),
+              false,
+              null));
     }
     return out;
   }

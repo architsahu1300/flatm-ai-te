@@ -93,4 +93,6 @@ flatmaite:
   search:
     # a named home locality also admits every locality within this many estimated minutes
     nearby-radius-minutes: ${SEARCH_NEARBY_RADIUS_MINUTES:25}
+    min-results: ${SEARCH_MIN_RESULTS:6}
+    rescue-radius-minutes: ${SEARCH_RESCUE_RADIUS_MINUTES:45}
   frontend-url: ${FRONTEND_URL:http://localhost:3000}

@@ -61,5 +61,11 @@ public class FlatmaiteProperties {
   public static class Search {
     /** A named home locality also admits every locality within this many estimated minutes. */
     private int nearbyRadiusMinutes = 25;
+
+    /** Below this many listings, the pipeline tops the page up with nearby and near-miss results. */
+    private int minResults = 6;
+
+    /** The second ring the rescue ladder reaches for before it starts dropping filters. */
+    private int rescueRadiusMinutes = 45;
   }
 }

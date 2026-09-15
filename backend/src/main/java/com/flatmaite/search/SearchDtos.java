@@ -26,7 +26,9 @@ public final class SearchDtos {
       Integer commuteMinutes,
       String commuteLabel,
       ListingDtos.CardResponse home,
-      FlatmateDtos.CardResponse flatmate) {}
+      FlatmateDtos.CardResponse flatmate,
+      boolean nearMiss,
+      String nearMissReason) {}
 
   public record Relaxer(String label, String description, SearchIntent relaxedIntent, long extraResults) {}
 
