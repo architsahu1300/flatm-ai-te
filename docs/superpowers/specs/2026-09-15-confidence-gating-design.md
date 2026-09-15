@@ -196,8 +196,18 @@ scored down, with the miss stated.
   alongside the existing nearby-areas note.
 - **Relaxers**: a soft slot is already not filtering, so it gets no relaxer; the remaining relaxers are ordered
   by ascending confidence of the slot they relax, so the shakiest constraint is offered first.
-- **`/apply`**: the controller replaces the confidence map with `1.0` for every non-null gated slot before
-  running the pipeline. The user has seen the chips and endorsed them; from then on they are filters.
+- **`/apply`**: the controller rebuilds the confidence map server-side (the client's is never trusted) from the
+  session's stored intent: a gated slot whose **value the user changed** becomes `1.0` — they are the author of
+  what they sent, so from then on it is a filter — and a slot they **left alone keeps the grade it had**.
+  *Amended after the WS4 final review.* The original rule ("`1.0` for every non-null gated slot") is wrong
+  because `/apply` is also the endpoint that fires when the user removes **one unrelated chip**: endorsing
+  everything still present would silently turn a guessed `roomType = ENTIRE` into a hard `AND` because someone
+  dropped their deposit chip — the exact bug this workstream exists to remove, and the opposite of what the soft
+  chip's own tooltip promises ("A preference, not a filter — say it outright to require it"). The
+  changed-vs-untouched discriminator is `ConfidenceGate.sameValue`, the same one `carryConfidence` uses, so the
+  two paths agree on what "the user did not touch this" means. The grades are **written out explicitly**, never
+  cleared: `carryConfidence` early-returns on an absent map, so an endorsement left implicit would evaporate on
+  the next conversational turn.
 
 ### 4.7 Thin-result rescue (the automatic ladder)
 

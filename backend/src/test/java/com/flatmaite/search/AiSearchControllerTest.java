@@ -86,16 +86,12 @@ class AiSearchControllerTest {
     assertThat(noteCaptor.getValue()).isEqualTo(IntentArbiter.FRESH_NOTE);
   }
 
-  @Test
-  void applyingChipsEndorsesEverySlot_soNothingStaysAPreference() {
+  /** Runs /apply against a session holding {@code prior} and returns the intent the pipeline saw. */
+  private SearchIntent applied(SearchIntent prior, SearchIntent edited) {
     UUID sessionId = UUID.randomUUID();
     AiSearchSession session = mockSession(sessionId);
     when(sessions.requireOwned(eq(sessionId), any(), any())).thenReturn(session);
-    SearchIntent edited =
-        SearchIntent.builder()
-            .roomType(RoomType.ENTIRE)
-            .confidence(java.util.Map.of("roomType", 0.5))
-            .build();
+    when(sessions.intentOf(session)).thenReturn(prior);
 
     controller.apply(
         new AiSearchController.ApplyIntentRequest(sessionId, edited),
@@ -104,6 +100,61 @@ class AiSearchControllerTest {
 
     ArgumentCaptor<SearchIntent> captor = ArgumentCaptor.forClass(SearchIntent.class);
     verify(pipeline).search(captor.capture(), any(), any(), any());
-    assertThat(captor.getValue().confidenceOf("roomType")).isEqualTo(1.0);
+    return captor.getValue();
+  }
+
+  @Test
+  void applyingAChangedSlotEndorsesIt_soItStopsBeingAPreference() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .confidence(java.util.Map.of("roomType", 0.5))
+            .build();
+    // the user edited the room-type chip: they are the author of the new value
+    SearchIntent edited =
+        SearchIntent.builder()
+            .roomType(RoomType.PRIVATE)
+            .confidence(java.util.Map.of("roomType", 0.5))
+            .build();
+
+    assertThat(applied(prior, edited).confidenceOf("roomType")).isEqualTo(1.0);
+  }
+
+  @Test
+  void removingOneChipLeavesTheOtherSoftSlotsSoft() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .maxDeposit(50000)
+            .confidence(java.util.Map.of("roomType", 0.5, "maxDeposit", 1.0))
+            .build();
+    // the user removed the deposit chip and touched nothing else
+    SearchIntent edited = prior.toBuilder().maxDeposit(null).build();
+
+    SearchIntent seen = applied(prior, edited);
+
+    assertThat(seen.confidenceOf("roomType")).isEqualTo(0.5);
+    assertThat(ConfidenceGate.isHard(seen, "roomType")).isFalse();
+  }
+
+  @Test
+  void aSlotTheAppliedIntentDoesNotCarry_isNotGraded() {
+    SearchIntent prior =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .maxDeposit(50000)
+            .confidence(java.util.Map.of("roomType", 0.5, "maxDeposit", 0.5))
+            .build();
+    SearchIntent edited = prior.toBuilder().maxDeposit(null).build();
+
+    assertThat(applied(prior, edited).confidence()).containsOnlyKeys("roomType");
+  }
+
+  @Test
+  void theEndorsementIsWrittenOut_soTheNextTurnCanCarryIt() {
+    // an empty map makes carryConfidence early-return: the endorsement must be explicit 1.0s
+    SearchIntent edited = SearchIntent.builder().roomType(RoomType.ENTIRE).build();
+
+    assertThat(applied(null, edited).confidence()).containsEntry("roomType", 1.0);
   }
 }

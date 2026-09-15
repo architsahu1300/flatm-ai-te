@@ -17,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -96,14 +97,31 @@ public class AiSearchController {
     if (body.sessionId() == null || body.intent() == null) {
       throw ApiException.badRequest("invalid_request", "sessionId and intent are required");
     }
-    // The user has seen these chips and pressed apply — from here they are filters, not guesses.
-    SearchIntent endorsed = body.intent().toBuilder().confidence(null).build();
     AuthPrincipal viewer = CurrentUser.orNull();
     UUID userId = viewer == null ? null : viewer.userId();
     String anonKey = anonKey(req, res, userId);
     rateLimit(userId, anonKey);
 
     AiSearchSession session = sessions.requireOwned(body.sessionId(), userId, anonKey);
+    // On /apply the user is the author of what they sent, so a value they changed is certain from
+    // here on. A slot they left alone keeps the grade it had: this same endpoint fires when someone
+    // removes one unrelated chip, and dropping a deposit chip is not an endorsement of a room type
+    // we only guessed — the soft chip's own tooltip promises exactly that. The client's confidence
+    // map is never trusted; it is rebuilt here from the session's stored intent.
+    // Grades are written out rather than cleared: an absent map makes carryConfidence early-return,
+    // so an endorsement left implicit would evaporate on the next conversational turn.
+    SearchIntent prior = sessions.intentOf(session);
+    Map<String, Double> endorsedGrades = new LinkedHashMap<>();
+    for (String slot : SearchIntent.GATED_SLOTS) {
+      if (!ConfidenceGate.isPresent(body.intent(), slot)) {
+        continue;
+      }
+      endorsedGrades.put(
+          slot,
+          ConfidenceGate.sameValue(prior, body.intent(), slot) ? prior.confidenceOf(slot) : 1.0);
+    }
+    SearchIntent endorsed = body.intent().toBuilder().confidence(endorsedGrades).build();
+
     AiSearchResponse result = pipeline.search(endorsed, userId, anonKey, session.getId());
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
