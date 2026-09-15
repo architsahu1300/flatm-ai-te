@@ -63,6 +63,9 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 | `AI_MOCK` | `auto` | `true`/`false` to force provider mode |
 | `AI_EXPLANATIONS_ENABLED` | `true` | Kill-switch → score-breakdown-only UI |
 | `SEARCH_NEARBY_RADIUS_MINUTES` | `25` | A named home locality also admits every locality within this many estimated minutes |
+| `EVAL_PACE_MS` | `4500` | Eval profile only — delay between provider calls |
+| `EVAL_TAGS` / `EVAL_LIMIT` | all / `0` | Eval profile only — run a subset of the golden set |
+| `EVAL_ALLOW_MOCK` | `false` | Eval profile only — allow the mock provider (runner smoke test) |
 
 Frontend: `BACKEND_URL` (default `http://localhost:8080`).
 
@@ -72,3 +75,22 @@ Frontend: `BACKEND_URL` (default `http://localhost:8080`).
 cd backend && ./mvnw verify              # unit + Testcontainers integration tests
 cd frontend && npm run lint && npx tsc --noEmit && npm run build
 ```
+
+### Intent eval
+
+Every `./mvnw verify` runs `IntentGoldenTest`: the keyword parser and the new-vs-refine arbiter
+against `backend/src/main/resources/eval/intent-golden.json` (≈ 75 real-shaped queries, including
+multi-turn follow-ups). The build fails if any must-pass case fails, the case pass rate drops below
+0.85, or `locations` / `budgetMax` / `roomType` slot accuracy drops below 0.90. Cases tagged
+`known-gap` are reported but not counted. Read `docs/eval/README.md` before interpreting a live run — two known key artefacts are listed there.
+
+Run the same set through the real model (never gates; paced for Gemini's free tier):
+
+```bash
+cd backend && FM_AI_PROVIDER=google-genai GEMINI_API_KEY=… ./mvnw spring-boot:run -Dspring-boot.run.profiles=eval
+```
+
+The report prints as a table and lands in `backend/target/eval/<provider>-<model>-<timestamp>.json`.
+Knobs: `EVAL_PACE_MS` (default 4500), `EVAL_TAGS=budget,commute`, `EVAL_LIMIT=10`,
+`EVAL_ALLOW_MOCK=true` (smoke-test the runner with the keyword parser). Adding cases:
+`docs/eval/README.md`.
