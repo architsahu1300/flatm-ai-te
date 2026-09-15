@@ -62,7 +62,12 @@ public class HybridRetriever {
 
   @Transactional(readOnly = true)
   public List<Candidate> retrieveListings(SearchIntent intent) {
-    ListingFilters filters = toFilters(intent);
+    return retrieveListings(intent, props.getSearch().getNearbyRadiusMinutes());
+  }
+
+  @Transactional(readOnly = true)
+  public List<Candidate> retrieveListings(SearchIntent intent, Integer radiusMinutes) {
+    ListingFilters filters = toFiltersWithRadius(intent, radiusMinutes);
     Map<String, Object> params = new LinkedHashMap<>();
     String where = ListingQueryService.buildWhere(filters, params);
 
@@ -282,35 +287,67 @@ public class HybridRetriever {
 
   /** Browse-time filters: the widened admission. */
   public ListingFilters toFilters(SearchIntent intent) {
-    return toFilters(intent, true);
+    return toFiltersWithRadius(intent, props.getSearch().getNearbyRadiusMinutes());
+  }
+
+  /** Saved-search alerts pass {@code false}: an alert cannot explain a widened area. */
+  public ListingFilters toFilters(SearchIntent intent, boolean widenToNearby) {
+    return toFiltersWithRadius(intent, widenToNearby ? props.getSearch().getNearbyRadiusMinutes() : null);
   }
 
   /**
-   * Maps intent → shared hard-filter vocabulary (budget headroom ×1.1 — near-misses surface as
-   * concerns). Saved-search alerts pass {@code widenToNearby = false}: an alert cannot explain a
-   * widened area, so it fires only for the localities the user actually saved.
+   * Maps intent → hard filters, honouring the confidence gate: a slot the reader only inferred is
+   * left out entirely, so it ranks (via {@link MatchScorer}) instead of deleting rows. Budget keeps
+   * its ×1.1 headroom — near-misses surface as concerns.
+   *
+   * @param radiusMinutes how far a named locality's neighbourhood reaches; null = strict (alerts).
    */
-  public ListingFilters toFilters(SearchIntent intent, boolean widenToNearby) {
+  public ListingFilters toFiltersWithRadius(SearchIntent intent, Integer radiusMinutes) {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
-    return ListingFilters.builder()
-        .localityIds(admittedLocalityIds(intent, widenToNearby))
-        .excludeLocalityIds(excludedLocalityIds(intent))
-        .budgetMin(intent.budgetMin())
-        .budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1))
-        .maxDeposit(intent.maxDeposit())
-        .roomType(intent.roomType())
-        .listingTypes(intent.listingTypes())
-        .furnishings(intent.furnished() == null ? null : List.of(intent.furnished()))
-        .bhkMin(intent.bhk() == null ? null : intent.bhk().min())
-        .bhkMax(intent.bhk() == null ? null : intent.bhk().max())
-        .moveInBy(parseMoveIn(intent.moveInDate()))
-        .genderPref(intent.genderPreference())
-        .amenitySlugs(intent.amenities())
-        .verifiedOnly(Boolean.TRUE.equals(intent.verifiedOnly()))
-        .smokeFreeHousehold("NO_SMOKERS".equals(lifestyle.smoking()))
-        .vegHousehold("VEGETARIAN".equals(lifestyle.diet()))
-        .couplesAllowed(intent.couplesOk())
-        .build();
+    boolean hardLocations = ConfidenceGate.isHard(intent, "locations");
+    ListingFilters.ListingFiltersBuilder b =
+        ListingFilters.builder()
+            .localityIds(hardLocations ? admittedLocalityIds(intent, radiusMinutes) : List.of())
+            .excludeLocalityIds(excludedLocalityIds(intent));
+    if (ConfidenceGate.isHard(intent, "budgetMin")) {
+      b.budgetMin(intent.budgetMin());
+    }
+    if (ConfidenceGate.isHard(intent, "budgetMax")) {
+      b.budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1));
+    }
+    if (ConfidenceGate.isHard(intent, "maxDeposit")) {
+      b.maxDeposit(intent.maxDeposit());
+    }
+    if (ConfidenceGate.isHard(intent, "roomType")) {
+      b.roomType(intent.roomType());
+    }
+    if (ConfidenceGate.isHard(intent, "listingTypes")) {
+      b.listingTypes(intent.listingTypes());
+    }
+    if (ConfidenceGate.isHard(intent, "furnished")) {
+      b.furnishings(intent.furnished() == null ? null : List.of(intent.furnished()));
+    }
+    if (ConfidenceGate.isHard(intent, "bhk")) {
+      b.bhkMin(intent.bhk() == null ? null : intent.bhk().min())
+          .bhkMax(intent.bhk() == null ? null : intent.bhk().max());
+    }
+    if (ConfidenceGate.isHard(intent, "moveInDate")) {
+      b.moveInBy(parseMoveIn(intent.moveInDate()));
+    }
+    if (ConfidenceGate.isHard(intent, "genderPreference")) {
+      b.genderPref(intent.genderPreference());
+    }
+    if (ConfidenceGate.isHard(intent, "amenities")) {
+      b.amenitySlugs(intent.amenities());
+    }
+    if (ConfidenceGate.isHard(intent, "couplesOk")) {
+      b.couplesAllowed(intent.couplesOk());
+    }
+    if (ConfidenceGate.isHard(intent, "lifestyle")) {
+      b.smokeFreeHousehold("NO_SMOKERS".equals(lifestyle.smoking()))
+          .vegHousehold("VEGETARIAN".equals(lifestyle.diet()));
+    }
+    return b.verifiedOnly(Boolean.TRUE.equals(intent.verifiedOnly())).build();
   }
 
   /** Home localities the user named — every id of an ambiguous alias — minus exclusions. */
@@ -365,20 +402,24 @@ public class HybridRetriever {
     return admittedLocalityIds(intent, true);
   }
 
-  /**
-   * Requested localities; plus everything within the nearby radius of each when
-   * {@code widenToNearby}; plus the commute radius when a workplace is named; minus exclusions.
-   * Requested ids come first, then by minutes. Empty list = no locality hard filter.
-   */
+  /** Boolean convenience: {@code true} widens by the configured radius, {@code false} is strict. */
   public List<UUID> admittedLocalityIds(SearchIntent intent, boolean widenToNearby) {
+    return admittedLocalityIds(intent, widenToNearby ? props.getSearch().getNearbyRadiusMinutes() : null);
+  }
+
+  /**
+   * Requested localities; plus everything within {@code radiusMinutes} of each (when non-null);
+   * plus the commute radius when a workplace is named; minus exclusions. Requested ids come first,
+   * then by minutes. Empty list = no locality hard filter.
+   */
+  public List<UUID> admittedLocalityIds(SearchIntent intent, Integer radiusMinutes) {
     List<UUID> requested = requestedLocalityIds(intent);
     Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
     LinkedHashSet<UUID> admitted = new LinkedHashSet<>(requested);
     Map<UUID, Integer> nearbyMinutes = new HashMap<>();
-    if (widenToNearby) {
-      int radius = props.getSearch().getNearbyRadiusMinutes();
+    if (radiusMinutes != null) {
       for (UUID id : requested) {
-        for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radius, Integer.MAX_VALUE)) {
+        for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusMinutes, Integer.MAX_VALUE)) {
           nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
         }
       }
