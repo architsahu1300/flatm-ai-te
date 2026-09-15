@@ -58,6 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SearchPipeline {
 
   private static final int RESULT_LIMIT = 20;
+  private static final org.slf4j.Logger CONFIDENCE_LOG = org.slf4j.LoggerFactory.getLogger(SearchPipeline.class);
 
   private final IntentLlm intentLlm;
   private final KeywordIntentParser keywordParser;
@@ -94,7 +95,8 @@ public class SearchPipeline {
       usageService.log(userId, anonKey, feature, "heuristic", "regex", 0, 0, true, true,
           System.currentTimeMillis() - start, null);
       return new IntentLlm.Extraction(
-          withConfidence(resolveLocalities(heuristic), query, prior), IntentLlm.Mode.NONE);
+          withConfidence(resolveLocalities(heuristic), query, prior, localityResolver),
+          IntentLlm.Mode.NONE);
     }
 
     // 2) cache
@@ -118,7 +120,8 @@ public class SearchPipeline {
     }
     IntentLlm.Extraction resolved =
         new IntentLlm.Extraction(
-            withConfidence(resolveLocalities(extracted.intent()), query, prior), extracted.mode());
+            withConfidence(resolveLocalities(extracted.intent()), query, prior, localityResolver),
+            extracted.mode());
     intentCache.put(cacheKey, resolved);
     usageService.log(
         userId,
@@ -173,19 +176,23 @@ public class SearchPipeline {
 
   /**
    * Grades an extracted intent against the words that produced it. Runs on every path — LLM, mock,
-   * heuristic, cache — so one rule decides what is enforced, whoever did the extracting. Fails
-   * closed: if grading throws, the intent keeps whatever it had and everything stays hard.
+   * heuristic, cache — so one rule decides what is enforced, whoever did the extracting.
+   *
+   * <p>Fails closed: if grading throws, the intent comes back with **no** grades at all, so every
+   * slot reads 1.0 and stays a hard filter. Returning the intent untouched would not be closed —
+   * it may already carry the model's own unvalidated self-rating, or a prior turn's stale grades.
    */
-  private SearchIntent withConfidence(SearchIntent intent, String query, SearchIntent prior) {
+  static SearchIntent withConfidence(
+      SearchIntent intent, String query, SearchIntent prior, LocalityResolver resolver) {
     if (intent == null) {
       return null;
     }
     Map<String, Double> graded;
     try {
-      graded = combineConfidence(IntentGrounding.score(intent, query, localityResolver), intent.confidence());
+      graded = combineConfidence(IntentGrounding.score(intent, query, resolver), intent.confidence());
     } catch (RuntimeException e) {
-      log.warn("Confidence grading failed, keeping every slot hard: {}", e.getMessage());
-      return intent;
+      CONFIDENCE_LOG.warn("Confidence grading failed, keeping every slot hard: {}", e.getMessage());
+      return intent.toBuilder().confidence(null).build();
     }
     Map<String, Double> merged =
         prior == null ? graded : SearchIntent.mergeConfidence(prior.confidence(), graded);

@@ -58,4 +58,37 @@ class SearchPipelineConfidenceTest {
 
     assertThat(merged).containsEntry("roomType", 0.5).containsEntry("budgetMax", 1.0);
   }
+
+  @Test
+  void gradingFailure_clearsEveryGrade_soNothingStaysSoft() {
+    LocalityResolver exploding = org.mockito.Mockito.mock(LocalityResolver.class);
+    org.mockito.Mockito.when(exploding.scan(org.mockito.ArgumentMatchers.anyString()))
+        .thenThrow(new IllegalStateException("resolver down"));
+    // the model already wrote its own self-rating into the intent — it must not survive
+    SearchIntent claimed =
+        SearchIntent.builder()
+            .roomType(RoomType.ENTIRE)
+            .confidence(Map.of("roomType", 0.2))
+            .build();
+
+    SearchIntent graded =
+        SearchPipeline.withConfidence(claimed, "2bhk in powai", null, exploding);
+
+    assertThat(graded.confidence()).isNull();
+    assertThat(graded.confidenceOf("roomType")).isEqualTo(1.0);
+    assertThat(graded.roomType()).isEqualTo(RoomType.ENTIRE); // the intent itself is untouched
+  }
+
+  @Test
+  void aNegativeSelfRatingFloorsAtZero_andANullValueIsIgnored() {
+    Map<String, Double> selfRating = new java.util.HashMap<>();
+    selfRating.put("roomType", -1.0);
+    selfRating.put("budgetMax", null);
+
+    Map<String, Double> merged =
+        SearchPipeline.combineConfidence(Map.of("roomType", 1.0, "budgetMax", 1.0), selfRating);
+
+    assertThat(merged).containsEntry("roomType", 0.0);
+    assertThat(merged).containsEntry("budgetMax", 1.0);
+  }
 }
