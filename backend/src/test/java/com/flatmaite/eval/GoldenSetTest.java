@@ -91,4 +91,53 @@ class GoldenSetTest {
     assertThat(filtered.priorOf(filtered.cases().get(0)).budgetMax()).isEqualTo(40000);
     assertThat(GoldenSet.parse(sample()).filter(Set.of(), 2).cases()).hasSize(2);
   }
+
+  @Test
+  void unknownCaseKey_isRejected_withTheCaseId() {
+    String json = """
+        {"version":1,"cases":[
+          {"id":"typo-case","tags":[],"query":"q","prior":null,"musPass":true,"expectVerdict":null,"expect":{}}]}
+        """;
+    assertThatThrownBy(() -> GoldenSet.parse(json))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("typo-case")
+        .hasMessageContaining("musPass");
+  }
+
+  @Test
+  void unknownNestedKey_isRejected_withTheCaseId() {
+    String json = """
+        {"version":1,"cases":[
+          {"id":"nested","tags":[],"query":"q","prior":null,"mustPass":false,"expectVerdict":null,
+           "expect":{"commuteTo":{"place":"BKC","minutes":20}}}]}
+        """;
+    assertThatThrownBy(() -> GoldenSet.parse(json))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("nested")
+        .hasMessageContaining("minutes");
+  }
+
+  @Test
+  void badVerdictValue_namesTheCase() {
+    String json = """
+        {"version":1,"cases":[
+          {"id":"verdict","tags":[],"query":"q","prior":null,"mustPass":false,"expectVerdict":"REFINEE","expect":{}}]}
+        """;
+    assertThatThrownBy(() -> GoldenSet.parse(json))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("verdict")
+        .hasMessageContaining("REFINEE");
+  }
+
+  @Test
+  void badEnumInsideExpect_namesTheCase() {
+    String json = """
+        {"version":1,"cases":[
+          {"id":"enum","tags":[],"query":"q","prior":null,"mustPass":false,"expectVerdict":null,
+           "expect":{"searchTarget":"HOUSES"}}]}
+        """;
+    assertThatThrownBy(() -> GoldenSet.parse(json))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("golden case enum");
+  }
 }

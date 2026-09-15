@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -34,6 +33,9 @@ public final class GoldenSet {
   private static final Set<String> BHK_KEYS = Set.of("min", "max");
   private static final Set<String> LIFESTYLE_KEYS = Set.of("smoking", "pets", "diet", "quiet");
   private static final Set<String> NAME_LIST_KEYS = Set.of("locations", "excludeLocations");
+  private static final Set<String> CASE_KEYS =
+      Set.of("id", "tags", "query", "prior", "mustPass", "expectVerdict", "scoreIntent", "expect");
+  private static final Set<String> PRIOR_KEYS = Set.of("case");
 
   private final int version;
   private final List<GoldenCase> all;
@@ -91,6 +93,7 @@ public final class GoldenSet {
     if (earlier.contains(id)) {
       throw new IllegalStateException("duplicate golden case id: " + id);
     }
+    validateKeys(id, node, CASE_KEYS, "case");
     List<String> tags = new ArrayList<>();
     node.path("tags").forEach(t -> tags.add(t.asText()));
     String query = node.path("query").asText(null);
@@ -100,6 +103,7 @@ public final class GoldenSet {
     String priorCase = null;
     JsonNode prior = node.path("prior");
     if (!prior.isMissingNode() && !prior.isNull()) {
+      validateKeys(id, prior, PRIOR_KEYS, "prior");
       priorCase = prior.path("case").asText(null);
       if (priorCase == null || !earlier.contains(priorCase)) {
         throw new IllegalStateException("golden case " + id + ": prior must name an earlier case, was " + priorCase);
@@ -110,7 +114,12 @@ public final class GoldenSet {
     NewQueryDetector.Verdict verdict = null;
     JsonNode v = node.path("expectVerdict");
     if (!v.isMissingNode() && !v.isNull()) {
-      verdict = NewQueryDetector.Verdict.valueOf(v.asText());
+      try {
+        verdict = NewQueryDetector.Verdict.valueOf(v.asText());
+      } catch (IllegalArgumentException e) {
+        throw new IllegalStateException(
+            "golden case " + id + ": expectVerdict must be NEW, REFINE or AMBIGUOUS, was '" + v.asText() + "'");
+      }
     }
     if (tags.contains(GoldenCase.KNOWN_GAP) && mustPass) {
       throw new IllegalStateException("golden case " + id + " is known-gap and must-pass at once");
@@ -123,7 +132,12 @@ public final class GoldenSet {
     validateKeys(id, expect.path("commuteTo"), COMMUTE_KEYS, "expect.commuteTo");
     validateKeys(id, expect.path("bhk"), BHK_KEYS, "expect.bhk");
     validateKeys(id, expect.path("lifestyle"), LIFESTYLE_KEYS, "expect.lifestyle");
-    SearchIntent expected = mapper.treeToValue(toIntentNode(mapper, (ObjectNode) expect), SearchIntent.class);
+    SearchIntent expected;
+    try {
+      expected = mapper.treeToValue(toIntentNode(mapper, (ObjectNode) expect), SearchIntent.class);
+    } catch (IllegalArgumentException | IOException e) {
+      throw new IllegalStateException("golden case " + id + ": expect does not deserialise — " + e.getMessage(), e);
+    }
     return new GoldenCase(id, List.copyOf(tags), query, priorCase, mustPass, verdict, scoreIntent, expected);
   }
 
