@@ -7,7 +7,9 @@ import com.flatmaite.common.domain.GenderPreference;
 import com.flatmaite.common.domain.ListingType;
 import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import lombok.Builder;
 
@@ -40,6 +42,7 @@ public record SearchIntent(
     List<LocationRef> excludeLocations,
     List<String> unresolvedLocations,
     Boolean verifiedOnly,
+    Map<String, Double> confidence,
     String freeText,
     String originalQuery) {
 
@@ -100,5 +103,43 @@ public record SearchIntent(
 
   public Lifestyle lifestyleOrEmpty() {
     return lifestyle == null ? Lifestyle.builder().build() : lifestyle;
+  }
+
+  /**
+   * Slots whose enforcement is confidence-gated, in the order used to break ties when the rescue
+   * ladder picks which filter to drop first.
+   */
+  public static final List<String> GATED_SLOTS =
+      List.of(
+          "locations", "excludeLocations", "budgetMin", "budgetMax", "maxDeposit", "roomType",
+          "listingTypes", "furnished", "bhk", "moveInDate", "genderPreference", "couplesOk",
+          "amenities", "lifestyle", "commuteTo", "commuteTo.maxMinutes", "verifiedOnly");
+
+  /**
+   * How directly the user's own words support this slot. An absent map or key means 1.0: everything
+   * that shipped before confidence gating was enforced as a hard filter, and an old session or a
+   * silent provider must keep behaving exactly that way.
+   */
+  public double confidenceOf(String slot) {
+    if (confidence == null) {
+      return 1.0;
+    }
+    Double value = confidence.get(slot);
+    return value == null ? 1.0 : value;
+  }
+
+  /** Refinement merge: the newer turn's grade wins; slots it did not touch keep the prior's. */
+  public static Map<String, Double> mergeConfidence(Map<String, Double> prior, Map<String, Double> next) {
+    if (prior == null && next == null) {
+      return null;
+    }
+    Map<String, Double> merged = new LinkedHashMap<>();
+    if (prior != null) {
+      merged.putAll(prior);
+    }
+    if (next != null) {
+      merged.putAll(next);
+    }
+    return merged;
   }
 }
