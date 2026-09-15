@@ -272,8 +272,8 @@ Saved-search alerts never run the ladder: an alert must fire on a real match, no
 
 ## 7. Files
 
-Create: `backend/src/main/java/com/flatmaite/search/{IntentGrounding,ConfidenceGate}.java`,
-`backend/src/test/java/com/flatmaite/search/{IntentGroundingTest,SearchIntentConfidenceTest,HybridRetrieverGatingTest,ThinResultRescueTest}.java`.
+Create: `backend/src/main/java/com/flatmaite/search/{IntentGrounding,ConfidenceGate,RescueLadder}.java`,
+`backend/src/test/java/com/flatmaite/search/{IntentGroundingTest,SearchIntentConfidenceTest,SearchPipelineConfidenceTest,HybridRetrieverGatingTest,ThinResultRescueTest}.java`.
 Modify: `SearchIntent.java`, `SearchPipeline.java`, `HybridRetriever.java`, `MatchScorer.java`, `OpenAiLlms.java`,
 `MockLlms.java`, `AiSearchController.java`, `SavedSearchAlertRunner.java` (call-site only), `SearchDtos.java`
 (`AiResult.nearMiss`/`nearMissReason`), `common/config/FlatmaiteProperties.java` (`MIN_RESULTS`,
