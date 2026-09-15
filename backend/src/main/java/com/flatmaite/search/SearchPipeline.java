@@ -93,7 +93,8 @@ public class SearchPipeline {
     if (heuristic != null) {
       usageService.log(userId, anonKey, feature, "heuristic", "regex", 0, 0, true, true,
           System.currentTimeMillis() - start, null);
-      return new IntentLlm.Extraction(resolveLocalities(heuristic), IntentLlm.Mode.NONE);
+      return new IntentLlm.Extraction(
+          withConfidence(resolveLocalities(heuristic), query, prior), IntentLlm.Mode.NONE);
     }
 
     // 2) cache
@@ -116,7 +117,8 @@ public class SearchPipeline {
       success = false;
     }
     IntentLlm.Extraction resolved =
-        new IntentLlm.Extraction(resolveLocalities(extracted.intent()), extracted.mode());
+        new IntentLlm.Extraction(
+            withConfidence(resolveLocalities(extracted.intent()), query, prior), extracted.mode());
     intentCache.put(cacheKey, resolved);
     usageService.log(
         userId,
@@ -145,6 +147,49 @@ public class SearchPipeline {
       }
     }
     return resolved;
+  }
+
+  /**
+   * The model may rate its own read of the user's words; that rating can only lower a grade, never
+   * raise one. Slots the words never grounded are not resurrected by the model's confidence in them.
+   */
+  static Map<String, Double> combineConfidence(Map<String, Double> grounding, Map<String, Double> selfRating) {
+    if (grounding == null) {
+      return null;
+    }
+    Map<String, Double> out = new LinkedHashMap<>(grounding);
+    if (selfRating != null) {
+      for (Map.Entry<String, Double> e : selfRating.entrySet()) {
+        Double self = e.getValue();
+        Double ground = out.get(e.getKey());
+        if (self == null || ground == null) {
+          continue;
+        }
+        out.put(e.getKey(), Math.min(ground, Math.max(0.0, Math.min(1.0, self))));
+      }
+    }
+    return out;
+  }
+
+  /**
+   * Grades an extracted intent against the words that produced it. Runs on every path — LLM, mock,
+   * heuristic, cache — so one rule decides what is enforced, whoever did the extracting. Fails
+   * closed: if grading throws, the intent keeps whatever it had and everything stays hard.
+   */
+  private SearchIntent withConfidence(SearchIntent intent, String query, SearchIntent prior) {
+    if (intent == null) {
+      return null;
+    }
+    Map<String, Double> graded;
+    try {
+      graded = combineConfidence(IntentGrounding.score(intent, query, localityResolver), intent.confidence());
+    } catch (RuntimeException e) {
+      log.warn("Confidence grading failed, keeping every slot hard: {}", e.getMessage());
+      return intent;
+    }
+    Map<String, Double> merged =
+        prior == null ? graded : SearchIntent.mergeConfidence(prior.confidence(), graded);
+    return intent.toBuilder().confidence(merged).build();
   }
 
   // ------------------------------------------------------------- search
