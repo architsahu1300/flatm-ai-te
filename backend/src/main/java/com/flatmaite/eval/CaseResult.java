@@ -1,11 +1,18 @@
 package com.flatmaite.eval;
 
+import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.eval.IntentComparator.SlotResult;
 import com.flatmaite.search.NewQueryDetector;
 import java.util.List;
 
 /** One golden case's outcome. {@code error} is set when the extractor threw; then no slots exist. */
-public record CaseResult(GoldenCase golden, List<SlotResult> slots, NewQueryDetector.Verdict verdict, String error, long millis) {
+public record CaseResult(
+    GoldenCase golden,
+    List<SlotResult> slots,
+    NewQueryDetector.Verdict verdict,
+    IntentLlm.Mode mode,
+    String error,
+    long millis) {
 
   public boolean verdictMatches() {
     return golden.expectVerdict() == null || golden.expectVerdict() == verdict;

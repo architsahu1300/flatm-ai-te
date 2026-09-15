@@ -39,10 +39,11 @@ public final class EvalReport {
   /** Per slot, over gated cases where the slot is present on either side (both "null"/"" = absent). */
   public Map<String, Double> slotAccuracy() {
     Map<String, Double> out = new LinkedHashMap<>();
+    List<CaseResult> g = gated();
     for (String slot : IntentComparator.SLOTS) {
       int present = 0;
       int matched = 0;
-      for (CaseResult r : gated()) {
+      for (CaseResult r : g) {
         for (SlotResult s : r.slots()) {
           if (!s.slot().equals(slot) || (absent(s.expected()) && absent(s.actual()))) {
             continue;
@@ -133,6 +134,7 @@ public final class EvalReport {
       c.put("passed", r.passed());
       c.put("knownGap", r.knownGap());
       c.put("verdict", r.verdict() == null ? null : r.verdict().name());
+      c.put("mode", r.mode() == null ? null : r.mode().name());
       c.put("firstMismatch", r.firstMismatch());
       c.put("millis", r.millis());
       ArrayNode slots = c.putArray("mismatches");

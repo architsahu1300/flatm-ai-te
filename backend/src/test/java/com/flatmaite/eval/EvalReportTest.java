@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.eval.IntentComparator.SlotResult;
 import com.flatmaite.search.NewQueryDetector;
 import com.flatmaite.search.SearchIntent;
@@ -28,11 +29,11 @@ class EvalReportTest {
   /** Three gated cases (2 pass, 1 fail on budgetMax), one known gap, one verdict-only case. */
   private static EvalReport sample() {
     return new EvalReport(List.of(
-        new CaseResult(golden("a", true, null, "basics"), List.of(ok("locations"), ok("budgetMax")), NewQueryDetector.Verdict.NEW, null, 1),
-        new CaseResult(golden("b", false, null, "basics", "budget"), List.of(ok("locations"), bad("budgetMax")), NewQueryDetector.Verdict.NEW, null, 1),
-        new CaseResult(golden("c", false, NewQueryDetector.Verdict.REFINE, "refinement"), List.of(ok("locations")), NewQueryDetector.Verdict.REFINE, null, 1),
-        new CaseResult(golden("gap", false, null, "budget", GoldenCase.KNOWN_GAP), List.of(bad("budgetMax")), NewQueryDetector.Verdict.NEW, null, 1),
-        new CaseResult(golden("v", false, NewQueryDetector.Verdict.NEW, "arbiter"), List.of(), NewQueryDetector.Verdict.REFINE, null, 1)));
+        new CaseResult(golden("a", true, null, "basics"), List.of(ok("locations"), ok("budgetMax")), NewQueryDetector.Verdict.NEW, IntentLlm.Mode.NONE, null, 1),
+        new CaseResult(golden("b", false, null, "basics", "budget"), List.of(ok("locations"), bad("budgetMax")), NewQueryDetector.Verdict.NEW, IntentLlm.Mode.NONE, null, 1),
+        new CaseResult(golden("c", false, NewQueryDetector.Verdict.REFINE, "refinement"), List.of(ok("locations")), NewQueryDetector.Verdict.REFINE, IntentLlm.Mode.NONE, null, 1),
+        new CaseResult(golden("gap", false, null, "budget", GoldenCase.KNOWN_GAP), List.of(bad("budgetMax")), NewQueryDetector.Verdict.NEW, IntentLlm.Mode.NONE, null, 1),
+        new CaseResult(golden("v", false, NewQueryDetector.Verdict.NEW, "arbiter"), List.of(), NewQueryDetector.Verdict.REFINE, IntentLlm.Mode.NONE, null, 1)));
   }
 
   @Test

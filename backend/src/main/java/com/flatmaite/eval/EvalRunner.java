@@ -112,7 +112,7 @@ public class EvalRunner implements ApplicationRunner {
 
     long started = System.currentTimeMillis();
     EvalReport report =
-        IntentEvaluator.run(set, extractor, nameOf, r -> log.info("{} {} {}", r.passed() ? "PASS" : r.knownGap() ? "GAP " : "FAIL", r.golden().id(), r.firstMismatch()));
+        IntentEvaluator.run(set, extractor, nameOf, r -> log.info("{} {} {}", r.knownGap() ? "GAP " : r.passed() ? "PASS" : "FAIL", r.golden().id(), r.firstMismatch()));
 
     Map<String, Object> meta = new LinkedHashMap<>();
     meta.put("provider", intentLlm.providerName());

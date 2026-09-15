@@ -7,6 +7,7 @@ import com.flatmaite.search.NewQueryDetector;
 import com.flatmaite.search.SearchIntent;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -157,5 +158,34 @@ class GoldenSetTest {
     assertThatThrownBy(() -> GoldenSet.parse(json))
         .isInstanceOf(IllegalStateException.class)
         .hasMessageContaining("golden case enum");
+  }
+
+  @Test
+  void verdictOnlyCase_needsAnExpectVerdict() {
+    String json = """
+        {"version":1,"cases":[
+          {"id":"verdict-only","tags":[],"query":"q","prior":null,"mustPass":false,"expectVerdict":null,
+           "scoreIntent":false,"expect":{}}]}
+        """;
+    assertThatThrownBy(() -> GoldenSet.parse(json))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("verdict-only")
+        .hasMessageContaining("a verdict-only case needs expectVerdict");
+  }
+
+  /** A gated slot (EvalThresholds.GATED_SLOTS) that no gated row states would silently drop out of the key. */
+  @Test
+  void everyGatedSlot_hasAtLeastOneGatedRow() {
+    List<GoldenCase> gated =
+        GoldenSet.load().cases().stream().filter(c -> c.scoreIntent() && !c.knownGap()).toList();
+    for (String slot : EvalThresholds.GATED_SLOTS) {
+      boolean covered = gated.stream().anyMatch(c -> switch (slot) {
+        case "locations" -> c.expected().locations() != null && !c.expected().locations().isEmpty();
+        case "budgetMax" -> c.expected().budgetMax() != null;
+        case "roomType" -> c.expected().roomType() != null;
+        default -> throw new IllegalStateException("unhandled gated slot: " + slot);
+      });
+      assertThat(covered).as("gated slot '%s' has at least one non-known-gap, scored row stating it", slot).isTrue();
+    }
   }
 }

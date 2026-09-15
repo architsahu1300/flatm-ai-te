@@ -124,6 +124,9 @@ public final class GoldenSet {
     if (tags.contains(GoldenCase.KNOWN_GAP) && mustPass) {
       throw new IllegalStateException("golden case " + id + " is known-gap and must-pass at once");
     }
+    if (!scoreIntent && verdict == null) {
+      throw new IllegalStateException("golden case " + id + ": a verdict-only case needs expectVerdict");
+    }
     JsonNode expect = node.path("expect");
     if (!expect.isObject()) {
       throw new IllegalStateException("golden case " + id + " needs an expect object");

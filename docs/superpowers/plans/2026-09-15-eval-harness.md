@@ -1991,7 +1991,7 @@ whole table with the first mismatch per case.
 
 - [ ] **Step 3: Full verification**
 
-Run: `./mvnw verify` from `backend/` (Docker up). Expected new/changed classes: `SeedLocalitiesTest` 5, `IntentArbiterTest` 5, `AiSearchControllerTest` 1, `GoldenSetTest` 12, `IntentComparatorTest` 7, `EvalReportTest` 6, `IntentEvaluatorTest` 1, `IntentGoldenTest` 2, `EvalRunnerTest` 3; every pre-existing class unchanged; `BUILD SUCCESS`. Report the summary `Tests run:` line. `git status --short` must be empty after the commit.
+Run: `./mvnw verify` from `backend/` (Docker up). Expected new/changed classes: `SeedLocalitiesTest` 5, `IntentArbiterTest` 5, `AiSearchControllerTest` 1, `GoldenSetTest` 14, `IntentComparatorTest` 7, `EvalReportTest` 6, `IntentEvaluatorTest` 1, `IntentGoldenTest` 2, `EvalRunnerTest` 3; every pre-existing class unchanged; `BUILD SUCCESS`. Report the summary `Tests run:` line. `git status --short` must be empty after the commit.
 
 - [ ] **Step 4: Commit**
 

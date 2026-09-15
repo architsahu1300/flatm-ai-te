@@ -27,12 +27,15 @@ public final class IntentEvaluator {
         IntentArbiter.Decision d = extractor.extract(c.query(), set.priorOf(c));
         List<IntentComparator.SlotResult> slots =
             c.scoreIntent() ? IntentComparator.compare(c.expected(), d.intent(), nameOf) : List.of();
-        result = new CaseResult(c, slots, d.verdict(), null, System.currentTimeMillis() - start);
+        result = new CaseResult(c, slots, d.verdict(), d.mode(), null, System.currentTimeMillis() - start);
       } catch (Exception e) {
-        result = new CaseResult(c, List.of(), null, e.getClass().getSimpleName() + ": " + e.getMessage(), System.currentTimeMillis() - start);
+        result = new CaseResult(c, List.of(), null, null, e.getClass().getSimpleName() + ": " + e.getMessage(), System.currentTimeMillis() - start);
       }
       results.add(result);
       onCase.accept(result);
+      if (Thread.currentThread().isInterrupted()) {
+        break;
+      }
     }
     return new EvalReport(results);
   }
