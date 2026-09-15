@@ -7,6 +7,7 @@ import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.search.IntentArbiter;
 import com.flatmaite.search.IntentLocalities;
 import com.flatmaite.search.LocalityResolver;
+import com.flatmaite.search.RefinementHeuristics;
 import com.flatmaite.search.SearchIntent;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import com.flatmaite.search.SearchPipeline;
@@ -31,7 +32,8 @@ import org.springframework.stereotype.Component;
  * Runs the golden set through the real wiring — provider, database gazetteer, arbiter — and writes
  * a report. Reports the offline thresholds but never enforces them: a live run informs, the build
  * gate is the keyword parser. Activate with the "eval" profile; refuses the mock provider unless
- * EVAL_ALLOW_MOCK=true (a smoke test of the runner itself).
+ * EVAL_ALLOW_MOCK=true (a smoke test of the runner itself). Run from {@code backend/} — the report
+ * path {@code target/eval/…} is resolved against the working directory.
  */
 @Component
 @Profile("eval")
@@ -101,7 +103,9 @@ public class EvalRunner implements ApplicationRunner {
               query,
               p,
               (q, pp) -> {
-                pace(calls[0]++ > 0);
+                if (needsProvider(q, pp)) {
+                  pace(calls[0]++ > 0);
+                }
                 return pipeline.extractIntent(q, pp, null, "eval");
               });
         };
@@ -134,6 +138,15 @@ public class EvalRunner implements ApplicationRunner {
     System.out.println("verdict accuracy " + report.verdictAccuracy());
     System.out.println("threshold violations (informational): " + EvalThresholds.violations(report));
     System.out.println("report: " + out.toAbsolutePath());
+  }
+
+  /**
+   * SearchPipeline answers a heuristic refinement ("cheaper", "closer to work", …) without calling the
+   * provider, so those attempts are neither paced nor counted. Identical (query, prior) pairs would be
+   * served from the pipeline's cache and still count here — the golden set has none.
+   */
+  static boolean needsProvider(String query, SearchIntent prior) {
+    return prior == null || RefinementHeuristics.apply(prior, query) == null;
   }
 
   /** Sleeps {@code paceMs} before every provider call except the first (notFirst == false). */
