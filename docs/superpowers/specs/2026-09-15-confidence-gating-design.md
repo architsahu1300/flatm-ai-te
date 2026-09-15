@@ -138,11 +138,14 @@ self-rating, so the offline eval grades pure grounding.
 follow-up re-states is re-graded against the follow-up's query. `MockLlms.MockIntentLlm` and `OpenAiLlms`'s
 refine path merge the map with the same "parsed non-null wins" rule they already use for values.
 
-### 4.4 Gating (`HybridRetriever.toFilters`)
+### 4.4 Gating (`search/ConfidenceGate`, new, pure; applied in `HybridRetriever.toFilters`)
+
+The threshold and the never-soft set live in one pure class so the retriever and the scorer share them without
+the scorer depending on a Spring bean:
 
 ```java
-  static final double HARD_THRESHOLD = 0.75;     // aligns with LocalityResolver.CONFIDENT
-  static final Set<String> ALWAYS_HARD = Set.of("excludeLocations", "verifiedOnly");
+  public static final double HARD_THRESHOLD = 0.75;   // aligns with LocalityResolver.CONFIDENT
+  public static final Set<String> ALWAYS_HARD = Set.of("excludeLocations", "verifiedOnly");
 ```
 
 A slot is **hard** when `intent.confidenceOf(slot) >= HARD_THRESHOLD` or it is in `ALWAYS_HARD`; otherwise it is
@@ -151,7 +154,7 @@ a negation the user typed must be honoured, and quietly surfacing unverified lis
 verified ones is the opposite of the product's promise. Both are also always explicitly stated in practice — the
 allow-list is a guarantee, not a workaround.
 
-`HybridRetriever.softSlots(SearchIntent)` → the ordered list of slot names that are non-null and soft; used by the
+`ConfidenceGate.softSlots(SearchIntent)` → the ordered list of slot names that are non-null and soft; used by the
 scorer, the pipeline note and the frontend.
 
 Saved-search alerts (`SavedSearchAlertRunner`, strict mode) apply the same gating: an alert on a guessed
@@ -269,7 +272,7 @@ Saved-search alerts never run the ladder: an alert must fire on a real match, no
 
 ## 7. Files
 
-Create: `backend/src/main/java/com/flatmaite/search/IntentGrounding.java`,
+Create: `backend/src/main/java/com/flatmaite/search/{IntentGrounding,ConfidenceGate}.java`,
 `backend/src/test/java/com/flatmaite/search/{IntentGroundingTest,SearchIntentConfidenceTest,HybridRetrieverGatingTest,ThinResultRescueTest}.java`.
 Modify: `SearchIntent.java`, `SearchPipeline.java`, `HybridRetriever.java`, `MatchScorer.java`, `OpenAiLlms.java`,
 `MockLlms.java`, `AiSearchController.java`, `SavedSearchAlertRunner.java` (call-site only), `SearchDtos.java`
