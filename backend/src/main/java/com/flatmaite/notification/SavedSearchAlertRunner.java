@@ -57,8 +57,21 @@ public class SavedSearchAlertRunner {
     log.info("saved-search alerts: {} searches checked, {} alerted", due.size(), alerted);
   }
 
+  /**
+   * A saved search is an endorsement, so alerts enforce every slot the user saved.
+   *
+   * <p>Elsewhere the confidence gate is a fair bargain: a slot the reader only inferred leaves the
+   * {@code WHERE} and becomes a ranking preference instead. There is no ranking here — this query
+   * takes the five newest rows that match and sends them — so a soft slot would be deleted rather
+   * than demoted, and a saved Powai search whose {@code locations} graded 0.58 would start alerting
+   * on every new listing in Mumbai. Stripping the grades keeps the alert about what the user saved.
+   */
+  static SearchIntent alertIntent(SearchIntent saved) {
+    return saved.toBuilder().confidence(null).build();
+  }
+
   private boolean runOne(SavedSearch search) throws Exception {
-    SearchIntent intent = objectMapper.readValue(search.getIntent(), SearchIntent.class);
+    SearchIntent intent = alertIntent(objectMapper.readValue(search.getIntent(), SearchIntent.class));
     // alerts fire only for the saved localities — there is no note here to explain a widened area
     ListingFilters filters = retriever.toFilters(intent, false);
 

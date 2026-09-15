@@ -157,8 +157,13 @@ allow-list is a guarantee, not a workaround.
 `ConfidenceGate.softSlots(SearchIntent)` → the ordered list of slot names that are non-null and soft; used by the
 scorer, the pipeline note and the frontend.
 
-Saved-search alerts (`SavedSearchAlertRunner`, strict mode) apply the same gating: an alert on a guessed
-constraint is exactly the alert that never fires.
+Saved-search alerts (`SavedSearchAlertRunner`, strict mode) **strip the confidence map entirely** before
+filtering — every slot the user saved is enforced, whatever its grade. *Amended after the WS4 final review.*
+The original rule ("alerts apply the same gating") assumed the gating bargain holds there, but it does not:
+everywhere else a soft slot leaves the `WHERE` and becomes a *ranking* preference, and the alert query does not
+rank — it takes the five newest rows that match and sends them. A soft slot in an alert is therefore deleted,
+not demoted, and a saved Powai search whose `locations` graded 0.58 would alert on every new listing in Mumbai.
+Saving a search is the same gesture `/apply` represents, so it is treated as the same endorsement.
 
 ### 4.5 Scoring a soft slot (`MatchScorer`)
 
