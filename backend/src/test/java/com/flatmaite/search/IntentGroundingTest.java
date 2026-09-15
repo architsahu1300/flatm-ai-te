@@ -236,4 +236,88 @@ class IntentGroundingTest {
                 "vegetarian household"))
         .containsEntry("lifestyle", IntentGrounding.STATED);
   }
+
+  @Test
+  void anAmenitySlugMustAppearAsAWholeWord() {
+    SearchIntent intent = SearchIntent.builder().amenities(List.of("ac")).build();
+    assertThat(score(intent, "accommodation in powai with good accessibility"))
+        .containsEntry("amenities", IntentGrounding.INFERRED);
+    assertThat(score(intent, "2bhk in powai with ac")).containsEntry("amenities", IntentGrounding.STATED);
+  }
+
+  @Test
+  void aSemiFurnishedQueryDoesNotGroundAFullyFurnishedClaim() {
+    assertThat(score(SearchIntent.builder().furnished(Furnishing.FULLY_FURNISHED).build(), "semi furnished room in chembur"))
+        .containsEntry("furnished", IntentGrounding.INFERRED);
+    assertThat(score(SearchIntent.builder().furnished(Furnishing.SEMI_FURNISHED).build(), "semi furnished room in chembur"))
+        .containsEntry("furnished", IntentGrounding.STATED);
+    assertThat(score(SearchIntent.builder().furnished(Furnishing.FULLY_FURNISHED).build(), "fully furnished 1bhk"))
+        .containsEntry("furnished", IntentGrounding.STATED);
+  }
+
+  @Test
+  void oneInventedLocalityDragsTheWholeListDown() {
+    SearchIntent both =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", id("Powai")), new LocationRef("Bandra", id("Bandra"))))
+            .build();
+    assertThat(score(both, "flats in powai")).containsEntry("locations", IntentGrounding.INFERRED);
+    assertThat(score(both, "flats in powai or bandra")).containsEntry("locations", 1.0);
+  }
+
+  @Test
+  void anAmbiguousAliasStillGroundsBothOfItsLocalities() {
+    SearchIntent andheri =
+        SearchIntent.builder()
+            .locations(
+                List.of(
+                    new LocationRef("Andheri East", id("Andheri East")),
+                    new LocationRef("Andheri West", id("Andheri West"))))
+            .build();
+    assertThat(score(andheri, "room in andheri")).containsEntry("locations", 1.0);
+  }
+
+  @Test
+  void aBhkClaimMustMatchTheBhkInTheQuery() {
+    SearchIntent three = SearchIntent.builder().bhk(new BhkRange(3, 3)).build();
+    assertThat(score(three, "1bhk in powai")).containsEntry("bhk", IntentGrounding.INFERRED);
+    assertThat(score(three, "3bhk in powai")).containsEntry("bhk", IntentGrounding.STATED);
+  }
+
+  @Test
+  void aCommuteRadiusClaimMustMatchTheMinutesInTheQuery() {
+    SearchIntent wide =
+        SearchIntent.builder().commuteTo(new CommuteTo("BKC", id("BKC"), 45)).build();
+    assertThat(score(wide, "room within 20 min of bkc"))
+        .containsEntry("commuteTo.maxMinutes", IntentGrounding.INFERRED);
+    assertThat(score(SearchIntent.builder().commuteTo(new CommuteTo("BKC", id("BKC"), 20)).build(), "room within 20 min of bkc"))
+        .containsEntry("commuteTo.maxMinutes", IntentGrounding.STATED);
+  }
+
+  @Test
+  void aCueAtTheStartOfALongerWordDoesNotGroundAnything() {
+    assertThat(
+            score(
+                SearchIntent.builder()
+                    .lifestyle(SearchIntent.Lifestyle.builder().diet("VEGETARIAN").pets("PET_FRIENDLY").build())
+                    .build(),
+                "flat near the vegetable market in a quiet category of building"))
+        .containsEntry("lifestyle", IntentGrounding.INFERRED);
+    assertThat(score(SearchIntent.builder().genderPreference(GenderPreference.MALE_ONLY).build(), "please mention the rent"))
+        .containsEntry("genderPreference", IntentGrounding.INFERRED);
+  }
+
+  @Test
+  void aMoveInDateIsWeakBecauseWeCannotConfirmItIsThatDate() {
+    assertThat(score(SearchIntent.builder().moveInDate("2026-10-01").build(), "moving in next month"))
+        .containsEntry("moveInDate", IntentGrounding.WEAK);
+    assertThat(score(SearchIntent.builder().moveInDate("2026-10-01").build(), "2bhk in powai"))
+        .containsEntry("moveInDate", IntentGrounding.INFERRED);
+  }
+
+  @Test
+  void aSquareFootageDoesNotGroundABudget() {
+    assertThat(score(SearchIntent.builder().budgetMax(600).build(), "600 sqft flat in powai"))
+        .containsEntry("budgetMax", IntentGrounding.INFERRED);
+  }
 }
