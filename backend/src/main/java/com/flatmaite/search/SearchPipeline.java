@@ -196,9 +196,30 @@ public class SearchPipeline {
       CONFIDENCE_LOG.warn("Confidence grading failed, keeping every slot hard: {}", e.getMessage());
       return intent.toBuilder().confidence(null).build();
     }
-    Map<String, Double> merged =
-        prior == null ? graded : SearchIntent.mergeConfidence(prior.confidence(), graded);
+    Map<String, Double> merged = carryConfidence(prior, intent, graded);
     return intent.toBuilder().confidence(merged).build();
+  }
+
+  /**
+   * Combines this turn's grades with the prior turn's. A slot whose value is carried unchanged keeps
+   * the stronger of the two grades: the user stated it once and has not taken it back, so a later
+   * sentence that simply does not mention it must not demote it to a preference. A slot whose value
+   * changed is graded by this turn's words alone.
+   */
+  static Map<String, Double> carryConfidence(
+      SearchIntent prior, SearchIntent next, Map<String, Double> graded) {
+    if (prior == null || prior.confidence() == null) {
+      return graded;
+    }
+    Map<String, Double> merged = graded == null ? new LinkedHashMap<>() : new LinkedHashMap<>(graded);
+    for (Map.Entry<String, Double> e : prior.confidence().entrySet()) {
+      if (e.getValue() == null || !ConfidenceGate.sameValue(prior, next, e.getKey())) {
+        continue;
+      }
+      Double current = merged.get(e.getKey());
+      merged.put(e.getKey(), current == null ? e.getValue() : Math.max(current, e.getValue()));
+    }
+    return merged;
   }
 
   // ------------------------------------------------------------- search

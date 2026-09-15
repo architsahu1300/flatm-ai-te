@@ -2,6 +2,7 @@ package com.flatmaite.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.flatmaite.common.domain.Furnishing;
 import com.flatmaite.common.domain.RoomType;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -90,5 +91,49 @@ class SearchPipelineConfidenceTest {
 
     assertThat(merged).containsEntry("roomType", 0.0);
     assertThat(merged).containsEntry("budgetMax", 1.0);
+  }
+
+  @Test
+  void aCarriedConstraintKeepsTheGradeItEarned() {
+    SearchIntent prior =
+        SearchIntent.builder().budgetMax(40000).confidence(Map.of("budgetMax", 1.0)).build();
+    SearchIntent next = SearchIntent.builder().budgetMax(40000).furnished(Furnishing.FULLY_FURNISHED).build();
+
+    // this turn's words ("make it fully furnished") never mention the budget
+    Map<String, Double> merged =
+        SearchPipeline.carryConfidence(prior, next, Map.of("budgetMax", 0.5, "furnished", 1.0));
+
+    assertThat(merged).containsEntry("budgetMax", 1.0);
+    assertThat(merged).containsEntry("furnished", 1.0);
+  }
+
+  @Test
+  void aChangedConstraintIsGradedByThisTurnsWordsAlone() {
+    SearchIntent prior =
+        SearchIntent.builder().budgetMax(40000).confidence(Map.of("budgetMax", 1.0)).build();
+    SearchIntent next = SearchIntent.builder().budgetMax(30000).build();
+
+    assertThat(SearchPipeline.carryConfidence(prior, next, Map.of("budgetMax", 0.5)))
+        .containsEntry("budgetMax", 0.5);
+  }
+
+  @Test
+  void restatingAConstraintMoreClearlyRaisesItsGrade() {
+    SearchIntent prior =
+        SearchIntent.builder().roomType(RoomType.PRIVATE).confidence(Map.of("roomType", 0.75)).build();
+    SearchIntent next = SearchIntent.builder().roomType(RoomType.PRIVATE).build();
+
+    assertThat(SearchPipeline.carryConfidence(prior, next, Map.of("roomType", 1.0)))
+        .containsEntry("roomType", 1.0);
+  }
+
+  @Test
+  void withNoPriorOrNoPriorGrades_thisTurnsGradesStand() {
+    Map<String, Double> graded = Map.of("roomType", 0.5);
+    assertThat(SearchPipeline.carryConfidence(null, SearchIntent.builder().build(), graded)).isEqualTo(graded);
+    assertThat(
+            SearchPipeline.carryConfidence(
+                SearchIntent.builder().build(), SearchIntent.builder().build(), graded))
+        .isEqualTo(graded);
   }
 }

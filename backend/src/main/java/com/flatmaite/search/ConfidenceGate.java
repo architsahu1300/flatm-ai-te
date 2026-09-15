@@ -2,6 +2,7 @@ package com.flatmaite.search;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -71,6 +72,40 @@ public final class ConfidenceGate {
       case "lifestyle" -> intent.lifestyle() != null;
       case "commuteTo", "commuteTo.maxMinutes" -> intent.commuteTo() != null;
       case "verifiedOnly" -> intent.verifiedOnly() != null;
+      default -> false;
+    };
+  }
+
+  /**
+   * Is this slot's value carried unchanged from the prior turn? A refinement re-grades only what it
+   * actually changed — a constraint the user stated earlier and did not repeat keeps the grade it
+   * earned, because saying nothing is not the same as taking it back.
+   */
+  public static boolean sameValue(SearchIntent prior, SearchIntent next, String slot) {
+    if (prior == null || next == null) {
+      return false;
+    }
+    return switch (slot) {
+      case "locations" -> Objects.equals(prior.locations(), next.locations());
+      case "excludeLocations" -> Objects.equals(prior.excludeLocations(), next.excludeLocations());
+      case "budgetMin" -> Objects.equals(prior.budgetMin(), next.budgetMin());
+      case "budgetMax" -> Objects.equals(prior.budgetMax(), next.budgetMax());
+      case "maxDeposit" -> Objects.equals(prior.maxDeposit(), next.maxDeposit());
+      case "roomType" -> prior.roomType() == next.roomType();
+      case "listingTypes" -> Objects.equals(prior.listingTypes(), next.listingTypes());
+      case "furnished" -> prior.furnished() == next.furnished();
+      case "bhk" -> Objects.equals(prior.bhk(), next.bhk());
+      case "moveInDate" -> Objects.equals(prior.moveInDate(), next.moveInDate());
+      case "genderPreference" -> prior.genderPreference() == next.genderPreference();
+      case "couplesOk" -> Objects.equals(prior.couplesOk(), next.couplesOk());
+      case "amenities" -> Objects.equals(prior.amenities(), next.amenities());
+      case "lifestyle" -> Objects.equals(prior.lifestyle(), next.lifestyle());
+      case "commuteTo" -> Objects.equals(prior.commuteTo(), next.commuteTo());
+      case "commuteTo.maxMinutes" ->
+          Objects.equals(
+              prior.commuteTo() == null ? null : prior.commuteTo().maxMinutes(),
+              next.commuteTo() == null ? null : next.commuteTo().maxMinutes());
+      case "verifiedOnly" -> Objects.equals(prior.verifiedOnly(), next.verifiedOnly());
       default -> false;
     };
   }

@@ -141,8 +141,9 @@ class SearchPipelineIntegrationTest {
     assertThat((Integer) intent.get("budgetMax")).isLessThan(25000);
     List<Map<String, Object>> locations = (List<Map<String, Object>>) intent.get("locations");
     assertThat(locations).extracting(l -> l.get("name")).contains("Powai");
-    // a real refinement never carries the "started fresh" note; it may still name soft preferences
-    assertThat((String) data.get("note")).doesNotContain("fresh search");
+    // the fix: budget/locality/room-type etc. were stated in earlier turns and are carried forward
+    // as hard grades even though this turn's words don't repeat them, so no soft slots remain here
+    assertThat(data.get("note")).isNull();
   }
 
   @Test
