@@ -274,9 +274,10 @@ exists.
    Pune both have an Indiranagar; Delhi NCR and Navi Mumbai both have a Sector 15. The V3 migration replaces it
    with `UNIQUE (city, name)`.
 2. **Scope.** `LocalityResolver` scans every locality globally, so a Mumbai user typing "MG Road" could match
-   Bangalore — fuzzy matching makes this likelier, not less. Resolution takes an explicit city scope, defaulting
-   to `"Mumbai"`, sourced from the user's profile locality where one exists. A future city selector sets it; no
-   UI for that is in scope here.
+   Bangalore — fuzzy matching makes this likelier, not less. Resolution takes an explicit city scope, sourced
+   from the user's profile locality. When there is no profile locality the scope is **`UNSET` — an explicit
+   state, never a silent fallback to Mumbai** (§4.11). A future city selector sets it; no UI for that is in
+   scope here.
 3. **Calibration.** `ROAD_CIRCUITY = 1.4`, `SPEED_KMPH = 20` and `OVERHEAD_MIN = 8` are Mumbai numbers held as
    static finals. They move into per-city configuration keyed by city name, with the current values as the
    Mumbai defaults — no behaviour change today, no Mumbai arithmetic applied to Pune later.
@@ -284,6 +285,39 @@ exists.
 What is explicitly **not** in scope: importing an open gazetteer (OSM/GeoNames) for other cities, a city selector
 in the UI, or per-city seed data. No second city exists yet. The point of this section is that adding one later
 should be an import plus a config entry, not a migration against live data.
+
+### 4.11 When the city scope is unset
+
+A user with no `profiles.current_locality_id` has no city. The scope is then `UNSET`, which is a value the code
+carries and branches on — not a Mumbai default wearing a disguise. A silent default is precisely the bug class
+this whole spec exists to remove: it would be correct today and confidently wrong the moment a Bangalore user
+signs up.
+
+`UNSET` behaves as follows:
+
+- **Results still appear.** Resolution runs unscoped across every city, which today means Mumbai, because Mumbai
+  is all there is. Nobody is shown an empty page for not having filled in a profile field.
+- **The user is told why, and what to do.** The response carries a prompt the UI renders above the results:
+
+  > **We don't know which city you're in.** [Set your location] on your profile so we can show homes near you.
+
+  It links to `/profile`, is dismissible per session, and is not an error state — the results below it are real.
+- **Commute constants fall back to the Mumbai calibration**, as §4.10 point 3 specifies for any unknown city.
+  This is a stated fallback for arithmetic that must produce some number, not a silent scoping decision.
+
+The API carries the scope explicitly so the UI never has to infer it:
+
+```
+citySearch {
+  city,     // "Mumbai", or null when UNSET
+  source,   // PROFILE | UNSET
+  prompt    // the copy above; null when source = PROFILE
+}
+```
+
+Once a second city exists, `UNSET` is where the city selector lands — the prompt becomes the entry point to it
+rather than a link to the profile. That is a later change to one string and one href, which is the point of
+making the state explicit now.
 
 The strategic direction this protects: the curated `SeedLocalities` list is demo fixture data, not the production
 gazetteer, and the three resolution sources that actually scale — a city's own listing inventory (step 2), a
@@ -306,6 +340,9 @@ is the seam that lets each arrive without touching callers.
   city.
 - **City scope:** a locality seeded under a second city is never matched by a Mumbai-scoped resolution, exactly
   or fuzzily. The fixture exists only in the test; no second city ships.
+- **`UNSET` scope:** a user with no profile locality still gets results, and the response carries
+  `citySearch.source = UNSET` with the prompt populated. Asserted explicitly, because the failure mode here is
+  silent correctness — a Mumbai default would pass any test that only checks the results.
 - Commute constants resolve from per-city config, and an unknown city falls back to the Mumbai defaults rather
   than to zero or a crash.
 
@@ -327,7 +364,8 @@ touched by this work, and a change there would mean something leaked.
    `FlatmaiteProperties.Search` and README updated.
 3. Gazetteer expansion with explicit `city`, `LISTING_COUNT` / `USER_COUNT`, `SeedLocalitiesTest`; re-seed and
    confirm per-locality coverage.
-4. `Placement` + city-scoped resolution + ladder step 2 (society / address).
+4. `Placement` + city-scoped resolution (including the `UNSET` state and its prompt) + ladder step 2
+   (society / address).
 5. Tier ladder replacing `RescueLadder.rungs()`; headroom moved out of the base filter.
 6. `choices` computation and the `/apply` escalation path.
 7. API DTO fields.
