@@ -56,6 +56,8 @@ titled as matching the user's budget must contain only listings within it.
 - Polygon/boundary search. Rings around centroids and per-property points are enough at this scale.
 - Replacing the commute estimate with a real Distance Matrix provider. The estimator's contract is unchanged.
 - Any change to intent extraction. WS3's golden set must stay green untouched.
+- Launching a second city — no import, no city selector, no non-Mumbai seed data. §4.10 only removes the
+  assumptions that would make adding one a migration against live data.
 
 ## 3. Decisions taken with the product owner
 
@@ -96,6 +98,10 @@ retrieval SQL (`HybridRetriever:85`, `:135`). A new migration adds the index to 
 CREATE EXTENSION IF NOT EXISTS cube;
 CREATE EXTENSION IF NOT EXISTS earthdistance;
 CREATE INDEX idx_properties_geo ON properties USING gist (ll_to_earth(lat, lng));
+
+-- a locality name is unique within its city, not globally (§4.10)
+ALTER TABLE localities DROP CONSTRAINT localities_name_key;
+ALTER TABLE localities ADD CONSTRAINT localities_city_name_key UNIQUE (city, name);
 ```
 
 Both extensions ship in `pgvector/pgvector:pg16`, which is the image used by Docker Compose *and* by the
@@ -125,6 +131,8 @@ README environment table is updated in the same change.
 
 Each entry keeps the existing shape — name, lat, lng, aliases, `rentBand` — with coordinates taken from the
 locality centroid and `rentBand` set to the typical private-room rent midpoint, consistent with the existing 38.
+`Seed` also gains an explicit `city` field, set to `"Mumbai"` on every row, rather than riding the column default
+(§4.10).
 
 Listing volume scales with the gazetteer: `LISTING_COUNT` rises from 80 to 240. Locality assignment is already
 round-robin (`locs.get(i % locs.size())` in `seedListings`), so ~4 listings per locality follow automatically —
@@ -154,6 +162,10 @@ callers. Until then, `source = NONE` drives §4.8.
 
 `OWN_DATA` placements enter WS4's grounding as `INFERRED` (0.5), not `STATED`, so `ConfidenceGate` treats them
 as a ranking preference rather than a hard filter — the existing machinery, unchanged.
+
+Every resolution step takes a **city scope** (§4.10). Both the gazetteer and the own-data steps filter to that
+city before matching, so no match can cross a city boundary — including a fuzzy one, which is where it would
+otherwise happen first.
 
 ### 4.4 The fallback ladder
 
@@ -252,6 +264,32 @@ today.
 - Extension creation failing on an exotic Postgres → the migration fails loudly at boot rather than silently
   falling back to sequential scans, consistent with Flyway owning the schema.
 
+### 4.10 Not painting ourselves into Mumbai
+
+The schema half-anticipated other cities — `localities.city` exists, defaulting to `'Mumbai'` — but three things
+would break on the second city, and all three are cheap to fix now and expensive to fix once multi-city data
+exists.
+
+1. **Uniqueness.** `localities_name_key UNIQUE (name)` permits exactly one "MG Road" system-wide. Bangalore and
+   Pune both have an Indiranagar; Delhi NCR and Navi Mumbai both have a Sector 15. The V3 migration replaces it
+   with `UNIQUE (city, name)`.
+2. **Scope.** `LocalityResolver` scans every locality globally, so a Mumbai user typing "MG Road" could match
+   Bangalore — fuzzy matching makes this likelier, not less. Resolution takes an explicit city scope, defaulting
+   to `"Mumbai"`, sourced from the user's profile locality where one exists. A future city selector sets it; no
+   UI for that is in scope here.
+3. **Calibration.** `ROAD_CIRCUITY = 1.4`, `SPEED_KMPH = 20` and `OVERHEAD_MIN = 8` are Mumbai numbers held as
+   static finals. They move into per-city configuration keyed by city name, with the current values as the
+   Mumbai defaults — no behaviour change today, no Mumbai arithmetic applied to Pune later.
+
+What is explicitly **not** in scope: importing an open gazetteer (OSM/GeoNames) for other cities, a city selector
+in the UI, or per-city seed data. No second city exists yet. The point of this section is that adding one later
+should be an import plus a config entry, not a migration against live data.
+
+The strategic direction this protects: the curated `SeedLocalities` list is demo fixture data, not the production
+gazetteer, and the three resolution sources that actually scale — a city's own listing inventory (step 2), a
+bulk open-data import, and geocoding (step 3) — all erode curation's role rather than extending it. `Placement`
+is the seam that lets each arrive without touching callers.
+
 ## 5. Testing
 
 **Unit**
@@ -264,7 +302,12 @@ today.
 - **Intent immutability:** a search whose results include tier 3 rows leaves `budgetMax` unchanged; a subsequent
   refinement still carries the original figure. This is the regression the product owner explicitly asked for.
 - `choices` counts match an independent query for the same criteria.
-- `SeedLocalitiesTest` count assertions updated (38 → new count) and the distinct-name invariant kept.
+- `SeedLocalitiesTest` count assertions updated (38 → 59) and the distinct-name invariant kept, now scoped per
+  city.
+- **City scope:** a locality seeded under a second city is never matched by a Mumbai-scoped resolution, exactly
+  or fuzzily. The fixture exists only in the test; no second city ships.
+- Commute constants resolve from per-city config, and an unknown city falls back to the Mumbai defaults rather
+  than to zero or a crash.
 
 **Integration** (`SearchPipelineIntegrationTest`, Testcontainers + seed data)
 
@@ -279,10 +322,12 @@ touched by this work, and a change there would mean something leaked.
 
 ## 6. Implementation order
 
-1. `V3__geo.sql` + extensions + index.
-2. `CommuteEstimator` km on `Nearby`; ring config in km; `FlatmaiteProperties.Search` and README updated.
-3. Gazetteer expansion, `LISTING_COUNT` / `USER_COUNT`, `SeedLocalitiesTest`; re-seed and confirm per-locality coverage.
-4. `Placement` + resolution ladder step 2 (society / address).
+1. `V3__geo.sql` — extensions, geo index, and the `UNIQUE (city, name)` swap.
+2. `CommuteEstimator` km on `Nearby`; ring config in km; per-city commute constants;
+   `FlatmaiteProperties.Search` and README updated.
+3. Gazetteer expansion with explicit `city`, `LISTING_COUNT` / `USER_COUNT`, `SeedLocalitiesTest`; re-seed and
+   confirm per-locality coverage.
+4. `Placement` + city-scoped resolution + ladder step 2 (society / address).
 5. Tier ladder replacing `RescueLadder.rungs()`; headroom moved out of the base filter.
 6. `choices` computation and the `/apply` escalation path.
 7. API DTO fields.
@@ -305,5 +350,5 @@ Steps 4–8 are what make the *next* unplaceable name behave well.
 
 **Docs:** `README.md` environment table.
 
-**Out of scope, separate workstream:** `GeocodingProvider` and implementations, `geocode_cache`, Mumbai
-bounding-box clipping, provider terms review.
+**Out of scope, separate workstream:** `GeocodingProvider` and implementations, `geocode_cache`, per-city
+bounding-box clipping (not Mumbai-hardcoded — see §4.10), provider terms review.
