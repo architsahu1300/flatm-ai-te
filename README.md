@@ -62,9 +62,10 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | _unset_ → Google login hidden | OAuth |
 | `AI_MOCK` | `auto` | `true`/`false` to force provider mode |
 | `AI_EXPLANATIONS_ENABLED` | `true` | Kill-switch → score-breakdown-only UI |
-| `SEARCH_NEARBY_RADIUS_MINUTES` | `25` | A named home locality also admits every locality within this many estimated minutes |
-| `SEARCH_MIN_RESULTS` | `6` | Below this many homes, nearby and near-miss options are added automatically |
-| `SEARCH_RESCUE_RADIUS_MINUTES` | `45` | The wider ring the top-up reaches for before it drops any filter |
+| `SEARCH_NEARBY_RADIUS_KM` | `5.0` | A named locality also admits every locality within this many km |
+| `SEARCH_CLOSE_RADIUS_KM` | `2.0` | Inside this distance a result is labelled "very close" |
+| `SEARCH_ESCALATION_RADIUS_KM` | `5.0` | The ring searched after the user raises their budget |
+| `SEARCH_MIN_RESULTS` | `6` | Below this many homes, the fallback ladder tops the page up |
 | `EVAL_PACE_MS` | `4500` | Eval profile only — delay between provider calls |
 | `EVAL_TAGS` / `EVAL_LIMIT` | all / `0` | Eval profile only — run a subset of the golden set |
 | `EVAL_ALLOW_MOCK` | `false` | Eval profile only — allow the mock provider (runner smoke test) |

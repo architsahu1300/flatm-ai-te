@@ -13,17 +13,21 @@ import java.util.List;
  */
 public final class RescueLadder {
 
-  /** @param slot the filter this rung gives up, or null for the wider-ring rung. */
-  public record Rung(String slot, SearchIntent intent, Integer radiusMinutes, String reason) {}
+  /**
+   * @param slot the filter this rung gives up, or null for the wider-ring rung.
+   * @param radiusKm the wider-ring rung's straight-line kilometre budget, or null for a
+   *     filter-dropping rung (which retrieves at the ladder's own default radius).
+   */
+  public record Rung(String slot, SearchIntent intent, Double radiusKm, String reason) {}
 
   private RescueLadder() {}
 
-  public static List<Rung> rungs(SearchIntent intent, int rescueRadiusMinutes) {
+  public static List<Rung> rungs(SearchIntent intent, double escalationRadiusKm) {
     List<Rung> out = new ArrayList<>();
     boolean hasPlace =
         ConfidenceGate.isPresent(intent, "locations") || ConfidenceGate.isPresent(intent, "commuteTo");
     if (hasPlace) {
-      out.add(new Rung(null, intent, rescueRadiusMinutes, "further out"));
+      out.add(new Rung(null, intent, escalationRadiusKm, "further out"));
     }
     List<String> droppable =
         SearchIntent.GATED_SLOTS.stream()

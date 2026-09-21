@@ -65,14 +65,17 @@ public class FlatmaiteProperties {
   @Getter
   @Setter
   public static class Search {
-    /** A named home locality also admits every locality within this many estimated minutes. */
-    private int nearbyRadiusMinutes = 25;
+    /** A named home locality also admits every locality within this many kilometres. */
+    private double nearbyRadiusKm = 5.0;
 
-    /** Below this many listings, the pipeline tops the page up with nearby and near-miss results. */
+    /** Inside this distance a row is labelled "very close" rather than given a figure. */
+    private double closeRadiusKm = 2.0;
+
+    /** The ring searched after the user explicitly raises their budget. */
+    private double escalationRadiusKm = 5.0;
+
+    /** Below this many listings, the fallback ladder tops the page up. */
     private int minResults = 6;
-
-    /** The second ring the rescue ladder reaches for before it starts dropping filters. */
-    private int rescueRadiusMinutes = 45;
   }
 
   /** Per-city commute calibration. Mumbai's numbers are the default for any city not listed. */

@@ -34,7 +34,7 @@ class HybridRetrieverGatingTest {
     Mockito.when(repo.findAll()).thenReturn(SeedLocalities.entities());
     LocalityResolver resolver = new LocalityResolver(repo);
     resolver.load();
-    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusMinutes defaults to 25
+    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusKm defaults to 5.0
     CommuteEstimator estimator = new CommuteEstimator(repo, props);
     estimator.reload();
     // constructor arguments follow HybridRetriever's field declaration order
@@ -136,13 +136,13 @@ class HybridRetrieverGatingTest {
   void aWiderRescueRadiusAdmitsMoreLocalities() {
     SearchIntent intent =
         SearchIntent.builder().locations(List.of(new LocationRef("Goregaon", SeedLocalities.id("Goregaon")))).build();
-    int normal = retriever.toFilters(intent).localityIds().size();
-    int wide = retriever.toFiltersWithRadius(intent, 45).localityIds().size();
-    // Task 2 hardcodes the nearestLocalities km ring to a literal 5.0 at both HybridRetriever call
-    // sites (grep "Task 3 replaces this literal"), so a differing radiusMinutes argument no longer
-    // changes the ring until Task 3 threads real per-rung kilometres through. Restore
-    // isGreaterThan(normal) once that lands.
-    assertThat(wide).isEqualTo(normal);
+
+    // Two explicit, different radii — not the configured defaults, which are both 5.0 and so
+    // cannot tell a wider ring from a narrower one.
+    int narrow = retriever.admittedLocalityIds(intent, 2.0).size();
+    int wide = retriever.admittedLocalityIds(intent, 8.0).size();
+
+    assertThat(wide).isGreaterThan(narrow);
   }
 
   @Test

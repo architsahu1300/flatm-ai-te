@@ -22,7 +22,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 /**
- * A named home locality admits its ~25-minute neighbourhood, ranks exact matches first, labels the
+ * A named home locality admits its ~5 km neighbourhood, ranks exact matches first, labels the
  * rest with their distance, and says so in the note. Against the deterministic seed.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
@@ -110,7 +110,7 @@ class LocationWideningIntegrationTest {
             .anySatisfy(cmp -> assertThat(cmp.detail()).contains("one of your preferred areas")));
     assertThat(nearby).isNotEmpty();
     assertThat(nearby).allSatisfy(h -> assertThat(h.commuteLabel()).contains("min from " + name));
-    assertThat(r.note()).contains("nearby areas within ~25 min");
+    assertThat(r.note()).contains("nearby areas within ~5.0 km");
   }
 
   @Test
@@ -121,7 +121,7 @@ class LocationWideningIntegrationTest {
 
     AiSearchResponse r = pipeline.search(guessed, null, null, UUID.randomUUID());
 
-    // nothing narrowed the query to a ring, so "within ~25 min" would be a claim about these rows
+    // nothing narrowed the query to a ring, so "within ~5.0 km" would be a claim about these rows
     // that the query never made true — the preferences sentence is what says something honest here
     assertThat(r.note()).doesNotContain("nearby areas within");
     assertThat(r.note()).contains("preferences, not filters").contains("area");

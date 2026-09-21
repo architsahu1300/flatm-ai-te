@@ -90,7 +90,7 @@ public class SearchPipeline {
   private record Homes(
       List<AiResult> results,
       boolean includesNearby,
-      int radiusMinutes,
+      double radiusKm,
       int exactCount,
       String rescueSummary) {}
 
@@ -105,7 +105,7 @@ public class SearchPipeline {
       Map<UUID, Integer> rungOf,
       Map<UUID, RescueLadder.Rung> rungMeta,
       List<String> reasons,
-      Integer widerRingRadiusMinutes) {
+      Double widerRingRadiusKm) {
 
     static Rescue none() {
       return new Rescue(Map.of(), Map.of(), Map.of(), List.of(), null);
@@ -125,20 +125,20 @@ public class SearchPipeline {
       List<RescueLadder.Rung> rungs,
       Set<UUID> alreadyFound,
       int minResults,
-      int defaultRadiusMinutes,
-      java.util.function.BiFunction<RescueLadder.Rung, Integer, List<Candidate>> retrieve) {
+      double defaultRadiusKm,
+      java.util.function.BiFunction<RescueLadder.Rung, Double, List<Candidate>> retrieve) {
     Map<UUID, Candidate> added = new LinkedHashMap<>();
     Map<UUID, Integer> rungOf = new LinkedHashMap<>();
     Map<UUID, RescueLadder.Rung> rungMeta = new LinkedHashMap<>();
     List<String> reasons = new ArrayList<>();
     Set<UUID> seen = new HashSet<>(alreadyFound);
-    Integer widerRingRadius = null;
+    Double widerRingRadius = null;
     int rungIndex = 1;
     for (RescueLadder.Rung rung : rungs) {
       if (seen.size() >= minResults) {
         break;
       }
-      int rungRadius = rung.radiusMinutes() == null ? defaultRadiusMinutes : rung.radiusMinutes();
+      double rungRadius = rung.radiusKm() == null ? defaultRadiusKm : rung.radiusKm();
       boolean addedAny = false;
       for (Candidate c : retrieve.apply(rung, rungRadius)) {
         if (seen.add(c.id())) {
@@ -317,7 +317,7 @@ public class SearchPipeline {
 
     Homes homes =
         target == SearchTarget.FLATMATES
-            ? new Homes(List.of(), false, 0, 0, null)
+            ? new Homes(List.of(), false, 0.0, 0, null)
             : searchHomes(intent, intentHash, viewerId, anonKey);
     List<AiResult> flatmates =
         target == SearchTarget.PROPERTIES ? List.of() : searchFlatmates(intent, intentHash, viewerId, anonKey);
@@ -329,7 +329,7 @@ public class SearchPipeline {
 
     String finalNote = note;
     if (homes.includesNearby()) {
-      String nearby = "Also showing nearby areas within ~%d min.".formatted(homes.radiusMinutes());
+      String nearby = "Also showing nearby areas within ~%.1f km.".formatted(homes.radiusKm());
       finalNote = note == null ? nearby : note + " " + nearby;
     }
 
@@ -380,10 +380,10 @@ public class SearchPipeline {
     if (rungOf.size() < props.getSearch().getMinResults()) {
       rescue =
           walkLadder(
-              RescueLadder.rungs(intent, props.getSearch().getRescueRadiusMinutes()),
+              RescueLadder.rungs(intent, props.getSearch().getEscalationRadiusKm()),
               rungOf.keySet(),
               props.getSearch().getMinResults(),
-              props.getSearch().getNearbyRadiusMinutes(),
+              props.getSearch().getNearbyRadiusKm(),
               (rung, rungRadius) -> retriever.retrieveListings(rung.intent(), rungRadius));
       byId.putAll(rescue.added());
       rungOf.putAll(rescue.rungOf());
@@ -392,7 +392,7 @@ public class SearchPipeline {
     List<String> rescueReasons = rescue.reasons();
 
     if (byId.isEmpty()) {
-      return new Homes(List.of(), false, 0, 0, null);
+      return new Homes(List.of(), false, 0.0, 0, null);
     }
     List<Listing> hydrated = listingQueryService.hydrate(new ArrayList<>(byId.keySet()));
 
@@ -412,12 +412,16 @@ public class SearchPipeline {
     Set<UUID> preferred = new HashSet<>(retriever.requestedLocalityIds(intent));
     boolean commuteIntent = intent.commuteTo() != null && intent.commuteTo().localityId() != null;
     UUID commuteAnchor = commuteIntent ? intent.commuteTo().localityId() : null;
-    int radius =
+    // ListingCandidate.radiusMinutes is the location score's minutes-based decay denominator — a
+    // stated commute cap is already minutes; a locations-based search converts the configured km
+    // ring through Mumbai's calibration, the same "how far is far" scale the decay always used.
+    int decayMinutes =
         commuteIntent
             ? (intent.commuteTo().maxMinutes() == null
                 ? SearchIntent.DEFAULT_COMMUTE_MINUTES
                 : intent.commuteTo().maxMinutes())
-            : props.getSearch().getNearbyRadiusMinutes();
+            : CommuteEstimator.minutesForKm(
+                props.getSearch().getNearbyRadiusKm(), props.getGeo().calibrationFor(null));
 
     record Row(
         Listing listing,
@@ -461,7 +465,7 @@ public class SearchPipeline {
               commuteMinutes,
               anchorName,
               commuteIntent,
-              radius,
+              decayMinutes,
               inPreferred);
       rows.add(
           new Row(
@@ -480,7 +484,7 @@ public class SearchPipeline {
         Comparator.comparingInt(Row::rung)
             .thenComparing(Comparator.comparingInt((Row r) -> r.scored().matchScore()).reversed()));
     List<Row> top = rows.stream().limit(RESULT_LIMIT).toList();
-    // "Also showing nearby areas within ~N min" is a claim about where these rows came from, so it
+    // "Also showing nearby areas within ~N km" is a claim about where these rows came from, so it
     // is only said when it is true. A soft `locations` puts no locality in the WHERE at all, so the
     // page is Mumbai-wide and no radius describes it — the "preferences, not filters" sentence
     // covers that case and says something the query actually made true. And when the wider-ring
@@ -490,8 +494,8 @@ public class SearchPipeline {
             && !commuteIntent
             && !preferred.isEmpty()
             && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
-    int nearbyRadius =
-        rescue.widerRingRadiusMinutes() == null ? radius : rescue.widerRingRadiusMinutes();
+    double nearbyRadiusKm =
+        rescue.widerRingRadiusKm() == null ? props.getSearch().getNearbyRadiusKm() : rescue.widerRingRadiusKm();
 
     long llmStart = System.currentTimeMillis();
     Map<UUID, Explanation> explanations =
@@ -546,7 +550,7 @@ public class SearchPipeline {
               nearMiss,
               nearMissReason));
     }
-    return new Homes(out, includesNearby, nearbyRadius, exactCount, rescueSummary);
+    return new Homes(out, includesNearby, nearbyRadiusKm, exactCount, rescueSummary);
   }
 
   /**

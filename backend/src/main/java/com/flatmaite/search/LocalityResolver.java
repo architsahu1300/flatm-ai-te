@@ -52,6 +52,7 @@ public class LocalityResolver {
   // generation of the gazetteer rather than racing a clear()-then-repopulate in place.
   private volatile Map<String, List<UUID>> byPhrase = new LinkedHashMap<>();
   private volatile Map<UUID, String> nameById = new LinkedHashMap<>();
+  private volatile Map<UUID, String> cityById = new LinkedHashMap<>();
   private volatile List<Locality> loaded = new ArrayList<>();
   private final AtomicLong version = new AtomicLong();
 
@@ -59,10 +60,12 @@ public class LocalityResolver {
   void load() {
     Map<String, List<UUID>> newByPhrase = new LinkedHashMap<>();
     Map<UUID, String> newNameById = new LinkedHashMap<>();
+    Map<UUID, String> newCityById = new LinkedHashMap<>();
     List<Locality> newLoaded = new ArrayList<>();
     for (Locality l : localities.findAll()) {
       newLoaded.add(l);
       newNameById.put(l.getId(), l.getName());
+      newCityById.put(l.getId(), l.getCity());
       index(newByPhrase, l.getName(), l.getId());
       for (String alias : l.getAliases()) {
         index(newByPhrase, alias, l.getId());
@@ -70,6 +73,7 @@ public class LocalityResolver {
     }
     byPhrase = newByPhrase;
     nameById = newNameById;
+    cityById = newCityById;
     loaded = newLoaded;
     version.incrementAndGet();
   }
@@ -173,6 +177,11 @@ public class LocalityResolver {
 
   public String nameOf(UUID id) {
     return nameById.getOrDefault(id, "Mumbai");
+  }
+
+  /** The city a locality belongs to, or null when the id is unknown — callers fall back themselves. */
+  public String cityOf(UUID id) {
+    return cityById.get(id);
   }
 
   /** "Name (alias, alias)" per locality — the controlled vocabulary handed to the intent prompt. */

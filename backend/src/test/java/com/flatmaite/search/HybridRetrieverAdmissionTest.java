@@ -2,6 +2,7 @@ package com.flatmaite.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -22,23 +23,27 @@ class HybridRetrieverAdmissionTest {
   private final UUID malad = UUID.nameUUIDFromBytes("Malad".getBytes());
   private final UUID bkc = UUID.nameUUIDFromBytes("BKC".getBytes());
   private final UUID bandra = UUID.nameUUIDFromBytes("Bandra".getBytes());
+  private final UUID colaba = UUID.nameUUIDFromBytes("Colaba".getBytes());
 
   private HybridRetriever retriever;
 
   @BeforeEach
   void setUp() {
     CommuteEstimator estimator = mock(CommuteEstimator.class);
-    // HybridRetriever currently calls nearestLocalities with a hardcoded 5.0 km literal (Task 3
-    // replaces it with real per-ring kilometres), so both stubs key off that same literal.
+    // The requested-locality ring is admitted at the caller's km argument directly, which defaults
+    // to props.getSearch().getNearbyRadiusKm() (5.0).
     when(estimator.nearestLocalities(eq(goregaon), eq(5.0), anyInt()))
         .thenReturn(
             List.of(
                 new CommuteEstimator.Nearby(ramMandir, 1.2, 17),
                 new CommuteEstimator.Nearby(malad, 1.4, 18)));
-    when(estimator.nearestLocalities(eq(bkc), eq(5.0), anyInt()))
+    // The commute-anchor ring is admitted at a km budget derived from the stated minutes through
+    // Mumbai's default calibration (unknown city here): (20 - 8 overhead) / 60 * 20 kmph / 1.4
+    // circuity ≈ 2.857 km.
+    when(estimator.nearestLocalities(eq(bkc), doubleThat(km -> Math.abs(km - 2.857142857142857) < 0.0001), anyInt()))
         .thenReturn(List.of(new CommuteEstimator.Nearby(bandra, 0.9, 12)));
     LocalityResolver resolver = mock(LocalityResolver.class);
-    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusMinutes defaults to 25
+    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusKm defaults to 5.0
     // constructor arguments follow HybridRetriever's field declaration order
     retriever = new HybridRetriever(null, null, estimator, resolver, props);
   }
@@ -51,9 +56,26 @@ class HybridRetrieverAdmissionTest {
   }
 
   @Test
-  void widened_admitsRequestedFirst_thenNearbyByMinutes() {
+  void widened_admitsRequestedFirst_thenNearbyByKm() {
     assertThat(retriever.admittedLocalityIds(homeIn(goregaon, "Goregaon")))
         .containsExactly(goregaon, ramMandir, malad);
+  }
+
+  @Test
+  void aNamedLocalityAdmitsEverythingWithinTheKilometreRing() {
+    SearchIntent intent = homeIn(goregaon, "Goregaon");
+
+    List<UUID> admitted = retriever.admittedLocalityIds(intent, 5.0);
+
+    assertThat(admitted).contains(goregaon, malad); // Malad is ~2.4 km away
+    assertThat(admitted).doesNotContain(colaba); // Colaba is ~25 km away
+  }
+
+  @Test
+  void aZeroRadiusAdmitsOnlyTheRequestedLocality() {
+    SearchIntent intent = homeIn(goregaon, "Goregaon");
+
+    assertThat(retriever.admittedLocalityIds(intent, 0.0)).containsExactly(goregaon);
   }
 
   @Test

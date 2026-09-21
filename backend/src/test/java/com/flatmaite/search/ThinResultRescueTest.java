@@ -28,16 +28,16 @@ class ThinResultRescueTest {
             .furnished(Furnishing.FULLY_FURNISHED)
             .build();
 
-    List<RescueLadder.Rung> rungs = RescueLadder.rungs(intent, 45);
+    List<RescueLadder.Rung> rungs = RescueLadder.rungs(intent, 45.0);
 
     assertThat(rungs.get(0).slot()).isNull();
-    assertThat(rungs.get(0).radiusMinutes()).isEqualTo(45);
+    assertThat(rungs.get(0).radiusKm()).isEqualTo(45.0);
   }
 
   @Test
   void withNoPlaceNamed_theLadderStartsByDroppingAFilter() {
     SearchIntent intent = SearchIntent.builder().budgetMax(30000).build();
-    assertThat(RescueLadder.rungs(intent, 45).get(0).slot()).isEqualTo("budgetMax");
+    assertThat(RescueLadder.rungs(intent, 45.0).get(0).slot()).isEqualTo("budgetMax");
   }
 
   @Test
@@ -50,7 +50,7 @@ class ThinResultRescueTest {
             .confidence(Map.of("budgetMax", 1.0, "furnished", 0.8, "roomType", 0.8))
             .build();
 
-    assertThat(RescueLadder.rungs(intent, 45))
+    assertThat(RescueLadder.rungs(intent, 45.0))
         .extracting(RescueLadder.Rung::slot)
         .containsExactly("roomType", "furnished", "budgetMax"); // 0.8 ties break in GATED_SLOTS order
   }
@@ -63,7 +63,7 @@ class ThinResultRescueTest {
             .verifiedOnly(true)
             .budgetMax(30000)
             .build();
-    assertThat(RescueLadder.rungs(intent, 45))
+    assertThat(RescueLadder.rungs(intent, 45.0))
         .extracting(RescueLadder.Rung::slot)
         .containsExactly("budgetMax");
   }
@@ -76,7 +76,7 @@ class ThinResultRescueTest {
             .budgetMax(30000)
             .confidence(Map.of("roomType", 0.5))
             .build();
-    assertThat(RescueLadder.rungs(intent, 45))
+    assertThat(RescueLadder.rungs(intent, 45.0))
         .extracting(RescueLadder.Rung::slot)
         .containsExactly("budgetMax");
   }
@@ -86,7 +86,7 @@ class ThinResultRescueTest {
     SearchIntent intent =
         SearchIntent.builder().budgetMax(30000).furnished(Furnishing.FULLY_FURNISHED).build();
     RescueLadder.Rung budget =
-        RescueLadder.rungs(intent, 45).stream().filter(r -> "budgetMax".equals(r.slot())).findFirst().orElseThrow();
+        RescueLadder.rungs(intent, 45.0).stream().filter(r -> "budgetMax".equals(r.slot())).findFirst().orElseThrow();
 
     assertThat(budget.intent().budgetMax()).isNull();
     assertThat(budget.intent().furnished()).isEqualTo(Furnishing.FULLY_FURNISHED);
@@ -94,12 +94,12 @@ class ThinResultRescueTest {
 
   @Test
   void anIntentWithNothingToRelax_hasNoLadder() {
-    assertThat(RescueLadder.rungs(SearchIntent.builder().build(), 45)).isEmpty();
+    assertThat(RescueLadder.rungs(SearchIntent.builder().build(), 45.0)).isEmpty();
   }
 
   @Test
   void aWiderRingReasonNeverClaimsADistanceItDoesNotHave() {
-    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45, "further out");
+    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45.0, "further out");
 
     String unresolved =
         SearchPipeline.nearMissReason(ring, null, "your area", false, SearchIntent.builder().build());
@@ -110,7 +110,7 @@ class ThinResultRescueTest {
 
   @Test
   void aWiderRingReasonReadsToForACommuteAndFromForAHomeArea() {
-    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45, "further out");
+    RescueLadder.Rung ring = new RescueLadder.Rung(null, SearchIntent.builder().build(), 45.0, "further out");
     SearchIntent empty = SearchIntent.builder().build();
 
     assertThat(SearchPipeline.nearMissReason(ring, 12, "BKC", true, empty)).isEqualTo("~12 min to BKC");
@@ -145,8 +145,8 @@ class ThinResultRescueTest {
 
   private static final SearchIntent ANY = SearchIntent.builder().build();
 
-  private static RescueLadder.Rung rung(String slot, Integer radius, String reason) {
-    return new RescueLadder.Rung(slot, ANY, radius, reason);
+  private static RescueLadder.Rung rung(String slot, Double radiusKm, String reason) {
+    return new RescueLadder.Rung(slot, ANY, radiusKm, reason);
   }
 
   private static HybridRetriever.Candidate candidate(UUID id) {
@@ -163,14 +163,14 @@ class ThinResultRescueTest {
     UUID already = UUID.randomUUID();
     UUID fresh = UUID.randomUUID();
     List<RescueLadder.Rung> rungs =
-        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget"));
+        List.of(rung(null, 45.0, "further out"), rung("budgetMax", null, "budget"));
 
     SearchPipeline.Rescue walk =
         SearchPipeline.walkLadder(
             rungs,
             Set.of(already),
             6,
-            25,
+            25.0,
             (r, radius) -> "further out".equals(r.reason()) ? found(already) : found(fresh));
 
     // rung 1 re-found only what we already had, so it contributed nothing and is not a reason
@@ -178,14 +178,14 @@ class ThinResultRescueTest {
     assertThat(walk.added()).containsOnlyKeys(fresh);
     // and the rung index still counts every rung walked, so the second rung is rung 2
     assertThat(walk.rungOf()).containsEntry(fresh, 2);
-    assertThat(walk.widerRingRadiusMinutes()).isNull();
+    assertThat(walk.widerRingRadiusKm()).isNull();
   }
 
   @Test
   void theWalkStopsAsSoonAsThePageIsNoLongerThin() {
     List<UUID> ids = java.util.stream.Stream.generate(UUID::randomUUID).limit(6).toList();
     List<RescueLadder.Rung> rungs =
-        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget"));
+        List.of(rung(null, 45.0, "further out"), rung("budgetMax", null, "budget"));
     List<String> asked = new java.util.ArrayList<>();
 
     SearchPipeline.Rescue walk =
@@ -193,7 +193,7 @@ class ThinResultRescueTest {
             rungs,
             Set.of(ids.get(0), ids.get(1)),
             4,
-            25,
+            25.0,
             (r, radius) -> {
               asked.add(r.reason());
               return found(ids.get(2), ids.get(3), ids.get(4));
@@ -202,7 +202,7 @@ class ThinResultRescueTest {
     // the first rung took the count from 2 to 5, past the minimum of 4 — the second is never tried
     assertThat(asked).containsExactly("further out");
     assertThat(walk.reasons()).containsExactly("further out");
-    assertThat(walk.widerRingRadiusMinutes()).isEqualTo(45);
+    assertThat(walk.widerRingRadiusKm()).isEqualTo(45.0);
   }
 
   @Test
@@ -213,7 +213,7 @@ class ThinResultRescueTest {
 
     SearchPipeline.Rescue walk =
         SearchPipeline.walkLadder(
-            rungs, Set.of(already), 6, 25, (r, radius) -> "budget".equals(r.reason()) ? found(one) : found());
+            rungs, Set.of(already), 6, 25.0, (r, radius) -> "budget".equals(r.reason()) ? found(one) : found());
 
     // both rungs were walked, the page is still short of 6, and the one find survives
     assertThat(walk.added()).containsOnlyKeys(one);
@@ -222,28 +222,28 @@ class ThinResultRescueTest {
 
   @Test
   void aRungWithNoRadiusOfItsOwn_retrievesAtTheConfiguredNearbyRadius() {
-    List<Integer> radii = new java.util.ArrayList<>();
+    List<Double> radii = new java.util.ArrayList<>();
 
     SearchPipeline.walkLadder(
-        List.of(rung(null, 45, "further out"), rung("budgetMax", null, "budget")),
+        List.of(rung(null, 45.0, "further out"), rung("budgetMax", null, "budget")),
         Set.of(),
         99,
-        25,
+        25.0,
         (r, radius) -> {
           radii.add(radius);
           return found(UUID.randomUUID());
         });
 
-    assertThat(radii).containsExactly(45, 25);
+    assertThat(radii).containsExactly(45.0, 25.0);
   }
 
   @Test
   void anEmptyLadderAddsNothing() {
     SearchPipeline.Rescue walk =
-        SearchPipeline.walkLadder(List.of(), Set.of(), 6, 25, (r, radius) -> found(UUID.randomUUID()));
+        SearchPipeline.walkLadder(List.of(), Set.of(), 6, 25.0, (r, radius) -> found(UUID.randomUUID()));
 
     assertThat(walk.added()).isEmpty();
     assertThat(walk.reasons()).isEmpty();
-    assertThat(walk.widerRingRadiusMinutes()).isNull();
+    assertThat(walk.widerRingRadiusKm()).isNull();
   }
 }
