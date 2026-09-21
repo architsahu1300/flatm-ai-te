@@ -12,9 +12,26 @@ import org.junit.jupiter.api.Test;
 class SeedLocalitiesTest {
 
   @Test
-  void thirtyEightLocalities_withUniqueNames() {
-    assertThat(SeedLocalities.ALL).hasSize(38);
-    assertThat(SeedLocalities.ALL.stream().map(SeedLocalities.Seed::name).distinct()).hasSize(38);
+  void theGazetteerCoversFiftyNineMumbaiLocalities() {
+    assertThat(SeedLocalities.ALL).hasSize(59);
+    assertThat(SeedLocalities.ALL.stream().map(SeedLocalities.Seed::name).distinct()).hasSize(59);
+    assertThat(SeedLocalities.ALL).allSatisfy(s -> assertThat(s.city()).isEqualTo("Mumbai"));
+  }
+
+  @Test
+  void theLocalitiesTheReportedBugNeeded() {
+    List<String> names = SeedLocalities.ALL.stream().map(SeedLocalities.Seed::name).toList();
+    assertThat(names).contains("Kandivali", "Borivali", "Dahisar", "Mira Road", "Versova");
+  }
+
+  @Test
+  void everyCentroidIsInsideTheMumbaiMetropolitanRegion() {
+    assertThat(SeedLocalities.ALL)
+        .allSatisfy(
+            s -> {
+              assertThat(s.lat()).isBetween(18.85, 19.35);
+              assertThat(s.lng()).isBetween(72.75, 73.15);
+            });
   }
 
   @Test
@@ -26,7 +43,7 @@ class SeedLocalitiesTest {
   @Test
   void entities_carryNameAliasesCoordinatesAndDeterministicIds() {
     List<Locality> all = SeedLocalities.entities();
-    assertThat(all).hasSize(38);
+    assertThat(all).hasSize(59);
     Locality bkc = all.stream().filter(l -> l.getName().equals("BKC")).findFirst().orElseThrow();
     assertThat(bkc.getId()).isEqualTo(SeedLocalities.id("BKC"));
     assertThat(bkc.getAliases()).contains("bandra kurla complex");

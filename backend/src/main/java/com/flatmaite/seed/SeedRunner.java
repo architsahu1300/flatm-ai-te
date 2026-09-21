@@ -121,8 +121,8 @@ public class SeedRunner implements ApplicationRunner {
   private final Random rng = new Random(42);
   private final Faker faker = new Faker(new Locale("en", "IND"), new Random(42));
 
-  private static final int USER_COUNT = 54;
-  private static final int LISTING_COUNT = 80;
+  private static final int USER_COUNT = 120;
+  private static final int LISTING_COUNT = 240;
   private static final int FLATMATE_COUNT = 35;
   private static final int IMAGE_COUNT = 15;
 
@@ -418,13 +418,14 @@ public class SeedRunner implements ApplicationRunner {
   private List<Listing> seedListings(List<User> allUsers, List<Locality> locs, List<Amenity> amens) {
     List<Listing> out = new ArrayList<>();
     List<UUID> expectedImageIds = new ArrayList<>();
+    // same 29:16:16:13:6 mix as the original 80-listing seed, scaled 3x to fill LISTING_COUNT.
     ListingType[] types = new ListingType[LISTING_COUNT];
     int idx = 0;
-    for (int i = 0; i < 29; i++) types[idx++] = ListingType.PRIVATE_ROOM;
-    for (int i = 0; i < 16; i++) types[idx++] = ListingType.SHARED_ROOM;
-    for (int i = 0; i < 16; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
-    for (int i = 0; i < 13; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
-    for (int i = 0; i < 6; i++) types[idx++] = ListingType.REPLACEMENT;
+    for (int i = 0; i < 87; i++) types[idx++] = ListingType.PRIVATE_ROOM;
+    for (int i = 0; i < 48; i++) types[idx++] = ListingType.SHARED_ROOM;
+    for (int i = 0; i < 48; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
+    for (int i = 0; i < 39; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
+    for (int i = 0; i < 18; i++) types[idx++] = ListingType.REPLACEMENT;
 
     for (int i = 0; i < LISTING_COUNT; i++) {
       ListingType type = types[i];
