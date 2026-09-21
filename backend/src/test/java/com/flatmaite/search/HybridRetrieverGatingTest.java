@@ -34,9 +34,9 @@ class HybridRetrieverGatingTest {
     Mockito.when(repo.findAll()).thenReturn(SeedLocalities.entities());
     LocalityResolver resolver = new LocalityResolver(repo);
     resolver.load();
-    CommuteEstimator estimator = new CommuteEstimator(repo);
-    estimator.reload();
     FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusMinutes defaults to 25
+    CommuteEstimator estimator = new CommuteEstimator(repo, props);
+    estimator.reload();
     // constructor arguments follow HybridRetriever's field declaration order
     retriever = new HybridRetriever(null, null, estimator, resolver, props);
   }
@@ -138,7 +138,11 @@ class HybridRetrieverGatingTest {
         SearchIntent.builder().locations(List.of(new LocationRef("Goregaon", SeedLocalities.id("Goregaon")))).build();
     int normal = retriever.toFilters(intent).localityIds().size();
     int wide = retriever.toFiltersWithRadius(intent, 45).localityIds().size();
-    assertThat(wide).isGreaterThan(normal);
+    // Task 2 hardcodes the nearestLocalities km ring to a literal 5.0 at both HybridRetriever call
+    // sites (grep "Task 3 replaces this literal"), so a differing radiusMinutes argument no longer
+    // changes the ring until Task 3 threads real per-rung kilometres through. Restore
+    // isGreaterThan(normal) once that lands.
+    assertThat(wide).isEqualTo(normal);
   }
 
   @Test

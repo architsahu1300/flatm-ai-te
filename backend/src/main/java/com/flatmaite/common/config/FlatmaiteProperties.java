@@ -1,6 +1,8 @@
 package com.flatmaite.common.config;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -15,7 +17,11 @@ public class FlatmaiteProperties {
   private Google google = new Google();
   private Storage storage = new Storage();
   private Search search = new Search();
+  private Geo geo = new Geo();
   private String frontendUrl = "http://localhost:3000";
+
+  /** Per-city travel calibration: road-circuity multiplier, effective speed, fixed overhead. */
+  public record Calibration(double roadCircuity, double speedKmph, int overheadMin) {}
 
   @Getter
   @Setter
@@ -67,5 +73,26 @@ public class FlatmaiteProperties {
 
     /** The second ring the rescue ladder reaches for before it starts dropping filters. */
     private int rescueRadiusMinutes = 45;
+  }
+
+  /** Per-city commute calibration. Mumbai's numbers are the default for any city not listed. */
+  @Getter
+  @Setter
+  public static class Geo {
+    private static final Calibration MUMBAI = new Calibration(1.4, 20.0, 8);
+
+    /** city name (case-insensitive) → calibration; Mumbai's values when absent or unknown. */
+    private Map<String, Calibration> calibration = new LinkedHashMap<>();
+
+    public Calibration calibrationFor(String city) {
+      if (city == null) {
+        return MUMBAI;
+      }
+      return calibration.entrySet().stream()
+          .filter(e -> e.getKey().equalsIgnoreCase(city))
+          .map(Map.Entry::getValue)
+          .findFirst()
+          .orElse(MUMBAI);
+    }
   }
 }

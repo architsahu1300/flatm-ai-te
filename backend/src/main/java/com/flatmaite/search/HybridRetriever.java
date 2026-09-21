@@ -438,7 +438,8 @@ public class HybridRetriever {
       admitted.addAll(requested);
       if (radiusMinutes != null) {
         for (UUID id : requested) {
-          for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusMinutes, Integer.MAX_VALUE)) {
+          // Task 3 replaces this literal
+          for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, 5.0, Integer.MAX_VALUE)) {
             nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
           }
         }
@@ -448,7 +449,8 @@ public class HybridRetriever {
     UUID anchor = commuteMinutes == null ? null : commuteAnchor(intent);
     if (anchor != null) {
       nearbyMinutes.merge(anchor, 0, Math::min);
-      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, commuteMinutes, Integer.MAX_VALUE)) {
+      // Task 3 replaces this literal
+      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, 5.0, Integer.MAX_VALUE)) {
         nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
       }
     }

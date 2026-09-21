@@ -28,10 +28,15 @@ class HybridRetrieverAdmissionTest {
   @BeforeEach
   void setUp() {
     CommuteEstimator estimator = mock(CommuteEstimator.class);
-    when(estimator.nearestLocalities(eq(goregaon), eq(25), anyInt()))
-        .thenReturn(List.of(new CommuteEstimator.Nearby(ramMandir, 17), new CommuteEstimator.Nearby(malad, 18)));
-    when(estimator.nearestLocalities(eq(bkc), eq(20), anyInt()))
-        .thenReturn(List.of(new CommuteEstimator.Nearby(bandra, 12)));
+    // HybridRetriever currently calls nearestLocalities with a hardcoded 5.0 km literal (Task 3
+    // replaces it with real per-ring kilometres), so both stubs key off that same literal.
+    when(estimator.nearestLocalities(eq(goregaon), eq(5.0), anyInt()))
+        .thenReturn(
+            List.of(
+                new CommuteEstimator.Nearby(ramMandir, 1.2, 17),
+                new CommuteEstimator.Nearby(malad, 1.4, 18)));
+    when(estimator.nearestLocalities(eq(bkc), eq(5.0), anyInt()))
+        .thenReturn(List.of(new CommuteEstimator.Nearby(bandra, 0.9, 12)));
     LocalityResolver resolver = mock(LocalityResolver.class);
     FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusMinutes defaults to 25
     // constructor arguments follow HybridRetriever's field declaration order
