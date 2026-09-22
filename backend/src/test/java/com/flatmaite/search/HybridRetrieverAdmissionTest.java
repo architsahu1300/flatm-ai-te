@@ -115,11 +115,13 @@ class HybridRetrieverAdmissionTest {
   }
 
   @Test
-  void budgetRange_carriesBothBounds_ceilingKeepsItsHeadroom() {
+  void budgetRange_carriesBothBounds_exactly_becauseTheHeadroomIsItsOwnTierNow() {
     SearchIntent intent =
         homeIn(goregaon, "Goregaon").toBuilder().budgetMin(20000).budgetMax(30000).build();
 
     assertThat(retriever.toFilters(intent).budgetMin()).isEqualTo(20000);
-    assertThat(retriever.toFilters(intent).budgetMax()).isEqualTo(33000); // 10% headroom, ceiling only
+    // the ×1.1 that used to ride on every query is RescueLadder's OVER_BUDGET tier, and only that
+    // tier's own block is labelled as over budget — a base query returns only what fits (WS6 §4.5)
+    assertThat(retriever.toFilters(intent).budgetMax()).isEqualTo(30000);
   }
 }

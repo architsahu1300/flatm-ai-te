@@ -57,7 +57,7 @@ class HybridRetrieverFiltersTest {
     assertThat(intent.commuteTo().maxMinutes()).isEqualTo(20);
 
     ListingFilters filters = retriever.toFilters(intent);
-    assertThat(filters.budgetMax()).isEqualTo(27500); // 25000 * 1.1 headroom
+    assertThat(filters.budgetMax()).isEqualTo(25000); // exactly what was asked; the band is a tier
     assertThat(filters.budgetMin()).isNull();
   }
 

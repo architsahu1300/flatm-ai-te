@@ -74,7 +74,7 @@ class SearchPipelineIntegrationTest {
     assertThat((List<?>) top.get("scoreBreakdown")).isNotEmpty();
     assertThat((List<?>) top.get("matchReasons")).isNotEmpty();
     // ranked: scores non-increasing among the exact matches. A thin exact page (this seed's BKC
-    // results land just under MIN_RESULTS) tops itself up with a rescue rung near miss, which sorts
+    // results land just under MIN_RESULTS) tops itself up with a later-tier near miss, which sorts
     // below every exact match regardless of score — so the non-increasing check applies only to the
     // exact-match prefix, not across that boundary.
     for (int i = 1; i < homes.size(); i++) {
@@ -185,10 +185,10 @@ class SearchPipelineIntegrationTest {
   @Test
   @Order(6)
   @SuppressWarnings("unchecked")
-  void overTightFloor_isRescuedInsteadOfOfferingOnlyARelaxer() {
-    // max seed rent is well under 200000 — this floor used to admit nothing until the user clicked
-    // a relaxer; the rescue ladder now drops the minimum itself (the only hard filter here) and
-    // tops the page up with the note explaining it, so relaxers (empty-page only) no longer fire.
+  void overTightFloor_offersACountedRelaxer_ratherThanQuietlyDroppingTheFloor() {
+    // max seed rent is well under 200000. The old ladder filled the page by dropping the minimum
+    // itself; nothing does that any longer — the floor is not distance and it is not the budget
+    // band, so it stays enforced and giving it up becomes a button the user presses.
     ResponseEntity<Map> response =
         rest.postForEntity("/api/v1/ai/search", json(Map.of("query", "flat more than 200000")), Map.class);
 
@@ -198,17 +198,21 @@ class SearchPipelineIntegrationTest {
     assertThat(intent.get("budgetMin")).isEqualTo(200000);
 
     List<Map<String, Object>> homes = (List<Map<String, Object>>) data.get("homes");
-    assertThat(homes).isNotEmpty();
-    assertThat(homes).allSatisfy(h -> assertThat(h.get("nearMiss")).isEqualTo(true));
-    assertThat(homes).allSatisfy(h -> assertThat((String) h.get("nearMissReason")).contains("minimum budget"));
-    assertThat((String) data.get("note")).contains("minimum budget");
-    assertThat((List<Map<String, Object>>) data.get("relaxers")).isEmpty();
+    assertThat(homes).isEmpty();
+    List<Map<String, Object>> relaxers = (List<Map<String, Object>>) data.get("relaxers");
+    assertThat(relaxers).isNotEmpty();
+    assertThat(relaxers)
+        .anySatisfy(
+            r -> {
+              assertThat((String) r.get("label")).containsIgnoringCase("minimum");
+              assertThat(((Number) r.get("extraResults")).longValue()).isGreaterThan(0);
+            });
   }
 
   @Test
   @Order(7)
   @SuppressWarnings("unchecked")
-  void impossibleBhk_isRescued_butTheExplicitExclusionStillHolds() {
+  void impossibleBhk_isOfferedAsARelaxer_andTheExplicitExclusionSurvivesTheOffer() {
     ResponseEntity<Map> first =
         rest.postForEntity("/api/v1/ai/search", json(Map.of("query", "flat in mumbai")), Map.class);
     Map<String, Object> firstData = (Map<String, Object>) first.getBody().get("data");
@@ -219,9 +223,10 @@ class SearchPipelineIntegrationTest {
     headers.setContentType(MediaType.APPLICATION_JSON);
     headers.add(HttpHeaders.COOKIE, freshCookie);
 
-    // bhk 99 admits nothing (seed tops out at 3) — the ladder drops it (the only impossible filter
-    // here) rather than leaving the page empty for a "Start broader" button. The exclusion is a
-    // promise (ConfidenceGate.ALWAYS_HARD) and is never on the ladder, so it must still hold.
+    // bhk 99 admits nothing (seed tops out at 3). The old ladder dropped it to fill the page; now
+    // size is neither distance nor the budget band, so it stays enforced, the page stays honestly
+    // empty and the compromise is offered as a counted relaxer instead. The exclusion is a promise
+    // (ConfidenceGate.ALWAYS_HARD), so even the offer must still carry it.
     Map<String, Object> excludeRef = new java.util.HashMap<>();
     excludeRef.put("name", "Powai");
     excludeRef.put("localityId", null);
@@ -237,26 +242,33 @@ class SearchPipelineIntegrationTest {
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     Map<String, Object> data = (Map<String, Object>) response.getBody().get("data");
     List<Map<String, Object>> homes = (List<Map<String, Object>>) data.get("homes");
-    assertThat(homes).isNotEmpty();
-    assertThat(homes).allSatisfy(h -> assertThat(h.get("nearMiss")).isEqualTo(true));
-    assertThat(homes)
-        .allSatisfy(
-            h -> {
-              Map<String, Object> home = (Map<String, Object>) h.get("home");
-              assertThat(home.get("localityName")).isNotEqualTo("Powai");
+    assertThat(homes).isEmpty();
+
+    List<Map<String, Object>> relaxers = (List<Map<String, Object>>) data.get("relaxers");
+    assertThat(relaxers).isNotEmpty();
+    assertThat(relaxers)
+        .anySatisfy(
+            r -> {
+              // the size relaxer clears bhk and nothing else — and never the exclusion
+              Map<String, Object> relaxed = (Map<String, Object>) r.get("relaxedIntent");
+              assertThat(relaxed.get("bhk")).isNull();
+              assertThat((List<Map<String, Object>>) relaxed.get("excludeLocations"))
+                  .extracting(l -> l.get("name"))
+                  .contains("Powai");
             });
-    assertThat((String) data.get("note")).contains("size");
   }
 
   @Test
-  @SuppressWarnings("unchecked")
   void anOverTightSearchIsToppedUpWithMarkedNearMisses() {
+    // Colaba's only seed listing is ₹35,500, so a ₹33,000 search has nothing under budget there or
+    // within five kilometres of it. The page is topped up from the labelled +10% band and from
+    // nowhere else.
     SearchIntent intent =
         SearchIntent.builder()
             .searchTarget(SearchTarget.PROPERTIES)
             .locations(List.of(new SearchIntent.LocationRef("Colaba", null)))
-            .budgetMax(9000)
-            .originalQuery("flat in colaba under 9k")
+            .budgetMax(33000)
+            .originalQuery("flat in colaba under 33000")
             .build();
 
     SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
@@ -275,6 +287,78 @@ class SearchPipelineIntegrationTest {
     }
     assertThat(res.homes().stream().filter(SearchDtos.AiResult::nearMiss))
         .allSatisfy(r -> assertThat(r.nearMissReason()).isNotBlank());
+    // nothing on the page is over budget without saying so, and nothing is over the band at all
+    assertThat(res.homes())
+        .allSatisfy(
+            r -> {
+              int rent = r.home().rentMonthly();
+              assertThat(rent).isLessThanOrEqualTo(36300); // 33000 × 1.1, the band's own ceiling
+              if (rent > 33000) {
+                assertThat(r.nearMiss()).isTrue();
+                assertThat(r.nearMissReason()).contains("over your budget");
+              }
+            });
+  }
+
+  @Test
+  void aSearchWithNothingInTheBandStaysEmpty_andOffersACountedRaise() {
+    // the same place with a budget nothing can reach: no tier may invent a page out of it
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .locations(List.of(new SearchIntent.LocationRef("Colaba", null)))
+            .budgetMax(9000)
+            .originalQuery("flat in colaba under 9k")
+            .build();
+
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+
+    assertThat(res.homes()).isEmpty();
+    assertThat(res.relaxers()).isNotEmpty();
+    assertThat(res.relaxers())
+        .anySatisfy(
+            r -> {
+              assertThat(r.label()).containsIgnoringCase("budget");
+              assertThat(r.extraResults()).isGreaterThan(0);
+              assertThat(r.relaxedIntent().budgetMax()).isGreaterThan(9000);
+            });
+    // the offer is an offer: the user's own budget has not moved
+    assertThat(res.intent().budgetMax()).isEqualTo(9000);
+  }
+
+  @Test
+  void theReportedBug_aKandivaliSearchNeverSmugglesInKurlaOrGoregaon() {
+    // "single sharing room in Kandivali under 15k" used to return a ₹12,000 room in Kurla and a
+    // ₹14,500 room in Goregaon with nothing saying so. Kandivali has exactly one seed listing, so
+    // the page is thin and the ladder does fire — but only out to five kilometres, and every row it
+    // adds says how far away it is.
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .locations(List.of(new SearchIntent.LocationRef("Kandivali", null)))
+            .budgetMax(15000)
+            .originalQuery("single sharing room in Kandivali under 15k")
+            .build();
+
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+
+    assertThat(res.homes()).isNotEmpty();
+    assertThat(res.homes())
+        .allSatisfy(
+            r -> {
+              assertThat(r.home().localityName()).isNotEqualTo("Kurla");
+              // within budget exactly, or in the band and labelled as such
+              if (r.home().rentMonthly() > 15000) {
+                assertThat(r.home().rentMonthly()).isLessThanOrEqualTo(16500);
+                assertThat(r.nearMissReason()).contains("over your budget");
+              }
+              // a row from another suburb is a near miss and says where it is
+              if (!"Kandivali".equals(r.home().localityName())) {
+                assertThat(r.nearMiss()).isTrue();
+                assertThat(r.nearMissReason()).isNotBlank();
+              }
+            });
+    assertThat(res.homes().get(0).home().localityName()).isEqualTo("Kandivali");
   }
 
   @Test

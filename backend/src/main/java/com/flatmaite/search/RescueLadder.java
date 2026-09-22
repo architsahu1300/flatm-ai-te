@@ -1,45 +1,60 @@
 package com.flatmaite.search;
 
+import com.flatmaite.common.config.FlatmaiteProperties;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 /**
- * What to try, in order, when the hard-filtered page comes back thin. The widest honest move first —
- * looking further out — and only then giving up a filter, least-confident first, because the
- * constraint the reader was least sure of is the one the user will miss least. Promises
- * ({@link ConfidenceGate#ALWAYS_HARD}) are never on the ladder: a short page is better than a
- * dishonest one.
+ * What to try, in order, when the requested placement comes back thin. Exactly two things relax and
+ * both are stated on the page: first distance — moving the map is the smallest thing to give up —
+ * and only then a +10% budget band. Every other filter the reader extracted is enforced in every
+ * tier, so a filter is either enforced or visibly relaxed and never quietly dropped. Giving one up
+ * is a thing the user does by clicking a relaxer ({@link #without}), not something the system does
+ * behind their back.
  */
 public final class RescueLadder {
 
   /**
-   * @param slot the filter this rung gives up, or null for the wider-ring rung.
-   * @param radiusKm the wider-ring rung's straight-line kilometre budget, or null for a
-   *     filter-dropping rung (which retrieves at the ladder's own default radius).
+   * Which block of the page a result belongs to. Declared in the ladder's own order — nearby under
+   * budget before nearby slightly over budget — which is also the order the page presents them in,
+   * so callers may sort on it.
    */
-  public record Rung(String slot, SearchIntent intent, Double radiusKm, String reason) {}
+  public enum SearchTier {
+    EXACT,
+    NEARBY,
+    OVER_BUDGET
+  }
+
+  /**
+   * @param intent what to retrieve with — the user's own intent, except that {@code OVER_BUDGET}
+   *     carries the +10% band that the block's own heading names.
+   * @param radiusKm how far out this tier reaches, in straight-line kilometres; 0 means the
+   *     requested placement only.
+   */
+  public record Tier(SearchTier tier, SearchIntent intent, double radiusKm) {}
 
   private RescueLadder() {}
 
-  public static List<Rung> rungs(SearchIntent intent, double escalationRadiusKm) {
-    List<Rung> out = new ArrayList<>();
-    boolean hasPlace =
-        ConfidenceGate.isPresent(intent, "locations") || ConfidenceGate.isPresent(intent, "commuteTo");
-    if (hasPlace) {
-      out.add(new Rung(null, intent, escalationRadiusKm, "further out"));
+  /**
+   * The ladder for this search: the requested placement first, then its neighbourhood, then the
+   * labelled band just above the budget. A tier only exists when it could mean something — there is
+   * no distance tier without somewhere to measure from, and no band without a budget to exceed.
+   *
+   * <p>Tiers 1 and 2 carry {@code budgetMax} exactly as the user stated it. The ×1.1 headroom that
+   * used to sit inside every query is tier 3 and nothing else (spec §4.5), so a block headed as
+   * within budget holds only listings within it.
+   */
+  public static List<Tier> tiers(
+      SearchIntent intent, Placement placement, FlatmaiteProperties.Search props) {
+    List<Tier> out = new ArrayList<>();
+    out.add(new Tier(SearchTier.EXACT, intent, 0.0));
+    if (placement.placed()) {
+      out.add(new Tier(SearchTier.NEARBY, intent, props.getNearbyRadiusKm()));
     }
-    List<String> droppable =
-        SearchIntent.GATED_SLOTS.stream()
-            .filter(s -> !ConfidenceGate.ALWAYS_HARD.contains(s))
-            .filter(s -> ConfidenceGate.isPresent(intent, s))
-            .filter(s -> ConfidenceGate.isHard(intent, s))
-            .sorted(
-                Comparator.comparingDouble(intent::confidenceOf)
-                    .thenComparingInt(SearchIntent.GATED_SLOTS::indexOf))
-            .toList();
-    for (String slot : droppable) {
-      out.add(new Rung(slot, without(intent, slot), null, ConfidenceGate.label(slot)));
+    if (intent.budgetMax() != null) {
+      SearchIntent band = intent.toBuilder().budgetMax((int) (intent.budgetMax() * 1.1)).build();
+      out.add(
+          new Tier(SearchTier.OVER_BUDGET, band, placement.placed() ? props.getNearbyRadiusKm() : 0.0));
     }
     return out;
   }

@@ -60,6 +60,11 @@ public class HybridRetriever {
   /** Row attributes carried through fusion, keyed by id while the rankings are collected. */
   private record Row(UUID localityId, Double lat, Double lng) {}
 
+  /**
+   * Retrieval at the configured neighbourhood radius. The AI pipeline does not come through here —
+   * it asks for each {@link RescueLadder.Tier}'s own radius, so that the block it labels as the
+   * requested area contains only the requested area.
+   */
   @Transactional(readOnly = true)
   public List<Candidate> retrieveListings(SearchIntent intent) {
     return retrieveListings(intent, props.getSearch().getNearbyRadiusKm());
@@ -301,8 +306,10 @@ public class HybridRetriever {
 
   /**
    * Maps intent → hard filters, honouring the confidence gate: a slot the reader only inferred is
-   * left out entirely, so it ranks (via {@link MatchScorer}) instead of deleting rows. Budget keeps
-   * its ×1.1 headroom — near-misses surface as concerns.
+   * left out entirely, so it ranks (via {@link MatchScorer}) instead of deleting rows. Budget is
+   * exactly what the user said: the ×1.1 headroom that used to be applied to every query is now
+   * {@link RescueLadder.SearchTier#OVER_BUDGET}'s own labelled band (spec §4.5), because a block
+   * headed as within budget must hold only listings within it.
    *
    * @param radiusKm how far a named locality's neighbourhood reaches, in straight-line kilometres;
    *     0.0 = strict (alerts).
@@ -318,7 +325,8 @@ public class HybridRetriever {
       b.budgetMin(intent.budgetMin());
     }
     if (ConfidenceGate.isHard(intent, "budgetMax")) {
-      b.budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1));
+      // exactly what the user said — the +10% band is its own tier now (WS6 §4.5)
+      b.budgetMax(intent.budgetMax());
     }
     if (ConfidenceGate.isHard(intent, "maxDeposit")) {
       b.maxDeposit(intent.maxDeposit());

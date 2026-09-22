@@ -86,7 +86,7 @@ public class SearchPipeline {
   /**
    * Ranked homes plus whether any came from outside the requested localities, and — when the
    * exact-match page came back thin — how many of {@code results} are exact ({@code exactCount})
-   * and which rescue rungs topped it up ({@code rescueSummary}, null when the ladder never fired).
+   * and which tiers topped it up ({@code rescueSummary}, null when the ladder never fired).
    */
   private record Homes(
       List<AiResult> results,
@@ -96,69 +96,73 @@ public class SearchPipeline {
       String rescueSummary) {}
 
   /**
-   * What walking the rescue ladder added on top of the exact page: the new candidates, which rung
-   * introduced each (1-based, matching the ladder's own order), the reasons to show for the rungs
-   * that actually contributed, and the radius of the wider-ring rung when it was one of them —
-   * which is then the honest radius to name in the "nearby areas" note.
+   * What walking the fallback ladder added on top of the exact page: the new candidates, which tier
+   * introduced each, the reasons to show for the tiers that actually contributed, and the widest
+   * ring any of them reached — which is then the honest radius to name in the "nearby areas" note.
    */
   record Rescue(
       Map<UUID, Candidate> added,
-      Map<UUID, Integer> rungOf,
-      Map<UUID, RescueLadder.Rung> rungMeta,
+      Map<UUID, RescueLadder.SearchTier> tierOf,
       List<String> reasons,
       Double widerRingRadiusKm) {
 
     static Rescue none() {
-      return new Rescue(Map.of(), Map.of(), Map.of(), List.of(), null);
+      return new Rescue(Map.of(), Map.of(), List.of(), null);
     }
   }
 
+  /** What the note calls a tier that actually contributed rows. */
+  static String tierReason(RescueLadder.SearchTier tier) {
+    return switch (tier) {
+      case EXACT -> "exact matches";
+      case NEARBY -> "further out";
+      case OVER_BUDGET -> "slightly over budget";
+    };
+  }
+
   /**
-   * Walks the rescue ladder until the page is no longer thin. Three rules live here and nowhere
+   * Walks the fallback ladder until the page is no longer thin. Three rules live here and nowhere
    * else, which is why this takes its retrieval as a function and can be tested without a database:
-   * a rung that finds nothing new is skipped silently and never named in the summary, the walk
+   * a tier that finds nothing new is skipped silently and never named in the summary, the walk
    * stops the moment {@code minResults} distinct listings are in hand, and an exhausted ladder
    * simply returns what it managed to find.
    *
-   * <p>{@code alreadyFound} is the exact (rung 0) page; it is copied, never mutated.
+   * <p>{@code tiers} are the ones after {@link RescueLadder.SearchTier#EXACT}, which the caller has
+   * already retrieved; {@code alreadyFound} is that exact page, copied and never mutated.
    */
   static Rescue walkLadder(
-      List<RescueLadder.Rung> rungs,
+      List<RescueLadder.Tier> tiers,
       Set<UUID> alreadyFound,
       int minResults,
-      double defaultRadiusKm,
-      java.util.function.BiFunction<RescueLadder.Rung, Double, List<Candidate>> retrieve) {
+      java.util.function.BiFunction<RescueLadder.Tier, Double, List<Candidate>> retrieve) {
     Map<UUID, Candidate> added = new LinkedHashMap<>();
-    Map<UUID, Integer> rungOf = new LinkedHashMap<>();
-    Map<UUID, RescueLadder.Rung> rungMeta = new LinkedHashMap<>();
+    Map<UUID, RescueLadder.SearchTier> tierOf = new LinkedHashMap<>();
     List<String> reasons = new ArrayList<>();
     Set<UUID> seen = new HashSet<>(alreadyFound);
     Double widerRingRadius = null;
-    int rungIndex = 1;
-    for (RescueLadder.Rung rung : rungs) {
+    for (RescueLadder.Tier tier : tiers) {
       if (seen.size() >= minResults) {
         break;
       }
-      double rungRadius = rung.radiusKm() == null ? defaultRadiusKm : rung.radiusKm();
       boolean addedAny = false;
-      for (Candidate c : retrieve.apply(rung, rungRadius)) {
+      for (Candidate c : retrieve.apply(tier, tier.radiusKm())) {
         if (seen.add(c.id())) {
           added.put(c.id(), c);
-          rungOf.put(c.id(), rungIndex);
-          rungMeta.put(c.id(), rung);
+          tierOf.put(c.id(), tier.tier());
           addedAny = true;
         }
       }
-      // a rung that finds nothing new is skipped silently — the ladder keeps going
+      // a tier that finds nothing new is skipped silently — the ladder keeps going
       if (addedAny) {
-        reasons.add(rung.reason());
-        if (rung.slot() == null) {
-          widerRingRadius = rungRadius;
+        reasons.add(tierReason(tier.tier()));
+        // "within ~N km" is a claim about where these rows came from: the widest ring that
+        // actually contributed is the only radius that describes all of them.
+        if (tier.radiusKm() > 0 && (widerRingRadius == null || tier.radiusKm() > widerRingRadius)) {
+          widerRingRadius = tier.radiusKm();
         }
       }
-      rungIndex++;
     }
-    return new Rescue(added, rungOf, rungMeta, reasons, widerRingRadius);
+    return new Rescue(added, tierOf, reasons, widerRingRadius);
   }
 
   // ------------------------------------------------------------- intent
@@ -364,31 +368,63 @@ public class SearchPipeline {
         finalNote);
   }
 
+  /**
+   * Where this search is anchored on the map, which is what decides whether the ladder has a
+   * distance tier to offer at all. {@link IntentLocalities} has already bound every place name it
+   * could to locality ids, so the anchor is those ids and the point at their centre; a name nothing
+   * could place left no id behind and the search is anchored nowhere, which the user is told about
+   * rather than being quietly served the whole city.
+   *
+   * <p>Only a slot that is actually filtering counts. A place the reader merely guessed at is not
+   * in the WHERE clause either (see {@link HybridRetriever#admittedLocalityIds}), so there is no
+   * ring around it to widen and no honest "within ~N km" to say about the rows. A stated commute is
+   * a place too, and it anchors the search when no home area does.
+   */
+  Placement placementOf(SearchIntent intent) {
+    if (ConfidenceGate.isHard(intent, "locations")) {
+      Placement home =
+          localityResolver.placementOf(
+              retriever.requestedLocalityIds(intent), intent.confidenceOf("locations"));
+      if (home.placed()) {
+        return home;
+      }
+    }
+    if (ConfidenceGate.isHard(intent, "commuteTo")
+        && intent.commuteTo() != null
+        && intent.commuteTo().localityId() != null) {
+      return localityResolver.placementOf(
+          List.of(intent.commuteTo().localityId()), intent.confidenceOf("commuteTo"));
+    }
+    return Placement.none();
+  }
+
   private Homes searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
-    // rung 0 = the exact, hard-filtered page, retrieved exactly as before.
+    List<RescueLadder.Tier> tiers =
+        RescueLadder.tiers(intent, placementOf(intent), props.getSearch());
+    // Tier 1 is the page itself: the requested placement only, and the budget exactly as stated.
+    // Its radius is the ladder's, not a default — a row from five kilometres away is a tier 2 row
+    // that says so, never an "exact match" the user has to discover is in another suburb.
+    RescueLadder.Tier exact = tiers.get(0);
     Map<UUID, Candidate> byId = new LinkedHashMap<>();
-    Map<UUID, Integer> rungOf = new LinkedHashMap<>();
-    Map<UUID, RescueLadder.Rung> rungMeta = new LinkedHashMap<>();
-    for (Candidate c : retriever.retrieveListings(intent)) {
+    Map<UUID, RescueLadder.SearchTier> tierOf = new LinkedHashMap<>();
+    for (Candidate c : retriever.retrieveListings(exact.intent(), exact.radiusKm())) {
       byId.putIfAbsent(c.id(), c);
-      rungOf.putIfAbsent(c.id(), 0);
+      tierOf.putIfAbsent(c.id(), exact.tier());
     }
 
-    // Thin page: walk the ladder, collecting new ids per rung, stopping as soon as we have enough
-    // or the ladder runs out. Retrieval per rung is the only repeated cost — hydration and scoring
-    // below run exactly once over the union.
+    // Thin page: walk the rest of the ladder, collecting new ids per tier, stopping as soon as we
+    // have enough or the ladder runs out. Retrieval per tier is the only repeated cost — hydration
+    // and scoring below run exactly once over the union.
     Rescue rescue = Rescue.none();
-    if (rungOf.size() < props.getSearch().getMinResults()) {
+    if (tierOf.size() < props.getSearch().getMinResults()) {
       rescue =
           walkLadder(
-              RescueLadder.rungs(intent, props.getSearch().getEscalationRadiusKm()),
-              rungOf.keySet(),
+              tiers.subList(1, tiers.size()),
+              tierOf.keySet(),
               props.getSearch().getMinResults(),
-              props.getSearch().getNearbyRadiusKm(),
-              (rung, rungRadius) -> retriever.retrieveListings(rung.intent(), rungRadius));
+              (tier, radiusKm) -> retriever.retrieveListings(tier.intent(), radiusKm));
       byId.putAll(rescue.added());
-      rungOf.putAll(rescue.rungOf());
-      rungMeta.putAll(rescue.rungMeta());
+      tierOf.putAll(rescue.tierOf());
     }
     List<String> rescueReasons = rescue.reasons();
 
@@ -431,7 +467,7 @@ public class SearchPipeline {
         Integer commute,
         String anchorName,
         boolean inPreferred,
-        int rung) {}
+        RescueLadder.SearchTier tier) {}
     List<Row> rows = new ArrayList<>();
     for (Listing l : hydrated) {
       Candidate c = byId.get(l.getId());
@@ -488,20 +524,21 @@ public class SearchPipeline {
               commuteMinutes,
               anchorName,
               inPreferred,
-              rungOf.getOrDefault(l.getId(), 0)));
+              tierOf.getOrDefault(l.getId(), RescueLadder.SearchTier.EXACT)));
     }
-    // Absolute sort, not score-based: every exact (rung 0) row outranks every near miss, whatever
-    // the scores. Within a group: score descending as the page does today; near misses additionally
-    // by rung ascending (rung 0 ties are broken by score alone, since every exact row shares rung 0).
+    // Absolute sort, not score-based: every exact row outranks every near miss, whatever the
+    // scores. Within a group: score descending as the page does today; near misses additionally in
+    // tier order — nearby under budget before nearby slightly over it, which is the order the
+    // product states them in. (EXACT ties break on score alone, since every exact row shares it.)
     rows.sort(
-        Comparator.comparingInt(Row::rung)
+        Comparator.comparingInt((Row r) -> r.tier().ordinal())
             .thenComparing(Comparator.comparingInt((Row r) -> r.scored().matchScore()).reversed()));
     List<Row> top = rows.stream().limit(RESULT_LIMIT).toList();
     // "Also showing nearby areas within ~N km" is a claim about where these rows came from, so it
     // is only said when it is true. A soft `locations` puts no locality in the WHERE at all, so the
     // page is Mumbai-wide and no radius describes it — the "preferences, not filters" sentence
-    // covers that case and says something the query actually made true. And when the wider-ring
-    // rung fired, the rows came from *its* radius, not the configured one.
+    // covers that case and says something the query actually made true. And when a distance tier
+    // fired, the rows came from *its* ring, not the configured one.
     boolean includesNearby =
         ConfidenceGate.isHard(intent, "locations")
             && !commuteIntent
@@ -528,7 +565,8 @@ public class SearchPipeline {
     Map<UUID, com.flatmaite.listing.ListingDtos.CardResponse> cards = new HashMap<>();
     listingAssembler.toCards(top.stream().map(Row::listing).toList()).forEach(card -> cards.put(card.id(), card));
 
-    int exactCount = (int) top.stream().filter(r -> r.rung() == 0).count();
+    int exactCount =
+        (int) top.stream().filter(r -> r.tier() == RescueLadder.SearchTier.EXACT).count();
     String rescueSummary = rescueReasons.isEmpty() ? null : String.join(", ", rescueReasons);
 
     List<AiResult> out = new ArrayList<>();
@@ -539,16 +577,17 @@ public class SearchPipeline {
           r.commute() == null || (!commuteIntent && r.inPreferred())
               ? null
               : "~%d min %s %s (estimate)".formatted(r.commute(), commuteIntent ? "to" : "from", r.anchorName());
-      boolean nearMiss = r.rung() > 0;
-      String nearMissReason = null;
-      if (nearMiss) {
-        RescueLadder.Rung rung = rungMeta.get(r.listing().getId());
-        nearMissReason =
-            rung == null
-                // defensive: every nearMiss row is introduced by some rung; never let a bug here 500 a search
-                ? "Nearby option"
-                : nearMissReason(rung, r.commute(), r.anchorName(), commuteIntent, intent);
-      }
+      boolean nearMiss = r.tier() != RescueLadder.SearchTier.EXACT;
+      String nearMissReason =
+          nearMiss
+              ? nearMissReason(
+                  r.tier(),
+                  r.listing().getRentMonthly(),
+                  r.commute(),
+                  r.anchorName(),
+                  commuteIntent,
+                  intent)
+              : null;
       out.add(
           new AiResult(
               "home",
@@ -567,109 +606,32 @@ public class SearchPipeline {
   }
 
   /**
-   * Why this listing is on the page although it does not match the search. Shown to users verbatim,
-   * so it states only what we actually know: a distance only when one was measured, and the slot we
-   * gave up otherwise.
+   * Why this listing is on the page although it is not a plain match. Shown to users verbatim, so
+   * it states only what this tier actually relaxed and only what we actually know: a distance when
+   * one was measured, and the size of the overshoot when the row is in the +10% band. No other
+   * relaxation can produce a row here — nothing else is relaxed without the user asking.
+   *
+   * <p>A tier-3 row is both slightly over budget and (when a place was named) possibly outside it;
+   * the money is what its block is headed by, and the distance is on the row's own commute label.
    */
   static String nearMissReason(
-      RescueLadder.Rung rung, Integer commuteMinutes, String anchorName, boolean commuteIntent, SearchIntent intent) {
-    if (rung.slot() == null) {
-      if (commuteMinutes == null) {
-        return "Outside your preferred areas";
+      RescueLadder.SearchTier tier,
+      Integer rentMonthly,
+      Integer commuteMinutes,
+      String anchorName,
+      boolean commuteIntent,
+      SearchIntent intent) {
+    if (tier == RescueLadder.SearchTier.OVER_BUDGET) {
+      if (rentMonthly == null || intent.budgetMax() == null || rentMonthly <= intent.budgetMax()) {
+        // no arithmetic we can stand behind — say the shape of the compromise, not a made-up figure
+        return "Slightly over your budget";
       }
-      return "~%d min %s %s".formatted(commuteMinutes, commuteIntent ? "to" : "from", anchorName);
+      return "₹%,d — ₹%,d over your budget".formatted(rentMonthly, rentMonthly - intent.budgetMax());
     }
-    return "%s — you asked for %s".formatted(ConfidenceGate.label(rung.slot()), droppedValueText(intent, rung.slot()));
-  }
-
-  /** Human-readable rendering of the original value a rescue rung gave up, for the near-miss reason. */
-  private static String droppedValueText(SearchIntent original, String slot) {
-    return switch (slot) {
-      case "locations" ->
-          original.locations() == null
-              ? ""
-              : original.locations().stream()
-                  .map(SearchIntent.LocationRef::name)
-                  .collect(Collectors.joining(", "));
-      case "budgetMin" -> "₹%,d".formatted(original.budgetMin());
-      case "budgetMax" -> "₹%,d".formatted(original.budgetMax());
-      case "maxDeposit" -> "₹%,d".formatted(original.maxDeposit());
-      case "roomType" -> humanizeEnum(original.roomType());
-      case "listingTypes" ->
-          original.listingTypes() == null
-              ? ""
-              : original.listingTypes().stream()
-                  .map(SearchPipeline::humanizeEnum)
-                  .collect(Collectors.joining(", "));
-      case "furnished" -> humanizeEnum(original.furnished());
-      case "bhk" -> bhkText(original.bhk());
-      case "moveInDate" -> humanizeDate(original.moveInDate());
-      case "genderPreference" -> humanizeEnum(original.genderPreference());
-      case "couplesOk" -> Boolean.TRUE.equals(original.couplesOk()) ? "couples ok" : "no couples";
-      case "amenities" -> original.amenities() == null ? "" : String.join(", ", original.amenities());
-      case "lifestyle" -> {
-        SearchIntent.Lifestyle l = original.lifestyleOrEmpty();
-        List<String> facets = new ArrayList<>();
-        if ("NO_SMOKERS".equals(l.smoking())) {
-          facets.add("no smokers");
-        } else if (l.smoking() != null) {
-          facets.add("smoking");
-        }
-        if (l.diet() != null) {
-          facets.add(l.diet().toLowerCase(Locale.ROOT).replace('_', ' '));
-        }
-        if (l.pets() != null) {
-          facets.add(l.pets().toLowerCase(Locale.ROOT).replace('_', ' '));
-        }
-        if (Boolean.TRUE.equals(l.quiet())) {
-          facets.add("quiet");
-        }
-        yield facets.isEmpty() ? "your lifestyle preferences" : String.join(", ", facets);
-      }
-      // place is a plain nullable String on the wire and can be absent even when commuteTo itself
-      // carries a localityId (a client-submitted commuteTo with no place text) — "" matches this
-      // method's own convention for "nothing to say" elsewhere in this switch, never the literal
-      // "null" rendered into "Commute — you asked for null".
-      case "commuteTo", "commuteTo.maxMinutes" ->
-          original.commuteTo() == null || original.commuteTo().place() == null
-              ? ""
-              : original.commuteTo().place();
-      default -> "";
-    };
-  }
-
-  private static String humanizeEnum(Enum<?> e) {
-    return e == null ? "" : e.name().toLowerCase(Locale.ROOT).replace('_', ' ');
-  }
-
-  private static String bhkText(SearchIntent.BhkRange bhk) {
-    if (bhk == null) {
-      return "";
+    if (commuteMinutes == null) {
+      return "Outside your preferred areas";
     }
-    if (bhk.min() != null && bhk.max() != null) {
-      return bhk.min().equals(bhk.max()) ? bhk.min() + " BHK" : bhk.min() + "-" + bhk.max() + " BHK";
-    }
-    if (bhk.min() != null) {
-      return bhk.min() + "+ BHK";
-    }
-    if (bhk.max() != null) {
-      return "up to " + bhk.max() + " BHK";
-    }
-    return "";
-  }
-
-  private static String humanizeDate(String isoDate) {
-    if (isoDate == null || isoDate.isEmpty()) {
-      return "";
-    }
-    try {
-      java.time.LocalDate date = java.time.LocalDate.parse(isoDate);
-      java.time.format.DateTimeFormatter formatter =
-          java.time.format.DateTimeFormatter.ofPattern("d MMM yyyy", Locale.ROOT);
-      return date.format(formatter);
-    } catch (Exception e) {
-      return isoDate;
-    }
+    return "~%d min %s %s".formatted(commuteMinutes, commuteIntent ? "to" : "from", anchorName);
   }
 
   /** The requested locality this candidate is closest to (by the commute estimate). */

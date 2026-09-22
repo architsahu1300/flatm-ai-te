@@ -106,8 +106,9 @@ public record SearchIntent(
   }
 
   /**
-   * Slots whose enforcement is confidence-gated, in the order used to break ties when the rescue
-   * ladder picks which filter to drop first.
+   * Slots whose enforcement is confidence-gated, in the order they are listed back to the user (the
+   * "preferences, not filters" note, and the relaxers offered when a page comes back empty). No
+   * automatic path drops one: the fallback ladder relaxes only distance and a labelled budget band.
    */
   public static final List<String> GATED_SLOTS =
       List.of(

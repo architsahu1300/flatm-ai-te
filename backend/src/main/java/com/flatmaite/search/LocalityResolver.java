@@ -232,6 +232,30 @@ public class LocalityResolver {
     return Optional.of(new Match(best.ids(), canonical(best.ids()), 0, 0, key, best.similarity()));
   }
 
+  /**
+   * The placement that locality ids already bound to an intent stand for: the gazetteer rows they
+   * name and the point at their centre, which is what the fallback ladder measures its rings from.
+   * Ids this resolver does not know contribute nothing, and an anchor made entirely of such ids is
+   * {@link Placement#none()} — the caller then has no place to widen around rather than a
+   * fictitious one. {@code confidence} is the grade the slot that named them already earned.
+   */
+  public Placement placementOf(List<UUID> localityIds, double confidence) {
+    List<UUID> known =
+        localityIds == null
+            ? List.of()
+            : localityIds.stream().filter(id -> id != null && nameById.containsKey(id)).toList();
+    if (known.isEmpty()) {
+      return Placement.none();
+    }
+    Point centroid = centroidOf(known);
+    return new Placement(
+        known,
+        centroid == null ? null : centroid.lat(),
+        centroid == null ? null : centroid.lng(),
+        Placement.Source.GAZETTEER,
+        confidence);
+  }
+
   private Placement toPlacement(Match m) {
     Point centroid = centroidOf(m.localityIds());
     Double lat = centroid == null ? null : centroid.lat();
