@@ -1,6 +1,7 @@
 package com.flatmaite.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.doubleThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.common.domain.SearchTarget;
+import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import java.util.List;
@@ -43,6 +45,10 @@ class HybridRetrieverAdmissionTest {
     when(estimator.nearestLocalities(eq(bkc), doubleThat(km -> Math.abs(km - 2.857142857142857) < 0.0001), anyInt()))
         .thenReturn(List.of(new CommuteEstimator.Nearby(bandra, 0.9, 12)));
     LocalityResolver resolver = mock(LocalityResolver.class);
+    // Centroids for the two anchors that get rings drawn around them. Everything else resolves to
+    // null, which is how the rest of this class stays a pure admission test: no centroid, no ring.
+    when(resolver.pointOf(goregaon)).thenReturn(new double[] {19.1663, 72.8526});
+    when(resolver.pointOf(bkc)).thenReturn(new double[] {19.0653, 72.8693});
     FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusKm defaults to 5.0
     // constructor arguments follow HybridRetriever's field declaration order
     retriever = new HybridRetriever(null, null, estimator, resolver, props);
@@ -104,6 +110,58 @@ class HybridRetrieverAdmissionTest {
             .build();
 
     assertThat(retriever.admittedLocalityIds(intent, false)).containsExactly(bkc, bandra);
+  }
+
+  // ---- which calls draw per-property rings, and which deliberately do not (ruling R14) ----
+
+  private SearchIntent commuteToBkc() {
+    return SearchIntent.builder()
+        .searchTarget(SearchTarget.PROPERTIES)
+        .commuteTo(new CommuteTo("BKC", bkc, 20))
+        .build();
+  }
+
+  @Test
+  void strictMode_drawsNoRing_evenForAStatedCommuteCap() {
+    // The alert path: SavedSearchAlertRunner calls toFilters(intent, false), i.e. radius 0.0. A
+    // stored "within 30 minutes of BKC" alert has always matched every property in a locality whose
+    // CENTROID is inside the budget. Tightening that to per-property here would silently change
+    // what existing alerts fire on — so the strict path emits no geo predicate at all, for any
+    // intent, exactly as before this workstream.
+    assertThat(retriever.toFilters(commuteToBkc(), false).geoRings()).isEmpty();
+    assertThat(retriever.toFiltersWithRadius(commuteToBkc(), 0.0).geoRings()).isEmpty();
+
+    // and the locality-level commute filter is untouched by that: it still applies in strict mode
+    assertThat(retriever.toFilters(commuteToBkc(), false).localityIds()).containsExactly(bkc, bandra);
+  }
+
+  @Test
+  void aWidenedCall_ringsTheCommuteAnchor() {
+    List<ListingFilters.GeoRing> rings = retriever.toFiltersWithRadius(commuteToBkc(), 5.0).geoRings();
+
+    // one ring, around BKC, at the same km budget the locality side was admitted at: (20 - 8) / 60
+    // × 20 kmph ÷ 1.4 circuity ≈ 2.857 km
+    assertThat(rings).hasSize(1);
+    assertThat(rings.get(0).lat()).isEqualTo(19.0653);
+    assertThat(rings.get(0).meters()).isCloseTo(2857.14, within(1.0));
+  }
+
+  @Test
+  void aHomeAreaAndAWorkplaceTogether_getARingEach() {
+    // The reason the commute anchor is ringed at all. With only the home circle drawn, every
+    // locality admitted for being near the office would be evicted by a circle it was never
+    // measured against — the office half of the query would quietly stop working.
+    SearchIntent intent =
+        homeIn(goregaon, "Goregaon").toBuilder().commuteTo(new CommuteTo("BKC", bkc, 20)).build();
+
+    List<ListingFilters.GeoRing> rings = retriever.toFiltersWithRadius(intent, 5.0).geoRings();
+
+    assertThat(rings).hasSize(2);
+    assertThat(rings)
+        .extracting(ListingFilters.GeoRing::lat)
+        .containsExactlyInAnyOrder(19.1663, 19.0653);
+    // the rings are OR-ed in the SQL, so a property near either anchor survives
+    assertThat(rings).extracting(ListingFilters.GeoRing::meters).anySatisfy(m -> assertThat(m).isEqualTo(5000.0));
   }
 
   @Test

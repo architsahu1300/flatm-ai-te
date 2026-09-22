@@ -187,10 +187,18 @@ public class ListingQueryService {
    * locality 4.9 km away renders "6.3 km from Kandivali" under a heading claiming 5 km.
    *
    * <p><b>{@code earth_box} is a bounding cube, not a circle</b> — on its own it would admit a
-   * corner property up to √3 × the radius out, which is the same lie in a smaller font. It is here
-   * because it is the shape {@code idx_properties_geo} (GiST over {@code ll_to_earth(lat, lng)})
-   * can actually answer, so it does the index-backed cut; {@code earth_distance} beside it trims
-   * the corners to the exact ring. Both, always — the box for speed, the distance for truth.
+   * corner property up to √3 × the radius out, which is the same lie in a smaller font. It is
+   * paired with {@code earth_distance}, which trims the corners to the exact ring, and the pair is
+   * what makes the figure in the heading true of every row under it.
+   *
+   * <p>{@code earth_box ... @>} is also the only <em>index-compatible</em> half of that pair:
+   * standing alone it plans as {@code Index Scan using idx_properties_geo}, which
+   * {@code earth_distance} never can. It does not get that plan <em>here</em>, though, and the
+   * comment should not pretend otherwise: this clause is a disjunction (the two escapes below), and
+   * the join is driven by {@code properties_pkey} from the listing side, so Postgres evaluates the
+   * whole thing as a per-row {@code Filter} — with {@code enable_seqscan = off} as well, so it is
+   * not merely an artefact of the seed's size. It is cheap to evaluate, not index-accelerated, and
+   * the index earns its keep only if a future query applies the ring on its own.
    *
    * <p>Two escapes, both deliberate and both {@code OR}-ed in ahead of the rings:
    *

@@ -500,12 +500,21 @@ public class HybridRetriever {
           Math.max(0, (commuteMinutes - cal.overheadMin()) / 60.0 * cal.speedKmph() / cal.roadCircuity());
       nearbyKm.merge(anchor, 0.0, Math::min);
       exempt.add(anchor);
-      // The commute ring gets a per-property ring of its own, at the same kilometre budget the
-      // locality side uses. Without one it would be the home ring's collateral damage: a search
-      // naming both a home area and a workplace would draw rings only around the home, and every
-      // locality admitted for being near the office would be evicted by a circle it was never
-      // measured against.
-      addRing(rings, anchor, budgetKm);
+      // On a widened call the commute anchor gets a per-property ring of its own, at the same
+      // kilometre budget the locality side just used. Without one it would be the home ring's
+      // collateral damage: a query naming both a home area and a workplace would draw circles only
+      // around the home, and every locality admitted for being near the office would be evicted by
+      // a circle it was never measured against.
+      //
+      // Gated on radiusKm, unlike the locality-level admission above it, which deliberately applies
+      // a stated commute cap even in strict mode. Tightening that cap to per-property on the strict
+      // path is arguably the more correct reading — the km budget is the exact inverse of the
+      // minutes conversion the user stated their cap in — but it is not this wave's to make:
+      // SavedSearchAlertRunner asks for radius 0.0, so it would silently change what every stored
+      // "within 30 minutes of BKC" alert matches on, with nobody told. Proposed separately.
+      if (radiusKm > 0) {
+        addRing(rings, anchor, budgetKm);
+      }
       for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, budgetKm, Integer.MAX_VALUE)) {
         nearbyKm.merge(n.localityId(), n.km(), Math::min);
       }

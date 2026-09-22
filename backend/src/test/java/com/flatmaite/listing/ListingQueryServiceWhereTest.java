@@ -45,10 +45,11 @@ class ListingQueryServiceWhereTest {
                 .build(),
             params);
 
-    // earth_box is what the GiST index on ll_to_earth(lat, lng) can answer, so it does the
-    // index-backed cut — but it is a bounding cube, and on its own it would admit a corner
-    // property well past the radius the page's heading names. earth_distance trims it to the
-    // actual ring. Both, or the figure in the heading is not the figure on the rows.
+    // earth_box is a bounding cube: on its own it would admit a corner property well past the
+    // radius the page's heading names, so earth_distance trims it to the actual ring. Both, or the
+    // figure in the heading is not the figure on the rows. (The box is also the index-compatible
+    // half — it is the shape idx_properties_geo can answer — but in this query the clause plans as
+    // a per-row Filter, not an index scan; see appendGeoRings' javadoc for the measured plan.)
     assertThat(where).contains("earth_box(ll_to_earth(:geoLat0, :geoLng0), :geoM0) @> ll_to_earth(p.lat, p.lng)");
     assertThat(where).contains("earth_distance(ll_to_earth(:geoLat0, :geoLng0), ll_to_earth(p.lat, p.lng)) <= :geoM0");
     assertThat(params).containsEntry("geoLat0", 19.2045).containsEntry("geoM0", 5000.0);
