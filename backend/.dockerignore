@@ -1,0 +1,7 @@
+# The whole directory is shipped to the builder as context, so the big
+# local-only trees matter even though the Dockerfile only COPYs pom.xml and src.
+target/
+uploads/
+.env
+*.log
+.DS_Store
