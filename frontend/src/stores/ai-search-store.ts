@@ -6,8 +6,11 @@ import {
   aiSearch,
   type AiResult,
   type AiSearchResponse,
+  type Choice,
+  type CitySearch,
   type CompareResponse,
   type Relaxer,
+  type ResultSummary,
   type SearchIntent,
 } from "@/lib/ai-client";
 import { ApiError } from "@/lib/api";
@@ -31,6 +34,12 @@ interface AiSearchState {
   widenedBy: string | null;
   /** Server-side explanation of anything surprising about this turn (e.g. a fresh-search reset). */
   note: string | null;
+  /** How the page as a whole reads — headline, tier counts, terminus. Null on a stale backend. */
+  resultSummary: ResultSummary | null;
+  /** Counted one-click compromises offered alongside the results (e.g. raise budget). */
+  choices: Choice[];
+  /** The city this search was confined to, and the prompt to show when it is unset. */
+  citySearch: CitySearch | null;
   activeTab: "homes" | "flatmates";
   turns: Turn[];
   compareIds: string[];
@@ -86,6 +95,9 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         flatmates: response.flatmates,
         relaxers: response.relaxers,
         note: response.note,
+        resultSummary: response.resultSummary ?? null,
+        choices: response.choices ?? [],
+        citySearch: response.citySearch ?? null,
         widenedBy,
         activeTab,
         compareIds: [],
@@ -108,6 +120,9 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
     relaxers: [],
     widenedBy: null,
     note: null,
+    resultSummary: null,
+    choices: [],
+    citySearch: null,
     activeTab: "homes",
     turns: [],
     compareIds: [],
@@ -177,6 +192,9 @@ export const useAiSearchStore = create<AiSearchState>()((set, get) => {
         relaxers: [],
         widenedBy: null,
         note: null,
+        resultSummary: null,
+        choices: [],
+        citySearch: null,
         turns: [],
         compareIds: [],
         comparison: null,

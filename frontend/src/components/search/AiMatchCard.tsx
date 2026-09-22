@@ -131,6 +131,16 @@ export function AiMatchCard({
                   {result.nearMissReason ?? "Near miss"}
                 </Badge>
               )}
+              {/* Keyed off distanceKm, never off tier — tier is set even for an unanchored
+                  search, but a distance is only ever measured from a real anchor. A bare
+                  number with no anchor name is meaningless, so both are required together. */}
+              {result.distanceKm != null && result.anchorName && (
+                <Badge variant="default" className="mt-1.5 ml-1.5">
+                  {result.distanceKm <= 2
+                    ? "very close"
+                    : `${result.distanceKm.toFixed(1)} km from ${result.anchorName}`}
+                </Badge>
+              )}
             </div>
             {/* home cards show the ring over the photo on mobile — avoid a second one */}
             <div className={cn("shrink-0", result.home && "hidden sm:block")}>

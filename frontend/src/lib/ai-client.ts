@@ -47,6 +47,10 @@ export interface ScoreComponent {
   detail: string | null;
 }
 
+// Which block of the results page a row belongs to (spec §4.6). Always set on a home row,
+// always null on a flatmate row.
+export type SearchTier = "EXACT" | "NEARBY" | "OVER_BUDGET";
+
 export interface AiResult {
   kind: "home" | "flatmate";
   matchScore: number;
@@ -59,6 +63,13 @@ export interface AiResult {
   flatmate: FlatmateCard | null;
   nearMiss?: boolean | null;
   nearMissReason?: string | null;
+  tier?: SearchTier | null;
+  // Set together only when the search was actually anchored on a place. Null together
+  // otherwise — including for a place the reader only inferred, which ranks but does not
+  // anchor. A distance chip must key off distanceKm being non-null, never off tier.
+  distanceKm?: number | null;
+  minutesFromAnchor?: number | null;
+  anchorName?: string | null;
 }
 
 export interface Relaxer {
@@ -66,6 +77,48 @@ export interface Relaxer {
   description: string;
   relaxedIntent: SearchIntent;
   extraResults: number;
+}
+
+/**
+ * How the page as a whole reads (spec §4.8). `headline` is worded correctly by the backend for
+ * both cases below — render it verbatim, never rebuild it client-side:
+ *  - A place was named and nothing could place it: `anchorName` is null, `unplacedNames` holds
+ *    what the user typed, `headline` says so, and the results below it are still real.
+ *  - No place was named at all: `anchorName` null, `unplacedNames` empty, `headline` null — no
+ *    fallback framing of any kind, citywide exactly as before this workstream.
+ * A place named AND placed sets `anchorName`, and `headline` is present only when the page needs
+ * explaining (nothing, or fewer than three exact matches).
+ */
+export interface ResultSummary {
+  anchorName?: string | null;
+  unplacedNames?: string[] | null;
+  exactCount: number;
+  nearbyCount: number;
+  overBudgetCount: number;
+  headline?: string | null;
+  terminus?: string | null;
+}
+
+/**
+ * The city this search was confined to (spec §4.11). `source: "UNSET"` — null `city`, a
+ * `prompt` to render — covers anyone with no profile locality, including every anonymous
+ * searcher. That is an explicit, first-class state, never an error, and never gates the results.
+ */
+export interface CitySearch {
+  city?: string | null;
+  source: "PROFILE" | "UNSET";
+  prompt?: string | null;
+}
+
+/**
+ * A counted, one-click compromise offered alongside the results, whatever their number. Never
+ * applied automatically — the stated budget changes only once this is posted via applyIntent.
+ */
+export interface Choice {
+  label: string;
+  action: "RAISE_BUDGET";
+  value: number;
+  count: number;
 }
 
 export interface AiSearchResponse {
@@ -76,6 +129,10 @@ export interface AiSearchResponse {
   flatmates: AiResult[];
   relaxers: Relaxer[];
   note: string | null;
+  // Every field below is optional on the client so a stale backend response cannot blank the page.
+  resultSummary?: ResultSummary | null;
+  choices?: Choice[] | null;
+  citySearch?: CitySearch | null;
 }
 
 export interface CompareRow {
