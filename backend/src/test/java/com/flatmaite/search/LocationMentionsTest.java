@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,7 +26,7 @@ class LocationMentionsTest {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll())
         .thenReturn(List.of(locality("Andheri East", "andheri"), locality("BKC"), locality("Powai"), locality("Malad")));
-    resolver = new LocalityResolver(repo);
+    resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
   }
 

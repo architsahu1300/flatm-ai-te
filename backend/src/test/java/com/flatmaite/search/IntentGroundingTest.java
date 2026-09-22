@@ -9,6 +9,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.SearchIntent.BhkRange;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
@@ -33,7 +34,7 @@ class IntentGroundingTest {
   static void setUp() {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll()).thenReturn(SeedLocalities.entities());
-    resolver = new LocalityResolver(repo);
+    resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.reload();
   }
 

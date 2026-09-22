@@ -6,6 +6,7 @@ import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
 import com.flatmaite.listing.ListingFilters;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class HybridRetrieverFiltersTest {
                 locality("Andheri East", "andheri east", "andheri"),
                 locality("Andheri West", "andheri west", "andheri"),
                 locality("BKC", "bandra kurla complex")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     parser = new KeywordIntentParser(resolver);
     CommuteEstimator estimator = Mockito.mock(CommuteEstimator.class);

@@ -8,6 +8,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import com.flatmaite.seed.SeedLocalities;
@@ -32,7 +33,7 @@ class HybridRetrieverGatingTest {
   void setUp() {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll()).thenReturn(SeedLocalities.entities());
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusKm defaults to 5.0
     CommuteEstimator estimator = new CommuteEstimator(repo, props);

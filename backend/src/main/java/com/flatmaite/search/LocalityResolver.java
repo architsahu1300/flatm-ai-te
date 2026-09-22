@@ -2,6 +2,7 @@ package com.flatmaite.search;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,6 +38,8 @@ public class LocalityResolver {
   public static final double CONFIDENT = 0.75;
   public static final int MIN_FUZZY_LENGTH = 5;
   public static final int MAX_WINDOW = 3;
+  /** Below this a token could LIKE-match half the table; own-data matching stays out. */
+  public static final int MIN_OWN_DATA_LENGTH = 5;
 
   /** A located mention. {@code tokenEnd} is exclusive. */
   public record Match(
@@ -48,6 +51,7 @@ public class LocalityResolver {
       double confidence) {}
 
   private final LocalityRepository localities;
+  private final PropertyRepository properties;
   // volatile + rebuild-then-swap in load(): a concurrent scan/resolve reads one consistent
   // generation of the gazetteer rather than racing a clear()-then-repopulate in place.
   private volatile Map<String, List<UUID>> byPhrase = new LinkedHashMap<>();
@@ -177,13 +181,33 @@ public class LocalityResolver {
   }
 
   /**
-   * Whole-string resolution confined to {@code scope} when it is set. This is the gazetteer step
-   * of the resolution ladder (spec §4.3): a hit is always {@link Placement.Source#GAZETTEER}, and
-   * a name that only matches outside {@code scope} — exactly or by fuzzy similarity — comes back
-   * {@link Placement.Source#NONE} rather than crossing the city boundary.
+   * Whole-string resolution confined to {@code scope} when it is set — the resolution ladder (spec
+   * §4.3). Step 1 is the gazetteer: a hit is always {@link Placement.Source#GAZETTEER}, and a name
+   * that only matches outside {@code scope} — exactly or by fuzzy similarity — never crosses the
+   * city boundary. Step 2, when the gazetteer misses, is our own inventory: a society or address
+   * name already sitting on a listing in {@code scope}, scored {@link Placement.Source#OWN_DATA}
+   * at a fixed 0.5 confidence — an inference from what renters actually wrote, not a curated
+   * statement, so {@code ConfidenceGate} treats it as a ranking preference rather than a hard
+   * filter. Only then does an unplaced name fall all the way to {@link Placement#none()}.
    */
   public Placement resolve(String name, CityScope scope) {
-    return resolveMatch(name, scope).map(this::toPlacement).orElseGet(Placement::none);
+    Optional<Match> gazetteer = resolveMatch(name, scope);
+    if (gazetteer.isPresent()) {
+      return toPlacement(gazetteer.get());
+    }
+    if (name != null && name.length() >= MIN_OWN_DATA_LENGTH) {
+      List<PropertyRepository.PlacementRow> rows =
+          properties.findPlacementByPlaceName(name, scope.city());
+      if (!rows.isEmpty()) {
+        return new Placement(
+            rows.stream().map(PropertyRepository.PlacementRow::getLocalityId).toList(),
+            rows.get(0).getLat(),
+            rows.get(0).getLng(),
+            Placement.Source.OWN_DATA,
+            0.5); // INFERRED — ConfidenceGate treats it as a preference, not a filter
+      }
+    }
+    return Placement.none();
   }
 
   private Optional<Match> resolveMatch(String name, CityScope scope) {
@@ -246,8 +270,12 @@ public class LocalityResolver {
     return ids.stream().filter(id -> scope.city().equalsIgnoreCase(cityById.get(id))).toList();
   }
 
+  /**
+   * The locality's name, or {@code null} when {@code id} is not one this resolver knows — never a
+   * city name standing in for an unknown place. Callers show nothing rather than invent a place.
+   */
   public String nameOf(UUID id) {
-    return nameById.getOrDefault(id, "Mumbai");
+    return nameById.get(id);
   }
 
   /** The city a locality belongs to, or null when the id is unknown — callers fall back themselves. */

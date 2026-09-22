@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import java.util.List;
@@ -36,7 +37,7 @@ class IntentLocalitiesTest {
                 locality("Andheri East", "andheri"),
                 locality("Andheri West", "andheri"),
                 locality("BKC", "bandra kurla complex", "bandra kurla")));
-    resolver = new LocalityResolver(repo);
+    resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
   }
 

@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -449,15 +450,23 @@ public class SearchPipeline {
                   : commuteEstimator.minutesBetween(c.localityId(), anchor);
         }
       }
+      // anchor is a real, resolved locality id whenever it is non-null (see commuteAnchor/nearestOf
+      // above), but nameOf can still come back null if the resolver's cache is stale relative to
+      // the id it was handed — "your area" is the same honest placeholder already used when there
+      // is no anchor at all, never a wrong city standing in for a place we cannot name.
       String anchorName =
           commuteIntent
               ? intent.commuteTo().place()
-              : anchor == null ? "your area" : localityResolver.nameOf(anchor);
+              : anchor == null
+                  ? "your area"
+                  : Objects.requireNonNullElse(localityResolver.nameOf(anchor), "your area");
       ListingCandidate candidate =
           new ListingCandidate(
               l,
               c == null ? null : c.localityId(),
-              c == null ? "Mumbai" : localityResolver.nameOf(c.localityId()),
+              // null rather than a Mumbai default: no candidate data, or a locality id nameOf does
+              // not recognise, is honestly "we don't know", not a false statement about Mumbai.
+              c == null ? null : localityResolver.nameOf(c.localityId()),
               lister != null && lister.getEmailVerifiedAt() != null,
               lister != null && lister.getPhoneVerifiedAt() != null,
               idVerified.contains(l.getListerId()),

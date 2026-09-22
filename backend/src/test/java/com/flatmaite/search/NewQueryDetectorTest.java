@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,7 +33,7 @@ class NewQueryDetectorTest {
                 locality("Goregaon", 19.1663, 72.8526),
                 locality("Andheri", 19.1197, 72.8468),
                 locality("BKC", 19.0662, 72.8697)));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     detector = new NewQueryDetector(resolver);
   }

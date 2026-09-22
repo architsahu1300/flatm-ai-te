@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.ai.MockLlms;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.IntentArbiter;
 import com.flatmaite.search.IntentLocalities;
 import com.flatmaite.search.KeywordIntentParser;
@@ -36,7 +37,7 @@ class IntentGoldenTest {
   static void wire() {
     LocalityRepository repo = mock(LocalityRepository.class);
     when(repo.findAll()).thenReturn(SeedLocalities.entities());
-    resolver = new LocalityResolver(repo);
+    resolver = new LocalityResolver(repo, mock(PropertyRepository.class));
     resolver.reload();
     KeywordIntentParser parser = new KeywordIntentParser(resolver);
     IntentLlm llm = new MockLlms.MockIntentLlm(parser);

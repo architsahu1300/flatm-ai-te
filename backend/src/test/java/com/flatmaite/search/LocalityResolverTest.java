@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,7 @@ class LocalityResolverTest {
 
   private LocalityResolver resolver;
   private LocalityRepository localities;
+  private PropertyRepository properties;
 
   static Locality locality(String name, String... aliases) {
     Locality l = Locality.builder().name(name).lat(19.0).lng(72.8).aliases(aliases).build();
@@ -67,7 +69,10 @@ class LocalityResolverTest {
               UUID wanted = inv.getArgument(0);
               return seedData.stream().filter(l -> wanted.equals(l.getId())).findFirst();
             });
-    resolver = new LocalityResolver(localities);
+    // Unstubbed: Mockito's default answer for a List-returning method is an empty list, so the
+    // own-data ladder step always misses here — these tests exercise the gazetteer layers only.
+    properties = Mockito.mock(PropertyRepository.class);
+    resolver = new LocalityResolver(localities, properties);
     resolver.load();
   }
 
@@ -153,7 +158,7 @@ class LocalityResolverTest {
   @Test
   void nameOf_andVocabulary() {
     assertThat(resolver.nameOf(id("Powai"))).isEqualTo("Powai");
-    assertThat(resolver.nameOf(UUID.randomUUID())).isEqualTo("Mumbai");
+    assertThat(resolver.nameOf(UUID.randomUUID())).isNull();
     assertThat(resolver.vocabulary())
         .contains("Powai (hiranandani)", "Kurla", "BKC (bandra kurla complex, bandra kurla)");
   }
@@ -162,7 +167,7 @@ class LocalityResolverTest {
   void reload_picksUpLocalitiesAddedAfterStartup() {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll()).thenReturn(List.of()).thenReturn(List.of(locality("Powai", "hiranandani")));
-    LocalityResolver fresh = new LocalityResolver(repo);
+    LocalityResolver fresh = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     fresh.load();
     assertThat(fresh.resolve("powai")).isEmpty();
 

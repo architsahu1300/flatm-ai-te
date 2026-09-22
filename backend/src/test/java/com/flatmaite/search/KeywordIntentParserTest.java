@@ -6,6 +6,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class KeywordIntentParserTest {
                 locality("Andheri West", "andheri west", "andheri"),
                 locality("BKC", "bandra kurla complex"),
                 locality("Malad")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     parser = new KeywordIntentParser(resolver);
   }
