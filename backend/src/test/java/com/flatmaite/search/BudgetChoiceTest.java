@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -45,6 +46,8 @@ class BudgetChoiceTest {
           DockerImageName.parse("pgvector/pgvector:pg16").asCompatibleSubstituteFor("postgres"));
 
   @Autowired SearchPipeline pipeline;
+  @Autowired HybridRetriever retriever;
+  @Autowired JdbcTemplate jdbc;
 
   @Test
   void theChoiceNamesTheCheapestPriceThatActuallyOpensListings() {
@@ -75,6 +78,101 @@ class BudgetChoiceTest {
     SearchIntent raised = intent.toBuilder().budgetMax(choice.value()).build();
     AiSearchResponse raisedResponse = pipeline.search(raised, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
     assertThat(raisedResponse.homes()).isNotEmpty();
+  }
+
+  /**
+   * Borivali, not Colaba, because this is the case that can tell the two countings apart. Colaba's
+   * 5 km ring holds no <em>active</em> seed listing but its own, so counting it widened and
+   * counting it strictly give the same answer and any assertion about it passes either way.
+   * Borivali (₹18,000) has Kandivali (₹13,000, ~2.9 km) and Dahisar (₹13,500, ~2.2 km) inside its
+   * ring, so a widened count reports a price Borivali itself does not offer.
+   */
+  private SearchIntent inBorivaliUnder(int budgetMax) {
+    return SearchIntent.builder()
+        .searchTarget(SearchTarget.PROPERTIES)
+        .locations(List.of(new SearchIntent.LocationRef("Borivali", null)))
+        .budgetMax(budgetMax)
+        .originalQuery("room in borivali under %d".formatted(budgetMax))
+        .build();
+  }
+
+  private Integer cheapestActiveIn(String locality) {
+    return jdbc.queryForObject(
+        """
+        SELECT min(l.rent_monthly)
+        FROM listings l JOIN properties p ON p.id = l.property_id
+        WHERE l.deleted_at IS NULL AND l.status = 'ACTIVE' AND p.locality_id = ?
+        """,
+        Integer.class,
+        SeedLocalities.id(locality));
+  }
+
+  @Test
+  void theChoicesCountAndPriceMatchAnIndependentQueryForTheSameCriteria() {
+    // Spec §5. theChoiceNamesTheCheapestPriceThatActuallyOpensListings above compares the label
+    // against the choice's own fields, so it is true by construction and cannot see whose listings
+    // `count` is actually describing. This counts the chip's own sentence — "in Borivali, at or
+    // under ₹X" — in raw SQL that shares nothing with the production filter builder.
+    SearchIntent intent = inBorivaliUnder(12000);
+
+    // the guard that stops this test from quietly becoming true by construction too: the ring
+    // around Borivali must really hold something cheaper than Borivali, or a widened count and a
+    // strict one would agree and prove nothing
+    assertThat(retriever.admittedLocalityIds(intent, 5.0)).contains(SeedLocalities.id("Kandivali"));
+    assertThat(cheapestActiveIn("Kandivali")).isLessThan(cheapestActiveIn("Borivali"));
+
+    Choice choice = pipeline.budgetChoice(intent, pipeline.placementOf(intent)).orElseThrow();
+
+    // the price named is the cheapest rent *in Borivali*, rounded up to ₹500 — not the cheapest
+    // within 5 km of it
+    int expectedValue = (int) (Math.ceil(cheapestActiveIn("Borivali") / 500.0) * 500);
+    assertThat(choice.value()).isEqualTo(expectedValue);
+
+    Long independentCount =
+        jdbc.queryForObject(
+            """
+            SELECT count(*)
+            FROM listings l JOIN properties p ON p.id = l.property_id
+            WHERE l.deleted_at IS NULL AND l.status = 'ACTIVE'
+              AND p.locality_id = ? AND l.rent_monthly <= ?
+            """,
+            Long.class,
+            SeedLocalities.id("Borivali"),
+            choice.value());
+
+    assertThat(choice.count()).isEqualTo(independentCount);
+    assertThat(choice.label()).isEqualTo("Borivali has %d from ₹%,d".formatted(independentCount, expectedValue));
+  }
+
+  @Test
+  void theChoicesOwnNextScreenAgreesWithIt() {
+    // The failure this replaces: a chip counted through the widened ring — "Borivali has 2 from
+    // ₹13,000", paid for by Kandivali and Dahisar — clicked, landing on a page headlined "No
+    // listings in Borivali under ₹13,000", because the EXACT tier is the requested placement only.
+    // A chip that moves the user's stated budget must be a claim its own next page can stand behind.
+    SearchIntent intent = inBorivaliUnder(12000);
+    Choice choice = pipeline.budgetChoice(intent, pipeline.placementOf(intent)).orElseThrow();
+
+    // clicking it is an /apply with the new budget, and that re-run is the escalated one (§4.7)
+    AiSearchResponse next =
+        pipeline.search(
+            intent.toBuilder().budgetMax(choice.value()).build(),
+            null,
+            "test",
+            UUID.randomUUID(),
+            null,
+            true,
+            CityScope.unset());
+
+    assertThat(next.resultSummary().anchorName()).isEqualTo("Borivali");
+    assertThat(next.resultSummary().headline()).doesNotContain("No listings in Borivali");
+    // the block the chip named is not empty, and holds no more than the chip promised
+    assertThat(next.resultSummary().exactCount()).isGreaterThan(0);
+    assertThat((long) next.resultSummary().exactCount()).isLessThanOrEqualTo(choice.count());
+    assertThat(next.homes())
+        .filteredOn(r -> r.tier() == RescueLadder.SearchTier.EXACT)
+        .isNotEmpty()
+        .allSatisfy(r -> assertThat(r.home().rentMonthly()).isLessThanOrEqualTo(choice.value()));
   }
 
   @Test

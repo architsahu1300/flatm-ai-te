@@ -426,7 +426,10 @@ public class SearchPipeline {
             homes.exactCount(),
             countOf(homes.results(), RescueLadder.SearchTier.NEARBY),
             countOf(homes.results(), RescueLadder.SearchTier.OVER_BUDGET),
-            homes.exhausted());
+            homes.exhausted(),
+            // the ring this search actually used, which is the same figure the "Also showing
+            // nearby areas within ~N km" note is worded from — 0.0 means no ring was drawn
+            homes.radiusKm() > 0 ? homes.radiusKm() : null);
 
     return new SearchDtos.AiSearchResponse(
         sessionId,
@@ -463,11 +466,14 @@ public class SearchPipeline {
       int exact,
       int nearby,
       int overBudget,
-      boolean exhausted) {
+      boolean exhausted,
+      Double nearbyRadiusKm) {
+    double closeRadiusKm = props.getSearch().getCloseRadiusKm();
     if (anchorName == null) {
       String unplacedHeadline = unplacedNames.isEmpty() ? null : couldNotPlace(unplacedNames, scope);
       return new SearchDtos.ResultSummary(
-          null, unplacedNames, exact, nearby, overBudget, unplacedHeadline, null);
+          null, unplacedNames, exact, nearby, overBudget, unplacedHeadline, null,
+          nearbyRadiusKm, closeRadiusKm);
     }
     String budget = intent.budgetMax() == null ? null : "₹%,d".formatted(intent.budgetMax());
     String headline =
@@ -482,7 +488,8 @@ public class SearchPipeline {
             ? "No more listings within %s near %s.".formatted(budget, anchorName)
             : null;
     return new SearchDtos.ResultSummary(
-        anchorName, unplacedNames, exact, nearby, overBudget, headline, terminus);
+        anchorName, unplacedNames, exact, nearby, overBudget, headline, terminus,
+        nearbyRadiusKm, closeRadiusKm);
   }
 
   /**
@@ -600,14 +607,18 @@ public class SearchPipeline {
     UUID commuteAnchor = commuteIntent ? intent.commuteTo().localityId() : null;
     // ListingCandidate.radiusMinutes is the location score's minutes-based decay denominator — a
     // stated commute cap is already minutes; a locations-based search converts the configured km
-    // ring through Mumbai's calibration, the same "how far is far" scale the decay always used.
+    // ring through the anchor's own city calibration, the same "how far is far" scale the decay
+    // always used. Passing null here would apply Mumbai's roads to a Pune anchor the moment a
+    // second city exists (§4.10 point 3); an unplaced anchor still falls back to Mumbai, which is
+    // that method's own documented behaviour rather than a scoping decision made here.
     int decayMinutes =
         commuteIntent
             ? (intent.commuteTo().maxMinutes() == null
                 ? SearchIntent.DEFAULT_COMMUTE_MINUTES
                 : intent.commuteTo().maxMinutes())
             : CommuteEstimator.minutesForKm(
-                props.getSearch().getNearbyRadiusKm(), props.getGeo().calibrationFor(null));
+                props.getSearch().getNearbyRadiusKm(),
+                props.getGeo().calibrationFor(cityOfAnchor(placement)));
 
     record Row(
         Listing listing,
@@ -1092,12 +1103,12 @@ public class SearchPipeline {
       return Optional.empty();
     }
     SearchIntent uncapped = intent.toBuilder().budgetMax(null).build();
-    Integer cheapest = cheapestRentFor(uncapped);
+    Integer cheapest = strictCheapestRentFor(uncapped);
     if (cheapest == null || cheapest <= intent.budgetMax()) {
       return Optional.empty();
     }
     int suggested = (int) (Math.ceil(cheapest / 500.0) * 500);
-    long count = countFor(intent.toBuilder().budgetMax(suggested).build());
+    long count = strictCountFor(intent.toBuilder().budgetMax(suggested).build());
     if (count == 0) {
       return Optional.empty();
     }
@@ -1124,6 +1135,18 @@ public class SearchPipeline {
   }
 
   /**
+   * The city the search is anchored in, or null when it is anchored nowhere — which
+   * {@link FlatmaiteProperties.Geo#calibrationFor} then reads as its documented Mumbai fallback for
+   * arithmetic that must produce some number.
+   */
+  private String cityOfAnchor(Placement placement) {
+    if (placement.localityIds().isEmpty()) {
+      return null;
+    }
+    return localityResolver.cityOf(placement.localityIds().get(0));
+  }
+
+  /**
    * The same anchor written for prose, so a choice chip and a result row never disagree about what
    * to call the same place — both fall back to "your area" through {@link #anchorLabel}.
    */
@@ -1131,13 +1154,46 @@ public class SearchPipeline {
     return anchorLabel(anchorNameOf(placement));
   }
 
+  /**
+   * Counted at the widened admission — the requested placement plus its neighbourhood ring. That
+   * is right for {@link #computeRelaxers}, whose labels name no place ("Raise budget to ₹18,000 —
+   * shows 6 options"): the relaxed search the user would land on is itself widened, so the count
+   * and the page agree.
+   */
   private long countFor(SearchIntent intent) {
-    ListingFilters filters = retriever.toFilters(intent);
+    return countWith(retriever.toFilters(intent));
+  }
+
+  /**
+   * Counted strictly inside the requested placement, ring radius 0.0 — the same admission
+   * {@link RescueLadder.SearchTier#EXACT} retrieves at.
+   *
+   * <p>This exists because {@link #budgetChoice}'s label <em>names the place</em>. Counted through
+   * the widened admission, a search of Borivali would report "Borivali has 2 from ₹13,000" — a
+   * price paid for by Kandivali (~2.9 km) and Dahisar (~2.2 km), which Borivali itself does not
+   * offer at any price below ₹18,000. Clicking that chip lands on a page headlined "No listings in
+   * Borivali under ₹13,000", because the headline reads off the strict tier. A chip whose own next
+   * screen contradicts it, having moved the user's stated budget to get there, is precisely the
+   * dishonesty this workstream removes. {@code BudgetChoiceTest} pins both halves.
+   */
+  private long strictCountFor(SearchIntent intent) {
+    return countWith(retriever.toFiltersWithRadius(intent, 0.0));
+  }
+
+  private long countWith(ListingFilters filters) {
     return listingQueryService.findIds(filters, ListingQueryService.Sort.NEWEST, 0, 1).total();
   }
 
+  /** The cheapest rent inside the requested placement only — see {@link #strictCountFor}. */
+  private Integer strictCheapestRentFor(SearchIntent intent) {
+    return cheapestRentWith(retriever.toFiltersWithRadius(intent, 0.0));
+  }
+
   private Integer cheapestRentFor(SearchIntent intent) {
-    ListingFilters filters = retriever.toFilters(intent);
+    return cheapestRentWith(retriever.toFilters(intent));
+  }
+
+  private Integer cheapestRentWith(ListingFilters filters) {
     var idPage = listingQueryService.findIds(filters, ListingQueryService.Sort.PRICE_ASC, 0, 1);
     if (idPage.ids().isEmpty()) {
       return null;

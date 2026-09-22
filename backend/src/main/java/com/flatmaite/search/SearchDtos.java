@@ -92,6 +92,17 @@ public final class SearchDtos {
    *
    * <p>{@code terminus} appears only when the fallback ladder ran out with a budget in play, which
    * is the one case where "no more" is a claim we can stand behind.
+   *
+   * <p>{@code nearbyRadiusKm} and {@code closeRadiusKm} are the two distances the page is allowed
+   * to print, sent because the client must never hold one of its own (ruling R15). Both are
+   * configurable ({@code SEARCH_NEARBY_RADIUS_KM}, {@code SEARCH_CLOSE_RADIUS_KM}) and the first
+   * additionally differs per search: the one re-run that follows an explicit budget raise reaches
+   * out to {@code SEARCH_ESCALATION_RADIUS_KM} instead. A literal "5 km" in the UI is therefore
+   * wrong in three separate ways, and silently so.
+   *
+   * <p>{@code nearbyRadiusKm} is null when this page was searched around no ring at all — nothing
+   * anchored it, or it has no rows. The client then words the block without a figure rather than
+   * inventing one. {@code closeRadiusKm} is a deployment constant and is always sent.
    */
   public record ResultSummary(
       String anchorName,
@@ -100,7 +111,9 @@ public final class SearchDtos {
       int nearbyCount,
       int overBudgetCount,
       String headline,
-      String terminus) {}
+      String terminus,
+      Double nearbyRadiusKm,
+      double closeRadiusKm) {}
 
   /**
    * The city this search was confined to, stated rather than left for the UI to infer (spec §4.11).
