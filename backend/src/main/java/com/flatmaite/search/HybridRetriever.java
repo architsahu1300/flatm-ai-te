@@ -316,10 +316,15 @@ public class HybridRetriever {
    */
   public ListingFilters toFiltersWithRadius(SearchIntent intent, double radiusKm) {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
+    Admission admission = admission(intent, radiusKm);
     ListingFilters.ListingFiltersBuilder b =
         ListingFilters.builder()
-            // admittedLocalityIds gates its two rings itself; an empty list is "no locality filter"
-            .localityIds(admittedLocalityIds(intent, radiusKm))
+            // admission gates its two rings itself; an empty list is "no locality filter"
+            .localityIds(admission.localityIds())
+            // and the same rings again per property, so a locality admitted by its centroid cannot
+            // smuggle in a listing at its far edge that the page's heading would misdescribe
+            .geoRings(admission.rings())
+            .geoExemptLocalityIds(admission.exemptIds())
             .excludeLocalityIds(excludedLocalityIds(intent));
     if (ConfidenceGate.isHard(intent, "budgetMin")) {
       b.budgetMin(intent.budgetMin());
@@ -448,14 +453,39 @@ public class HybridRetriever {
    * <p>Exclusions are removed however the positive side was graded: they are {@code ALWAYS_HARD}.
    */
   public List<UUID> admittedLocalityIds(SearchIntent intent, double radiusKm) {
+    return admission(intent, radiusKm).localityIds();
+  }
+
+  /**
+   * What a radius admits, in both granularities at once: the locality ids the SQL locality filter
+   * needs, and the same rings expressed as points and metres for {@link ListingFilters.GeoRing} to
+   * enforce per property (ruling R14). They are computed in one pass precisely so they cannot come
+   * to describe different circles — a heading naming 5 km and a row reporting 6.3 km is the exact
+   * disagreement this pairing exists to prevent.
+   *
+   * @param localityIds every admitted locality, requested ones first, then by distance
+   * @param exemptIds the localities the user <em>named</em> — home areas and a stated workplace.
+   *     They are admitted because the user asked for them, not because of a distance we measured,
+   *     so no distance claim is being made about them and no ring may evict them.
+   * @param rings one per named place, at that place's own radius; empty when no radius applies or
+   *     no centroid could be found, which leaves retrieval exactly as it was before R14
+   */
+  private record Admission(
+      List<UUID> localityIds, List<UUID> exemptIds, List<ListingFilters.GeoRing> rings) {}
+
+  private Admission admission(SearchIntent intent, double radiusKm) {
     Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
     LinkedHashSet<UUID> admitted = new LinkedHashSet<>();
+    LinkedHashSet<UUID> exempt = new LinkedHashSet<>();
     Map<UUID, Double> nearbyKm = new HashMap<>();
+    List<ListingFilters.GeoRing> rings = new ArrayList<>();
     if (ConfidenceGate.isHard(intent, "locations")) {
       List<UUID> requested = requestedLocalityIds(intent);
       admitted.addAll(requested);
+      exempt.addAll(requested);
       if (radiusKm > 0) {
         for (UUID id : requested) {
+          addRing(rings, id, radiusKm);
           for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusKm, Integer.MAX_VALUE)) {
             nearbyKm.merge(n.localityId(), n.km(), Math::min);
           }
@@ -469,6 +499,13 @@ public class HybridRetriever {
       double budgetKm =
           Math.max(0, (commuteMinutes - cal.overheadMin()) / 60.0 * cal.speedKmph() / cal.roadCircuity());
       nearbyKm.merge(anchor, 0.0, Math::min);
+      exempt.add(anchor);
+      // The commute ring gets a per-property ring of its own, at the same kilometre budget the
+      // locality side uses. Without one it would be the home ring's collateral damage: a search
+      // naming both a home area and a workplace would draw rings only around the home, and every
+      // locality admitted for being near the office would be evicted by a circle it was never
+      // measured against.
+      addRing(rings, anchor, budgetKm);
       for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, budgetKm, Integer.MAX_VALUE)) {
         nearbyKm.merge(n.localityId(), n.km(), Math::min);
       }
@@ -477,7 +514,24 @@ public class HybridRetriever {
         .sorted(Map.Entry.comparingByValue())
         .forEach(e -> admitted.add(e.getKey()));
     admitted.removeAll(excluded);
-    return new ArrayList<>(admitted);
+    exempt.removeAll(excluded);
+    return new Admission(new ArrayList<>(admitted), new ArrayList<>(exempt), rings);
+  }
+
+  /**
+   * A ring around one locality's centroid, or nothing at all when the resolver cannot place it.
+   * Nothing is the right answer: {@link CommuteEstimator#nearestLocalities} admits nothing around
+   * an anchor it has no centroid for either, so a ring-less admission is an admission with no
+   * proximity claim in it to police.
+   */
+  private void addRing(List<ListingFilters.GeoRing> rings, UUID localityId, double radiusKm) {
+    if (radiusKm <= 0) {
+      return;
+    }
+    double[] point = localityResolver.pointOf(localityId);
+    if (point != null) {
+      rings.add(new ListingFilters.GeoRing(point[0], point[1], radiusKm * 1000.0));
+    }
   }
 
   /**

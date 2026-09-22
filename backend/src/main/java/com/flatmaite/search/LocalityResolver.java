@@ -312,6 +312,18 @@ public class LocalityResolver {
     return cityById.get(id);
   }
 
+  /**
+   * The locality's centroid as {@code {lat, lng}}, or null when the id is not one this resolver
+   * knows — a ring is simply not drawn around a place we cannot locate, rather than around a
+   * guessed point. This is the centre a per-property ring is measured from (spec §4.1), and it is
+   * the same point {@link CommuteEstimator} measures its locality distances between, so the ring
+   * a heading names and the distance a row prints can never describe different circles.
+   */
+  public double[] pointOf(UUID id) {
+    Point p = id == null ? null : pointById.get(id);
+    return p == null ? null : new double[] {p.lat(), p.lng()};
+  }
+
   /** "Name (alias, alias)" per locality — the controlled vocabulary handed to the intent prompt. */
   public List<String> vocabulary() {
     List<String> out = new ArrayList<>();
