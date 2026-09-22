@@ -32,6 +32,20 @@ public final class SearchDtos {
 
   public record Relaxer(String label, String description, SearchIntent relaxedIntent, long extraResults) {}
 
+  /** What a clicked choice does. Only one action exists today: raise the stated budget. */
+  public enum ChoiceAction {
+    RAISE_BUDGET
+  }
+
+  /**
+   * A counted, one-click compromise offered alongside the results — never applied automatically.
+   * {@code value} is the new {@code budgetMax} a {@code RAISE_BUDGET} choice would set; {@code
+   * count} is how many listings that actually opens up. The user's own {@link SearchIntent} does
+   * not change until this is posted to {@code /api/v1/ai/apply} (see {@link
+   * AiSearchController#apply}) — viewing or scoring an auto-shown over-budget row is not consent.
+   */
+  public record Choice(String label, ChoiceAction action, int value, long count) {}
+
   public record AiSearchResponse(
       UUID sessionId,
       SearchIntent intent,
@@ -39,6 +53,7 @@ public final class SearchDtos {
       List<AiResult> homes,
       List<AiResult> flatmates,
       List<Relaxer> relaxers,
+      List<Choice> choices,
       String note) {}
 
   public record CompareRow(String label, List<String> values, Integer bestIndex) {}

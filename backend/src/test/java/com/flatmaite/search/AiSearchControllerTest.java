@@ -2,10 +2,13 @@ package com.flatmaite.search;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,10 +49,11 @@ class AiSearchControllerTest {
     when(rateLimiter.tryAcquire(anyString(), anyInt(), anyInt())).thenReturn(true);
     when(pipeline.search(any(), any(), any(), any(), any())).thenReturn(dummyResponse());
     when(pipeline.search(any(), any(), any(), any())).thenReturn(dummyResponse());
+    when(pipeline.search(any(), any(), any(), any(), any(), anyBoolean())).thenReturn(dummyResponse());
   }
 
   private static SearchDtos.AiSearchResponse dummyResponse() {
-    return new SearchDtos.AiSearchResponse(null, null, "mock", List.of(), List.of(), List.of(), null);
+    return new SearchDtos.AiSearchResponse(null, null, "mock", List.of(), List.of(), List.of(), List.of(), null);
   }
 
   private AiSearchSession mockSession(UUID sessionId) {
@@ -156,5 +160,40 @@ class AiSearchControllerTest {
     SearchIntent edited = SearchIntent.builder().roomType(RoomType.ENTIRE).build();
 
     assertThat(applied(null, edited).confidence()).containsEntry("roomType", 1.0);
+  }
+
+  @Test
+  void clickingRaiseBudget_takesTheEscalatedPath_notTheOrdinaryOverload() {
+    SearchIntent prior = SearchIntent.builder().budgetMax(15000).build();
+    SearchIntent edited = SearchIntent.builder().budgetMax(17000).build();
+
+    UUID sessionId = UUID.randomUUID();
+    AiSearchSession session = mockSession(sessionId);
+    when(sessions.requireOwned(eq(sessionId), any(), any())).thenReturn(session);
+    when(sessions.intentOf(session)).thenReturn(prior);
+
+    controller.apply(
+        new AiSearchController.ApplyIntentRequest(sessionId, edited),
+        new MockHttpServletRequest(),
+        new MockHttpServletResponse());
+
+    // the 6-arg overload, escalated=true — never the ordinary 4-arg one this same click would
+    // otherwise take
+    verify(pipeline).search(any(), any(), any(), any(), isNull(), eq(true));
+    verify(pipeline, never()).search(any(), any(), any(), any());
+  }
+
+  @Test
+  void loweringTheBudgetOnApply_neverEscalates() {
+    // a relaxer/chip edit that happens to touch budgetMax without raising it must stay on the
+    // ordinary path — applied() itself verifies the plain 4-arg overload was the one called
+    SearchIntent prior = SearchIntent.builder().budgetMax(15000).build();
+    applied(prior, prior.toBuilder().budgetMax(12000).build());
+  }
+
+  @Test
+  void keepingTheBudgetUnchangedOnApply_neverEscalates() {
+    SearchIntent prior = SearchIntent.builder().budgetMax(15000).build();
+    applied(prior, prior.toBuilder().budgetMax(15000).build());
   }
 }

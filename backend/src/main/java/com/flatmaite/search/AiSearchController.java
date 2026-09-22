@@ -122,7 +122,21 @@ public class AiSearchController {
     }
     SearchIntent endorsed = body.intent().toBuilder().confidence(endorsedGrades).build();
 
-    AiSearchResponse result = pipeline.search(endorsed, userId, anonKey, session.getId());
+    // A clicked "Raise budget to ₹X" choice is an /apply like any other, except this one re-run
+    // reaches escalationRadiusKm instead of nearbyRadiusKm (spec §4.7). Detected the same way the
+    // endorsement above is: by comparing what the user posted to what the session already had —
+    // never by trusting a client-sent flag. Every other /apply (a room-type chip, a relaxer click
+    // that happens to leave budgetMax alone) takes the ordinary, non-escalated path.
+    boolean escalatedBudget =
+        prior != null
+            && prior.budgetMax() != null
+            && endorsed.budgetMax() != null
+            && endorsed.budgetMax() > prior.budgetMax();
+
+    AiSearchResponse result =
+        escalatedBudget
+            ? pipeline.search(endorsed, userId, anonKey, session.getId(), null, true)
+            : pipeline.search(endorsed, userId, anonKey, session.getId());
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
     result.flatmates().forEach(r -> resultIds.add(r.flatmate().id()));

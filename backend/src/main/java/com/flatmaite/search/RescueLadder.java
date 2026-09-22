@@ -43,18 +43,32 @@ public final class RescueLadder {
    * <p>Tiers 1 and 2 carry {@code budgetMax} exactly as the user stated it. The ×1.1 headroom that
    * used to sit inside every query is tier 3 and nothing else (spec §4.5), so a block headed as
    * within budget holds only listings within it.
+   *
+   * <p>Rings 2 and 3 use {@code props.getNearbyRadiusKm()}. The one exception is the re-run that
+   * follows an explicit budget-raise click (spec §4.7) — see the 4-argument overload.
    */
   public static List<Tier> tiers(
       SearchIntent intent, Placement placement, FlatmaiteProperties.Search props) {
+    return tiers(intent, placement, props, props.getNearbyRadiusKm());
+  }
+
+  /**
+   * @param ringRadiusKm how far tiers 2 and 3 reach, in straight-line kilometres. Ordinarily {@code
+   *     props.getNearbyRadiusKm()} (see the 3-argument overload); the caller passes {@code
+   *     props.getEscalationRadiusKm()} instead for the single re-run that follows an explicit
+   *     "raise my budget" click. The two default to the same 5.0 but are configured separately on
+   *     purpose, so this is a distinct argument rather than a field read from {@code props} here.
+   */
+  public static List<Tier> tiers(
+      SearchIntent intent, Placement placement, FlatmaiteProperties.Search props, double ringRadiusKm) {
     List<Tier> out = new ArrayList<>();
     out.add(new Tier(SearchTier.EXACT, intent, 0.0));
     if (placement.placed()) {
-      out.add(new Tier(SearchTier.NEARBY, intent, props.getNearbyRadiusKm()));
+      out.add(new Tier(SearchTier.NEARBY, intent, ringRadiusKm));
     }
     if (intent.budgetMax() != null) {
       SearchIntent band = intent.toBuilder().budgetMax((int) (intent.budgetMax() * 1.1)).build();
-      out.add(
-          new Tier(SearchTier.OVER_BUDGET, band, placement.placed() ? props.getNearbyRadiusKm() : 0.0));
+      out.add(new Tier(SearchTier.OVER_BUDGET, band, placement.placed() ? ringRadiusKm : 0.0));
     }
     return out;
   }

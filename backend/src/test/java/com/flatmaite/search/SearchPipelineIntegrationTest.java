@@ -447,6 +447,60 @@ class SearchPipelineIntegrationTest {
     }
   }
 
+  @Test
+  @SuppressWarnings("unchecked")
+  void raisingTheBudgetSticksForTheRestOfTheSession() {
+    // Colaba's only seed listing (₹35,500) is far outside a ₹9,000 cap — the same fixture
+    // BudgetChoiceTest and aSearchWithNothingInTheBandStaysEmpty_andOffersACountedRaise rely on to
+    // prove a RAISE_BUDGET choice is actually offered here.
+    ResponseEntity<Map> first =
+        rest.postForEntity("/api/v1/ai/search", json(Map.of("query", "room in colaba under 9000")), Map.class);
+    Map<String, Object> firstData = (Map<String, Object>) first.getBody().get("data");
+    String freshSessionId = (String) firstData.get("sessionId");
+    String freshCookie = first.getHeaders().getFirst(HttpHeaders.SET_COOKIE).split(";")[0];
+    Map<String, Object> firstIntent = (Map<String, Object>) firstData.get("intent");
+    assertThat(firstIntent.get("budgetMax")).isEqualTo(9000);
+
+    List<Map<String, Object>> choices = (List<Map<String, Object>>) firstData.get("choices");
+    Map<String, Object> raise =
+        choices.stream()
+            .filter(c -> "RAISE_BUDGET".equals(c.get("action")))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no RAISE_BUDGET choice among " + choices));
+    int raisedValue = ((Number) raise.get("value")).intValue();
+    assertThat(raisedValue).isGreaterThan(9000);
+
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    headers.add(HttpHeaders.COOKIE, freshCookie);
+
+    // clicking the choice: the FULL modified intent, budgetMax patched to the raised value — /apply
+    // takes no partial patches, it replays whatever intent the client sends (AiSearchController.apply)
+    Map<String, Object> patchedIntent = new java.util.HashMap<>(firstIntent);
+    patchedIntent.put("budgetMax", raisedValue);
+    ResponseEntity<Map> appliedResp =
+        rest.postForEntity(
+            "/api/v1/ai/apply",
+            new HttpEntity<>(Map.of("sessionId", freshSessionId, "intent", patchedIntent), headers),
+            Map.class);
+    assertThat(appliedResp.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> appliedData = (Map<String, Object>) appliedResp.getBody().get("data");
+    Map<String, Object> appliedIntent = (Map<String, Object>) appliedData.get("intent");
+    assertThat(appliedIntent.get("budgetMax")).isEqualTo(raisedValue);
+
+    // sticky: a later refinement that never mentions budget still carries the raised value
+    ResponseEntity<Map> refined =
+        rest.postForEntity(
+            "/api/v1/ai/refine",
+            new HttpEntity<>(Map.of("query", "only verified ones", "sessionId", freshSessionId), headers),
+            Map.class);
+    assertThat(refined.getStatusCode()).isEqualTo(HttpStatus.OK);
+    Map<String, Object> refinedData = (Map<String, Object>) refined.getBody().get("data");
+    Map<String, Object> refinedIntent = (Map<String, Object>) refinedData.get("intent");
+    assertThat(refinedIntent.get("budgetMax")).isEqualTo(raisedValue);
+    assertThat(refinedIntent.get("verifiedOnly")).isEqualTo(true);
+  }
+
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

@@ -22,6 +22,8 @@ import com.flatmaite.search.MatchScorer.FlatmateCandidate;
 import com.flatmaite.search.MatchScorer.ListingCandidate;
 import com.flatmaite.search.MatchScorer.Scored;
 import com.flatmaite.search.SearchDtos.AiResult;
+import com.flatmaite.search.SearchDtos.Choice;
+import com.flatmaite.search.SearchDtos.ChoiceAction;
 import com.flatmaite.search.SearchDtos.Relaxer;
 import com.flatmaite.user.Profile;
 import com.flatmaite.user.ProfileRepository;
@@ -41,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -311,19 +314,34 @@ public class SearchPipeline {
 
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId) {
-    return search(intent, viewerId, anonKey, sessionId, null);
+    return search(intent, viewerId, anonKey, sessionId, null, false);
   }
 
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(
       SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note) {
+    return search(intent, viewerId, anonKey, sessionId, note, false);
+  }
+
+  /**
+   * @param escalated true only for the one re-run that follows an explicit "raise my budget" click
+   *     (spec §4.7): the fallback ladder's ring becomes {@code escalationRadiusKm} rather than
+   *     {@code nearbyRadiusKm} for this search alone. The automatic path — a page topped up with
+   *     nearby or over-budget rows the user never asked for — always passes {@code false}; only
+   *     {@link AiSearchController#apply} sets it, and only when the posted intent's own {@code
+   *     budgetMax} is higher than the session's prior one. Viewing or scoring an auto-shown row is
+   *     not the click that does this.
+   */
+  @Transactional(readOnly = true)
+  public SearchDtos.AiSearchResponse search(
+      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note, boolean escalated) {
     String intentHash = EmbeddingTextComposer.sha256(intentJson(intent));
     SearchTarget target = intent.targetOrDefault();
 
     Homes homes =
         target == SearchTarget.FLATMATES
             ? new Homes(List.of(), false, 0.0, 0, null)
-            : searchHomes(intent, intentHash, viewerId, anonKey);
+            : searchHomes(intent, intentHash, viewerId, anonKey, escalated);
     List<AiResult> flatmates =
         target == SearchTarget.PROPERTIES ? List.of() : searchFlatmates(intent, intentHash, viewerId, anonKey);
 
@@ -331,6 +349,15 @@ public class SearchPipeline {
     if (homes.results().isEmpty() && target != SearchTarget.FLATMATES) {
       relaxers = computeRelaxers(intent);
     }
+
+    // Offered alongside the results, whatever their number — a thin-but-nonempty page still
+    // deserves "Or: Kandivali has 3 from ₹17,000", not just a fully empty one. budgetChoice()
+    // itself is the gate: it comes back empty whenever the named place already has something
+    // in budget, or raising the budget would open no doors.
+    List<Choice> choices =
+        target == SearchTarget.FLATMATES
+            ? List.of()
+            : budgetChoice(intent, placementOf(intent)).map(List::of).orElse(List.of());
 
     String finalNote = note;
     if (homes.includesNearby()) {
@@ -365,6 +392,7 @@ public class SearchPipeline {
         homes.results(),
         flatmates,
         relaxers,
+        choices,
         finalNote);
   }
 
@@ -398,9 +426,16 @@ public class SearchPipeline {
     return Placement.none();
   }
 
-  private Homes searchHomes(SearchIntent intent, String intentHash, UUID viewerId, String anonKey) {
+  private Homes searchHomes(
+      SearchIntent intent, String intentHash, UUID viewerId, String anonKey, boolean escalated) {
+    // Both default to 5.0 km but are configured separately on purpose (spec §4.7): the automatic
+    // path never sees escalated=true, so a page the user never asked to widen stays within
+    // nearbyRadiusKm, and only the re-run after an explicit "raise my budget" click reaches out to
+    // escalationRadiusKm instead.
+    double ringRadiusKm =
+        escalated ? props.getSearch().getEscalationRadiusKm() : props.getSearch().getNearbyRadiusKm();
     List<RescueLadder.Tier> tiers =
-        RescueLadder.tiers(intent, placementOf(intent), props.getSearch());
+        RescueLadder.tiers(intent, placementOf(intent), props.getSearch(), ringRadiusKm);
     // Tier 1 is the page itself: the requested placement only, and the budget exactly as stated.
     // Its radius is the ladder's, not a default — a row from five kilometres away is a tier 2 row
     // that says so, never an "exact match" the user has to discover is in another suburb.
@@ -544,8 +579,7 @@ public class SearchPipeline {
             && !commuteIntent
             && !preferred.isEmpty()
             && top.stream().anyMatch(r -> r.candidate() != null && !r.inPreferred());
-    double nearbyRadiusKm =
-        rescue.widerRingRadiusKm() == null ? props.getSearch().getNearbyRadiusKm() : rescue.widerRingRadiusKm();
+    double nearbyRadiusKm = rescue.widerRingRadiusKm() == null ? ringRadiusKm : rescue.widerRingRadiusKm();
 
     long llmStart = System.currentTimeMillis();
     Map<UUID, Explanation> explanations =
@@ -891,6 +925,53 @@ public class SearchPipeline {
       }
     }
     return out;
+  }
+
+  /**
+   * The one compromise worth offering when a place has nothing in budget: what the cheapest
+   * listing there actually costs, and how many open up at that price. Returns empty when raising
+   * the budget changes nothing — either nothing is stated to raise, there is nowhere to anchor the
+   * claim, the cheapest option already fits (so there is nothing to open), or the rounded offer
+   * would open no doors — because an offer that opens no doors is noise.
+   *
+   * <p>This never writes to {@code intent}; it only ever reads it and hands back a number. The
+   * stated budget moves only when the caller posts this value to {@code /api/v1/ai/apply} — see
+   * {@link AiSearchController#apply}.
+   */
+  Optional<Choice> budgetChoice(SearchIntent intent, Placement placement) {
+    if (intent.budgetMax() == null || !placement.placed()) {
+      return Optional.empty();
+    }
+    SearchIntent uncapped = intent.toBuilder().budgetMax(null).build();
+    Integer cheapest = cheapestRentFor(uncapped);
+    if (cheapest == null || cheapest <= intent.budgetMax()) {
+      return Optional.empty();
+    }
+    int suggested = (int) (Math.ceil(cheapest / 500.0) * 500);
+    long count = countFor(intent.toBuilder().budgetMax(suggested).build());
+    if (count == 0) {
+      return Optional.empty();
+    }
+    String place = placementName(placement);
+    return Optional.of(
+        new Choice(
+            "%s has %d from ₹%,d".formatted(place, count, suggested),
+            ChoiceAction.RAISE_BUDGET,
+            suggested,
+            count));
+  }
+
+  /**
+   * The name to show for a placement's anchor — the first of its requested localities, or "your
+   * area" when the resolver cannot name it. Mirrors the fallback already used for the per-row
+   * commute label ({@code anchorName} in {@link #searchHomes}), so a choice and a row never
+   * disagree about what to call the same place.
+   */
+  private String placementName(Placement placement) {
+    if (placement.localityIds().isEmpty()) {
+      return "your area";
+    }
+    return Objects.requireNonNullElse(localityResolver.nameOf(placement.localityIds().get(0)), "your area");
   }
 
   private long countFor(SearchIntent intent) {
