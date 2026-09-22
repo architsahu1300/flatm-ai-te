@@ -3,18 +3,41 @@
 import { AiMatchCard } from "@/components/search/AiMatchCard";
 import { Button } from "@/components/ui/button";
 import { resultId } from "@/stores/ai-search-store";
-import { findRaiseBudgetChoice, type AiResult, type Choice, type ResultSummary } from "@/lib/ai-client";
+import {
+  findRaiseBudgetChoice,
+  formatRadiusKm,
+  type AiResult,
+  type Choice,
+  type ResultSummary,
+} from "@/lib/ai-client";
 
 const TIER_ORDER = ["EXACT", "NEARBY", "OVER_BUDGET"] as const;
 
-function tierTitle(tier: (typeof TIER_ORDER)[number], anchorName: string): string {
+/**
+ * Both figures in these subheads come off `resultSummary`, never from a literal here. The nearby
+ * ring is configurable (`SEARCH_NEARBY_RADIUS_KM`) *and* varies per search — the re-run after an
+ * explicit budget raise reaches out to `SEARCH_ESCALATION_RADIUS_KM` — so a hardcoded "5 km" is
+ * silently wrong on a re-tuned deployment and on every escalated page. With no ring on the
+ * response the block is worded without a number rather than with a guessed one.
+ *
+ * OVER_BUDGET says "Near {anchor}", not "In {anchor}": that tier is retrieved out to the full
+ * ring, so its rows carry badges like "2.1 km from Kandivali" — an "In Kandivali" heading would be
+ * contradicted by the cards directly underneath it.
+ */
+function tierTitle(
+  tier: (typeof TIER_ORDER)[number],
+  anchorName: string,
+  nearbyRadiusKm?: number | null,
+): string {
   switch (tier) {
     case "EXACT":
       return `In ${anchorName}`;
     case "NEARBY":
-      return "Within 5 km, under budget";
+      return nearbyRadiusKm != null
+        ? `Within ${formatRadiusKm(nearbyRadiusKm)} km, under budget`
+        : "Nearby, under budget";
     case "OVER_BUDGET":
-      return `In ${anchorName}, slightly over budget`;
+      return `Near ${anchorName}, slightly over budget`;
   }
 }
 
@@ -74,6 +97,8 @@ export function ResultGroups({
     <AiMatchCard
       key={resultId(r)}
       result={r}
+      // the "very close" threshold is SEARCH_CLOSE_RADIUS_KM, not a number this component owns
+      closeRadiusKm={summary?.closeRadiusKm}
       compareSelected={compareIds.includes(resultId(r))}
       onToggleCompare={() => onToggleCompare(resultId(r))}
     />
@@ -98,7 +123,7 @@ export function ResultGroups({
             return (
               <div key={tier}>
                 <h2 className="mb-3 text-sm font-semibold text-text-muted">
-                  {tierTitle(tier, anchorName)}
+                  {tierTitle(tier, anchorName, summary?.nearbyRadiusKm)}
                 </h2>
                 <div className="space-y-4">{items.map(card)}</div>
               </div>

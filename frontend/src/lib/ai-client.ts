@@ -101,6 +101,24 @@ export interface ResultSummary {
   overBudgetCount: number;
   headline?: string | null;
   terminus?: string | null;
+  // The two distances this page may print, sent so nothing here holds one of its own. Both are
+  // configurable server-side (SEARCH_NEARBY_RADIUS_KM, SEARCH_CLOSE_RADIUS_KM) and the ring
+  // additionally changes per search — the re-run after an explicit budget raise reaches out to
+  // SEARCH_ESCALATION_RADIUS_KM instead — so a hardcoded "5 km" in a subhead is wrong in three
+  // ways at once and says nothing when it is. `nearbyRadiusKm` is null when no ring was drawn
+  // around this page at all, and a subhead must then be worded without a figure.
+  nearbyRadiusKm?: number | null;
+  closeRadiusKm?: number | null;
+}
+
+/**
+ * A ring or threshold for a heading: "5" for 5.0, "2.5" for 2.5. The backend keeps these as
+ * doubles because they are configuration, but "Within 5.0 km" reads like a measurement nobody
+ * took — and this figure is a straight line between centroids, so a decimal that is always zero
+ * would claim a precision it does not have.
+ */
+export function formatRadiusKm(km: number): string {
+  return Number.isInteger(km) ? String(km) : km.toFixed(1);
 }
 
 /**
@@ -156,7 +174,9 @@ function deepEqual(a: unknown, b: unknown): boolean {
  * nothing else: every other field of `relaxedIntent` is deep-equal to the current intent's.
  */
 export function isBudgetRaiseRelaxer(rx: Relaxer, currentIntent: SearchIntent | null): boolean {
-  if (!currentIntent || rx.relaxedIntent.budgetMax === currentIntent.budgetMax) {
+  // relaxedIntent is non-null per the contract, but this runs on a parsed HTTP body: a truncated
+  // or older response reaching it must filter nothing rather than throw inside a render.
+  if (!currentIntent || !rx.relaxedIntent || rx.relaxedIntent.budgetMax === currentIntent.budgetMax) {
     return false;
   }
   return deepEqual(withoutBudgetMax(rx.relaxedIntent), withoutBudgetMax(currentIntent));

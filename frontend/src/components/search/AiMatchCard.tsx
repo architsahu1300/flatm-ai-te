@@ -14,10 +14,18 @@ export function AiMatchCard({
   result,
   compareSelected,
   onToggleCompare,
+  closeRadiusKm,
 }: {
   result: AiResult;
   compareSelected: boolean;
   onToggleCompare: () => void;
+  /**
+   * The "very close" threshold, from `resultSummary.closeRadiusKm` — i.e. from
+   * `SEARCH_CLOSE_RADIUS_KM`, which is configurable and which a literal here would render inert.
+   * Absent means we were not told the threshold, and the badge then states the distance rather
+   * than deciding on a number of its own what counts as close.
+   */
+  closeRadiusKm?: number | null;
 }) {
   const [whyOpen, setWhyOpen] = useState(false);
   const id = result.home?.id ?? result.flatmate?.id ?? "";
@@ -136,7 +144,7 @@ export function AiMatchCard({
                   number with no anchor name is meaningless, so both are required together. */}
               {result.distanceKm != null && result.anchorName && (
                 <Badge variant="default" className="mt-1.5 ml-1.5">
-                  {result.distanceKm <= 2
+                  {closeRadiusKm != null && result.distanceKm <= closeRadiusKm
                     ? "very close"
                     : `${result.distanceKm.toFixed(1)} km from ${result.anchorName}`}
                 </Badge>
