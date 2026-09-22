@@ -244,18 +244,23 @@ class SearchPipelineIntegrationTest {
     List<Map<String, Object>> homes = (List<Map<String, Object>>) data.get("homes");
     assertThat(homes).isEmpty();
 
+    // a relaxer for the one impossible filter, by name — not the "Start broader" reset, which would
+    // drop every other filter as well to relax this one
     List<Map<String, Object>> relaxers = (List<Map<String, Object>>) data.get("relaxers");
-    assertThat(relaxers).isNotEmpty();
-    assertThat(relaxers)
-        .anySatisfy(
-            r -> {
-              // the size relaxer clears bhk and nothing else — and never the exclusion
-              Map<String, Object> relaxed = (Map<String, Object>) r.get("relaxedIntent");
-              assertThat(relaxed.get("bhk")).isNull();
-              assertThat((List<Map<String, Object>>) relaxed.get("excludeLocations"))
-                  .extracting(l -> l.get("name"))
-                  .contains("Powai");
-            });
+    assertThat(relaxers).extracting(r -> (String) r.get("label")).doesNotContain("Start broader");
+    Map<String, Object> sizeRelaxer =
+        relaxers.stream()
+            .filter(r -> ((String) r.get("label")).contains("size"))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no size relaxer among " + relaxers));
+
+    assertThat(((Number) sizeRelaxer.get("extraResults")).longValue()).isGreaterThan(0);
+    // it clears bhk and nothing else — and never the exclusion, which is a promise
+    Map<String, Object> relaxed = (Map<String, Object>) sizeRelaxer.get("relaxedIntent");
+    assertThat(relaxed.get("bhk")).isNull();
+    assertThat((List<Map<String, Object>>) relaxed.get("excludeLocations"))
+        .extracting(l -> l.get("name"))
+        .contains("Powai");
   }
 
   @Test
@@ -327,7 +332,42 @@ class SearchPipelineIntegrationTest {
   }
 
   @Test
-  void theReportedBug_aKandivaliSearchNeverSmugglesInKurlaOrGoregaon() {
+  void aSlotWithNoHandWrittenRelaxer_stillGetsACountedOfferOfItsOwn() {
+    // No seed listing has a deposit of ₹1, so the page is empty. Before the ladder stopped dropping
+    // filters by itself, deposit was one of nine gated slots with no offer at all — the only way out
+    // was "Start broader", which drops every other filter to relax this one.
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .maxDeposit(1)
+            .verifiedOnly(true)
+            .excludeLocations(List.of(new SearchIntent.LocationRef("Kurla", SeedLocalities.id("Kurla"))))
+            .originalQuery("flat with a deposit of one rupee")
+            .build();
+
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+
+    assertThat(res.homes()).isEmpty();
+    assertThat(res.relaxers()).extracting(SearchDtos.Relaxer::label).doesNotContain("Start broader");
+    SearchDtos.Relaxer deposit =
+        res.relaxers().stream()
+            .filter(r -> r.label().contains("deposit"))
+            .findFirst()
+            .orElseThrow(() -> new AssertionError("no deposit relaxer among " + res.relaxers()));
+
+    assertThat(deposit.extraResults()).isGreaterThan(0);
+    assertThat(deposit.relaxedIntent().maxDeposit()).isNull();
+    // it gives up the deposit and nothing else: the exclusion the user typed is still a promise
+    assertThat(deposit.relaxedIntent().excludeLocations())
+        .extracting(SearchIntent.LocationRef::name)
+        .contains("Kurla");
+    assertThat(deposit.relaxedIntent().verifiedOnly()).isTrue();
+    // and the user's own intent is untouched until they click it
+    assertThat(res.intent().maxDeposit()).isEqualTo(1);
+  }
+
+  @Test
+  void theReportedBug_neitherKurlaNorGoregaonIsPassedOffAsAKandivaliMatch() {
     // "single sharing room in Kandivali under 15k" used to return a ₹12,000 room in Kurla and a
     // ₹14,500 room in Goregaon with nothing saying so. Kandivali has exactly one seed listing, so
     // the page is thin and the ladder does fire — but only out to five kilometres, and every row it
@@ -343,10 +383,20 @@ class SearchPipelineIntegrationTest {
     SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
 
     assertThat(res.homes()).isNotEmpty();
+    // Kurla is ~20 km east of Kandivali: outside every tier's ring, so it cannot appear at all
+    assertThat(res.homes()).extracting(r -> r.home().localityName()).doesNotContain("Kurla");
+    // Goregaon may legitimately fall inside the 5 km ring. What it may never be again is an
+    // unlabelled match: if it is on the page it is a near miss that says how far away it is.
+    assertThat(res.homes())
+        .filteredOn(r -> "Goregaon".equals(r.home().localityName()))
+        .allSatisfy(
+            r -> {
+              assertThat(r.nearMiss()).isTrue();
+              assertThat(r.nearMissReason()).contains("min from Kandivali");
+            });
     assertThat(res.homes())
         .allSatisfy(
             r -> {
-              assertThat(r.home().localityName()).isNotEqualTo("Kurla");
               // within budget exactly, or in the band and labelled as such
               if (r.home().rentMonthly() > 15000) {
                 assertThat(r.home().rentMonthly()).isLessThanOrEqualTo(16500);

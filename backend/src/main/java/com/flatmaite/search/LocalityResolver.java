@@ -238,8 +238,13 @@ public class LocalityResolver {
    * Ids this resolver does not know contribute nothing, and an anchor made entirely of such ids is
    * {@link Placement#none()} — the caller then has no place to widen around rather than a
    * fictitious one. {@code confidence} is the grade the slot that named them already earned.
+   *
+   * <p>The name carries the assumption: this always stamps {@link Placement.Source#GAZETTEER}, so
+   * it is only correct for ids that came from the gazetteer. Anything derived from the own-data
+   * step of {@link #resolve(String, CityScope)} must keep that step's own source and its fixed 0.5
+   * confidence (spec §4.3) and must not be run back through here.
    */
-  public Placement placementOf(List<UUID> localityIds, double confidence) {
+  public Placement gazetteerPlacementOf(List<UUID> localityIds, double confidence) {
     List<UUID> known =
         localityIds == null
             ? List.of()

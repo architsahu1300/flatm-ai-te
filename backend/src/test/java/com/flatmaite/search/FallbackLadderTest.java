@@ -106,12 +106,17 @@ class FallbackLadderTest {
   }
 
   @Test
-  void theBandIsTheOnlyTierThatEverMovesTheBudget_andItNeverMovesTheIntent() {
+  void theBandIsBuiltOnACopy_soTheUsersOwnIntentIsNeverRewritten() {
     SearchIntent intent = kandivaliUnder(15000);
 
-    RescueLadder.tiers(intent, kandivaliPlacement(), props);
+    List<RescueLadder.Tier> tiers = RescueLadder.tiers(intent, kandivaliPlacement(), props);
 
-    // tiers are retrieval concerns; the user's own intent is untouched by walking the ladder
+    // tiers are retrieval concerns (spec §4.5): the two under-budget tiers hand back the very
+    // intent they were given, and only the band is a new object — so a later refinement
+    // ("only verified ones") still carries ₹15,000 and not ₹16,500
+    assertThat(tiers.get(0).intent()).isSameAs(intent);
+    assertThat(tiers.get(1).intent()).isSameAs(intent);
+    assertThat(tiers.get(2).intent()).isNotSameAs(intent);
     assertThat(intent.budgetMax()).isEqualTo(15000);
   }
 

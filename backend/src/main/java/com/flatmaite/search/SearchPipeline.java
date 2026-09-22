@@ -383,7 +383,7 @@ public class SearchPipeline {
   Placement placementOf(SearchIntent intent) {
     if (ConfidenceGate.isHard(intent, "locations")) {
       Placement home =
-          localityResolver.placementOf(
+          localityResolver.gazetteerPlacementOf(
               retriever.requestedLocalityIds(intent), intent.confidenceOf("locations"));
       if (home.placed()) {
         return home;
@@ -392,7 +392,7 @@ public class SearchPipeline {
     if (ConfidenceGate.isHard(intent, "commuteTo")
         && intent.commuteTo() != null
         && intent.commuteTo().localityId() != null) {
-      return localityResolver.placementOf(
+      return localityResolver.gazetteerPlacementOf(
           List.of(intent.commuteTo().localityId()), intent.confidenceOf("commuteTo"));
     }
     return Placement.none();
@@ -748,11 +748,28 @@ public class SearchPipeline {
   private record RelaxerCandidate(Relaxer relaxer, String slot) {}
 
   /**
+   * Slots that already have a hand-written relaxer below, with a better label than a generic one
+   * could be ("Raise budget to ₹17,000" beats "Drop the budget filter"). The generic pass skips
+   * them rather than offering the same slot twice. {@code commuteTo} and its radius belong to the
+   * hand-written location relaxer, which clears both together — {@link RescueLadder#without} maps
+   * either of them onto the whole {@code commuteTo}, so a separate "commute time" offer would drop
+   * the workplace as well and be mislabelled.
+   */
+  private static final Set<String> HAND_WRITTEN_RELAXERS =
+      Set.of("budgetMax", "budgetMin", "lifestyle", "locations", "commuteTo", "commuteTo.maxMinutes", "verifiedOnly");
+
+  /**
    * "No results" is never a dead end — offer one-click constraint relaxations with real counts.
    * Offered in ascending order of the reader's confidence in the slot each relaxer relaxes: the
    * constraint the reader was least sure of is the one the user will miss least. Ties (equal
    * confidence, including the common case where every slot is a hard 1.0) break by the order the
    * candidates were considered, via a stable sort.
+   *
+   * <p>Since the fallback ladder stopped dropping filters on its own (WS6 §4.4), this is the only
+   * place a filter is ever given up, so every gated slot the user actually stated needs an offer of
+   * its own. Without one, the sole way out of an impossible {@code bhk} would be the "Start broader"
+   * reset at the bottom, which drops every filter at once — dropping nine constraints to relax one
+   * is not a visible relaxation of that one.
    */
   private List<Relaxer> computeRelaxers(SearchIntent intent) {
     List<RelaxerCandidate> candidates = new ArrayList<>();
@@ -818,6 +835,32 @@ public class SearchPipeline {
             new RelaxerCandidate(
                 new Relaxer("Search all of Mumbai", "shows %d more".formatted(count), relaxed, count),
                 "locations"));
+      }
+    }
+    // Every other slot the user stated and that is actually filtering gets its own counted offer,
+    // clearing that slot and nothing else. A soft slot is not filtering in the first place, so
+    // giving it up would open no doors; an exclusion the user typed is a promise and is never
+    // offered at all (verifiedOnly is ALWAYS_HARD too, but has its own hand-written offer above —
+    // the user clicking it is the consent the gate exists to require). This runs only on an empty
+    // page, and costs one count per stated slot.
+    for (String slot : SearchIntent.GATED_SLOTS) {
+      if (HAND_WRITTEN_RELAXERS.contains(slot)
+          || ConfidenceGate.ALWAYS_HARD.contains(slot)
+          || !ConfidenceGate.isPresent(intent, slot)
+          || !ConfidenceGate.isHard(intent, slot)) {
+        continue;
+      }
+      SearchIntent relaxed = RescueLadder.without(intent, slot);
+      long count = countFor(relaxed);
+      if (count > 0) {
+        candidates.add(
+            new RelaxerCandidate(
+                new Relaxer(
+                    "Drop the %s filter".formatted(ConfidenceGate.label(slot)),
+                    "shows %d more".formatted(count),
+                    relaxed,
+                    count),
+                slot));
       }
     }
     candidates.sort(Comparator.comparingDouble(c -> intent.confidenceOf(c.slot())));
