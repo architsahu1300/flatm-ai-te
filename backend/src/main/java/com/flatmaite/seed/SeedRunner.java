@@ -534,7 +534,13 @@ public class SeedRunner implements ApplicationRunner {
           .ifPresent(existing -> l.setEmbeddingTextHash(existing.getEmbeddingTextHash()));
       out.add(listings.save(l));
     }
-    // orphanRemoval does not fire on detached-merge; drop stale images from earlier seed versions
+    // orphanRemoval is unreliable on this detached-merge pattern: for most listings it never
+    // queues a delete (hence the raw JDBC sweep below), but for some it does, deferred to the
+    // next flush. Flush now, while those rows still exist, so any such delete lands normally
+    // instead of racing the raw sweep and later exploding as a StaleObjectStateException on
+    // whatever unrelated query (e.g. embedListings' properties.findAll()) triggers the auto-flush.
+    listings.flush();
+    // drop whatever orphanRemoval still didn't catch: stale images from earlier seed versions
     int strays =
         jdbcTemplate.update(
             "DELETE FROM listing_images WHERE id <> ALL (?)",
