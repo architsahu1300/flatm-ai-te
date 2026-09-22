@@ -66,7 +66,7 @@ class RentalVocabularyTest {
     LocalityResolver resolver = new LocalityResolver(localities, Mockito.mock(PropertyRepository.class));
     resolver.load();
 
-    SearchIntent intent = new KeywordIntentParser(resolver).parse(query);
+    SearchIntent intent = new KeywordIntentParser(resolver).parse(query, CityScope.unset());
     assertThat(intent.roomType()).isEqualTo(expected);
   }
 }

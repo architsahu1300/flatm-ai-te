@@ -276,7 +276,7 @@ class SearchPipelineIntegrationTest {
             .originalQuery("flat in colaba under 33000")
             .build();
 
-    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     assertThat(res.homes()).isNotEmpty();
     assertThat(res.homes().stream().filter(SearchDtos.AiResult::nearMiss)).isNotEmpty();
@@ -316,7 +316,7 @@ class SearchPipelineIntegrationTest {
             .originalQuery("flat in colaba under 9k")
             .build();
 
-    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     assertThat(res.homes()).isEmpty();
     assertThat(res.relaxers()).isNotEmpty();
@@ -345,7 +345,7 @@ class SearchPipelineIntegrationTest {
             .originalQuery("flat with a deposit of one rupee")
             .build();
 
-    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     assertThat(res.homes()).isEmpty();
     assertThat(res.relaxers()).extracting(SearchDtos.Relaxer::label).doesNotContain("Start broader");
@@ -380,7 +380,7 @@ class SearchPipelineIntegrationTest {
             .originalQuery("single sharing room in Kandivali under 15k")
             .build();
 
-    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     assertThat(res.homes()).isNotEmpty();
     // Kurla is ~20 km east of Kandivali: outside every tier's ring, so it cannot appear at all
@@ -425,7 +425,7 @@ class SearchPipelineIntegrationTest {
             .originalQuery("flat near work")
             .build();
 
-    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     assertThat(res.homes()).isNotEmpty();
     // commuteLabel/nearMissReason are legitimately null on some rows (no commute measured, or not a
@@ -566,8 +566,72 @@ class SearchPipelineIntegrationTest {
     assertThat(summary.get("headline")).isNull();
     assertThat(summary.get("anchorName")).isNull();
     assertThat(summary.get("terminus")).isNull();
+    // and no unplaced names either: that is what tells this case apart from §4.8's, which does
+    // get a headline. A client must not have to cross-reference the intent to know which it has.
+    assertThat((List<?>) summary.get("unplacedNames")).isEmpty();
     assertThat((List<Map<String, Object>>) data.get("homes"))
         .allSatisfy(h -> assertThat(h.get("distanceKm")).isNull());
+  }
+
+  @Test
+  void aNameNothingCouldPlaceIsSaidOutLoud_ratherThanLookingLikeAPlainCitywideSearch() {
+    // what IntentLocalities hands the pipeline when the reader named a place and no layer of the
+    // ladder could place it (spec §4.8). The mock provider cannot produce this — it only emits
+    // names it matched — so the intent is built the way the LLM path would leave it.
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .unresolvedLocations(List.of("Ulwe"))
+            .freeText("Ulwe")
+            .budgetMax(20000)
+            .originalQuery("room in Ulwe under 20k")
+            .build();
+
+    SearchDtos.ResultSummary scoped =
+        pipeline
+            .search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.of("Mumbai"))
+            .resultSummary();
+
+    assertThat(scoped.unplacedNames()).containsExactly("Ulwe");
+    assertThat(scoped.headline()).isEqualTo("We couldn't place \"Ulwe\". Showing results across Mumbai.");
+    assertThat(scoped.anchorName()).isNull();
+    assertThat(scoped.terminus()).isNull(); // nothing to be "near"
+
+    // an UNSET viewer is not told a city we never confined the search to
+    SearchDtos.ResultSummary unset =
+        pipeline
+            .search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset())
+            .resultSummary();
+    assertThat(unset.headline()).doesNotContain("Mumbai");
+    assertThat(unset.headline()).startsWith("We couldn't place \"Ulwe\".");
+  }
+
+  @Test
+  void anInferredPlaceRanksThePage_butLabelsNoRowWithADistanceFromIt() {
+    // a 0.5 `locations` is what an own-data binding arrives as. It puts no locality in the WHERE
+    // clause, so the page is citywide and there is no ring it was searched around — no row may
+    // claim "3.4 km from Kandivali" under a heading that calls it an exact match.
+    SearchIntent inferred =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .locations(List.of(new SearchIntent.LocationRef("Kandivali", SeedLocalities.id("Kandivali"))))
+            .confidence(Map.of("locations", 0.5))
+            .originalQuery("room near a society we only know from our own listings")
+            .build();
+
+    SearchDtos.AiSearchResponse res =
+        pipeline.search(inferred, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
+
+    assertThat(res.homes()).isNotEmpty();
+    assertThat(res.resultSummary().anchorName()).isNull();
+    assertThat(res.homes())
+        .allSatisfy(
+            r -> {
+              assertThat(r.anchorName()).isNull();
+              assertThat(r.distanceKm()).isNull();
+              assertThat(r.minutesFromAnchor()).isNull();
+              assertThat(r.tier()).isNotNull(); // tier is always set on a home row
+            });
   }
 
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {

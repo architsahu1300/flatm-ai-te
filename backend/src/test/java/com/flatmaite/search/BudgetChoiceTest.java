@@ -73,7 +73,7 @@ class BudgetChoiceTest {
     // raising the budget to exactly this value must actually open the page up — not "some", a real
     // non-empty result
     SearchIntent raised = intent.toBuilder().budgetMax(choice.value()).build();
-    AiSearchResponse raisedResponse = pipeline.search(raised, null, "test", UUID.randomUUID());
+    AiSearchResponse raisedResponse = pipeline.search(raised, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
     assertThat(raisedResponse.homes()).isNotEmpty();
   }
 
@@ -117,7 +117,7 @@ class BudgetChoiceTest {
             .originalQuery("flat in colaba under 33000")
             .build();
 
-    AiSearchResponse response = pipeline.search(intent, null, "test", UUID.randomUUID());
+    AiSearchResponse response = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
 
     // the page may contain a row over the stated budget...
     assertThat(response.homes()).anySatisfy(r -> assertThat(r.home().rentMonthly()).isGreaterThan(33000));
@@ -142,8 +142,8 @@ class BudgetChoiceTest {
             .originalQuery("flat in kandivali")
             .build();
 
-    AiSearchResponse ordinary = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false);
-    AiSearchResponse escalated = pipeline.search(intent, null, "test", UUID.randomUUID(), null, true);
+    AiSearchResponse ordinary = pipeline.search(intent, null, "test", UUID.randomUUID(), null, false, CityScope.unset());
+    AiSearchResponse escalated = pipeline.search(intent, null, "test", UUID.randomUUID(), null, true, CityScope.unset());
 
     assertThat(ordinary.note()).contains("~5.0 km");
     assertThat(escalated.note()).contains("~20.0 km");

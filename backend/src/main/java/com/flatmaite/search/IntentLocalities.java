@@ -18,6 +18,11 @@ import java.util.UUID;
  * layer can place moves to {@code unresolvedLocations} and stays in {@code freeText} so lexical and
  * semantic retrieval still see it. Never guesses by substring.
  *
+ * <p>Every locality id an intent carries passes through here, including ids some earlier step
+ * already bound — the keyword parser, the mock provider, a chip edit. Those are checked against the
+ * scope rather than trusted, because binding a name somewhere else must not become a way around the
+ * city boundary; this is the one place they all funnel through.
+ *
  * <p>This is the only production caller of {@link LocalityResolver#resolve(String, CityScope)}, so
  * it is also where the ladder's verdict is kept rather than thrown away. A binding the gazetteer
  * made is a statement and is graded elsewhere, by the words that produced it. A binding our own
@@ -54,6 +59,11 @@ public final class IntentLocalities {
     home = home.stream().filter(ref -> !excludedIds.contains(ref.localityId())).toList();
 
     CommuteTo commute = intent.commuteTo();
+    if (commute != null && !inScope(resolver, commute.localityId(), scope)) {
+      // an anchor bound outside this viewer's city is not their workplace: unbind it and let the
+      // ladder below try to place the name they actually typed, inside the scope
+      commute = new CommuteTo(commute.place(), null, commute.maxMinutes());
+    }
     if (commute != null && commute.localityId() == null) {
       Placement placement = resolver.resolve(commute.place(), scope);
       if (placement.placed()) {
@@ -95,7 +105,16 @@ public final class IntentLocalities {
     }
     for (LocationRef ref : refs) {
       if (ref.localityId() != null) {
-        out.add(ref);
+        // A ref that arrives already bound — the keyword parser, the mock provider, a chip edit —
+        // is still held to the scope here. Binding a name somewhere else must not be a way around
+        // the city boundary, and this is the one place every producer of ids funnels through. An id
+        // outside the scope, or one the gazetteer cannot place at all, is not this viewer's area:
+        // the name they typed is surfaced as unplaced rather than filtering on somebody else's city.
+        if (inScope(resolver, ref.localityId(), scope)) {
+          out.add(ref);
+        } else if (ref.name() != null && !unresolved.contains(ref.name())) {
+          unresolved.add(ref.name());
+        }
         continue;
       }
       Placement placement = resolver.resolve(ref.name(), scope);
@@ -113,6 +132,20 @@ public final class IntentLocalities {
       }
     }
     return out;
+  }
+
+  /**
+   * Whether a locality id belongs to the viewer's city. A null id has nothing to check — the caller
+   * is about to resolve a name instead. An {@code UNSET} scope reaches every seeded city (§4.11),
+   * so everything is in scope. A set scope admits only ids the gazetteer places in that city: an id
+   * it cannot place at all is not confirmable and is treated as out of scope, which errs toward not
+   * filtering on a place we cannot stand behind.
+   */
+  private static boolean inScope(LocalityResolver resolver, UUID localityId, CityScope scope) {
+    if (localityId == null || !scope.isSet()) {
+      return true;
+    }
+    return scope.city().equalsIgnoreCase(resolver.cityOf(localityId));
   }
 
   /**

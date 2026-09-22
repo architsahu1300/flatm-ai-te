@@ -225,7 +225,7 @@ public class SearchPipeline {
       extracted = intentLlm.extractWithMode(query, prior);
     } catch (Exception e) {
       log.warn("Intent extraction hard-failed, degrading to keyword parse", e);
-      extracted = new IntentLlm.Extraction(keywordParser.parse(query), IntentLlm.Mode.NONE);
+      extracted = new IntentLlm.Extraction(keywordParser.parse(query, scope), IntentLlm.Mode.NONE);
       success = false;
     }
     IntentLlm.Extraction resolved =
@@ -336,20 +336,12 @@ public class SearchPipeline {
 
   // ------------------------------------------------------------- search
 
-  /** Unscoped: resolution reaches every seeded city, which is what an UNSET viewer gets (§4.11). */
-  @Transactional(readOnly = true)
-  public SearchDtos.AiSearchResponse search(SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId) {
-    return search(intent, viewerId, anonKey, sessionId, null, false, CityScope.unset());
-  }
-
-  /** Unscoped: resolution reaches every seeded city, which is what an UNSET viewer gets (§4.11). */
-  @Transactional(readOnly = true)
-  public SearchDtos.AiSearchResponse search(
-      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note, boolean escalated) {
-    return search(intent, viewerId, anonKey, sessionId, note, escalated, CityScope.unset());
-  }
-
   /**
+   * There is deliberately no overload that defaults the scope. A caller that does not state which
+   * city it is searching in is a caller that has not thought about §4.11, and a convenience
+   * overload would let one compile — {@code CityScope.unset()} is cheap to type and says what it
+   * means.
+   *
    * @param escalated true only for the one re-run that follows an explicit "raise my budget" click
    *     (spec §4.7): the fallback ladder's ring becomes {@code escalationRadiusKm} rather than
    *     {@code nearbyRadiusKm} for this search alone. The automatic path — a page topped up with
@@ -424,10 +416,12 @@ public class SearchPipeline {
 
     // A flatmate-only search has no homes to tier, so it is anchored nowhere as far as the summary
     // is concerned — otherwise every such page would be headlined "No listings in Kandivali".
-    String anchorName = target == SearchTarget.FLATMATES ? null : anchorNameOf(placement);
+    boolean framed = target != SearchTarget.FLATMATES;
     SearchDtos.ResultSummary resultSummary =
         summarize(
-            anchorName,
+            framed ? anchorNameOf(placement) : null,
+            framed && intent.unresolvedLocations() != null ? List.copyOf(intent.unresolvedLocations()) : List.of(),
+            citySearchScope,
             intent,
             homes.exactCount(),
             countOf(homes.results(), RescueLadder.SearchTier.NEARBY),
@@ -455,17 +449,25 @@ public class SearchPipeline {
   }
 
   /**
-   * The framing above the results (spec §4.6). Everything here hangs off {@code anchorName}: with
-   * no anchor there is no headline and no terminus, because a query naming no locality at all is
-   * simply a citywide search and saying anything about "here" would be inventing a place. A
-   * headline appears only on a page that needs explaining — nothing at all, or fewer than three
-   * exact matches — and the terminus only when the ladder ran out with a budget in play, which is
-   * the one case where "no more" is a claim we can actually stand behind.
+   * The framing above the results (spec §4.6, §4.8). Unanchored splits in two, and the split is the
+   * point of carrying {@code unplacedNames}: a name nothing could place is told to the user — "We
+   * couldn't place 'Ulwe'" — whereas a query that named no place at all gets no framing whatever,
+   * because saying anything about "here" would be inventing a place. Neither has an anchor, so
+   * neither gets a terminus: there is nothing to be "near".
    */
   private SearchDtos.ResultSummary summarize(
-      String anchorName, SearchIntent intent, int exact, int nearby, int overBudget, boolean exhausted) {
+      String anchorName,
+      List<String> unplacedNames,
+      CityScope scope,
+      SearchIntent intent,
+      int exact,
+      int nearby,
+      int overBudget,
+      boolean exhausted) {
     if (anchorName == null) {
-      return new SearchDtos.ResultSummary(null, exact, nearby, overBudget, null, null);
+      String unplacedHeadline = unplacedNames.isEmpty() ? null : couldNotPlace(unplacedNames, scope);
+      return new SearchDtos.ResultSummary(
+          null, unplacedNames, exact, nearby, overBudget, unplacedHeadline, null);
     }
     String budget = intent.budgetMax() == null ? null : "₹%,d".formatted(intent.budgetMax());
     String headline =
@@ -479,7 +481,24 @@ public class SearchPipeline {
         exhausted && budget != null
             ? "No more listings within %s near %s.".formatted(budget, anchorName)
             : null;
-    return new SearchDtos.ResultSummary(anchorName, exact, nearby, overBudget, headline, terminus);
+    return new SearchDtos.ResultSummary(
+        anchorName, unplacedNames, exact, nearby, overBudget, headline, terminus);
+  }
+
+  /**
+   * The §4.8 headline for a name nothing could place. It names the city only when we know it: an
+   * {@code UNSET} viewer is already being told we don't know where they are ({@code citySearch}),
+   * and claiming "across Mumbai" to them would be the silent default this workstream exists to
+   * remove.
+   */
+  private static String couldNotPlace(List<String> names, CityScope scope) {
+    List<String> quoted = names.stream().map("\"%s\""::formatted).toList();
+    String listed =
+        quoted.size() == 1
+            ? quoted.get(0)
+            : String.join(", ", quoted.subList(0, quoted.size() - 1)) + " or " + quoted.get(quoted.size() - 1);
+    return "We couldn't place %s. Showing results %s."
+        .formatted(listed, scope.isSet() ? "across " + scope.city() : "from every area we cover");
   }
 
   /**
@@ -706,6 +725,12 @@ public class SearchPipeline {
     int exactCount =
         (int) top.stream().filter(r -> r.tier() == RescueLadder.SearchTier.EXACT).count();
     String rescueSummary = rescueReasons.isEmpty() ? null : String.join(", ", rescueReasons);
+    // `preferred` is ungated on purpose — a place the reader only inferred still ranks rows by
+    // proximity to it (that happens in the scorer). But it anchors nothing: no locality reached the
+    // WHERE clause, so the page is citywide and there is no ring it was searched around. The row's
+    // distance-shaped components say so by being absent, rather than labelling a citywide result
+    // "3.4 km from Kandivali" under a heading that calls it an exact match.
+    boolean anchored = placement.placed();
 
     List<AiResult> out = new ArrayList<>();
     for (Row r : top) {
@@ -741,9 +766,9 @@ public class SearchPipeline {
               nearMiss,
               nearMissReason,
               r.tier(),
-              r.distanceKm(),
-              r.commute(),
-              r.anchorName()));
+              anchored ? r.distanceKm() : null,
+              anchored ? r.commute() : null,
+              anchored ? r.anchorName() : null));
     }
     return new Homes(out, includesNearby, nearbyRadiusKm, exactCount, rescueSummary, exhausted);
   }

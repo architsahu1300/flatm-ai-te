@@ -49,7 +49,7 @@ class HybridRetrieverFiltersTest {
 
   @Test
   void withinMinutesOfPlace_parsesAsACeiling_andReachesTheFilter() {
-    SearchIntent intent = parser.parse("room within 20 min of bkc, 25k");
+    SearchIntent intent = parser.parse("room within 20 min of bkc, 25k", CityScope.unset());
 
     assertThat(intent.budgetMax()).isEqualTo(25000);
     assertThat(intent.budgetMin()).isNull();
@@ -63,7 +63,7 @@ class HybridRetrieverFiltersTest {
 
   @Test
   void moreThan_parsesAsAFloor_andReachesTheFilterWithNoHeadroom() {
-    SearchIntent intent = parser.parse("flat in andheri more than 30000");
+    SearchIntent intent = parser.parse("flat in andheri more than 30000", CityScope.unset());
 
     assertThat(intent.budgetMin()).isEqualTo(30000);
     assertThat(intent.budgetMax()).isNull();

@@ -292,6 +292,58 @@ class IntentLocalitiesTest {
     assertThat(out.unresolvedLocations()).isNull();
   }
 
+  // ---- ids that arrive already bound are still held to the scope (review finding 1) ----
+
+  @Test
+  void anIdBoundByAnEarlierStep_isStillCheckedAgainstTheScope() {
+    // the keyword parser and the mock provider both emit refs that already carry ids. Binding a
+    // name somewhere else must not be a way round the city boundary.
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Indiranagar", id("Indiranagar"))))
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.locations()).isNull();
+    assertThat(out.unresolvedLocations()).containsExactly("Indiranagar");
+  }
+
+  @Test
+  void anIdBoundByAnEarlierStep_survivesWhenItIsInScope() {
+    SearchIntent in =
+        SearchIntent.builder().locations(List.of(new LocationRef("Powai", id("Powai")))).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.locations()).containsExactly(new LocationRef("Powai", id("Powai")));
+    assertThat(out.unresolvedLocations()).isNull();
+  }
+
+  @Test
+  void aCommuteAnchorBoundOutsideTheScope_isUnboundAndRetriedByName() {
+    SearchIntent in =
+        SearchIntent.builder().commuteTo(new CommuteTo("Indiranagar", id("Indiranagar"), 30)).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.commuteTo().localityId()).isNull();
+    assertThat(out.unresolvedLocations()).containsExactly("Indiranagar");
+  }
+
+  @Test
+  void anUnscopedViewerKeepsEveryPreBoundId() {
+    // UNSET reaches every seeded city, so nothing an earlier step bound is taken away (§4.11)
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Indiranagar", id("Indiranagar"))))
+            .build();
+
+    assertThat(resolve(in, resolver).locations())
+        .extracting(LocationRef::localityId)
+        .containsExactly(id("Indiranagar"));
+  }
+
   @Test
   void aCommutePlaceOnlyOurOwnListingsCanPlace_stillAnchorsTheCommute() {
     ownData("Oberoi Splendor", id("BKC"));

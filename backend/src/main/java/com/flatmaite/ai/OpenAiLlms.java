@@ -1,6 +1,7 @@
 package com.flatmaite.ai;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flatmaite.search.CityScope;
 import com.flatmaite.search.KeywordIntentParser;
 import com.flatmaite.search.SearchIntent;
 import java.util.List;
@@ -164,7 +165,10 @@ public final class OpenAiLlms {
             return new Extraction(finish(call(intentSystemCurrent(), query, converter, first.getMessage()), query, null), Mode.NONE);
           } catch (Exception second) {
             log.warn("Intent repair failed, using keyword fallback: {}", second.getMessage());
-            return new Extraction(fallback.parse(query), Mode.NONE);
+            // Unscoped for the same reason MockIntentLlm is: IntentLlm is the provider contract
+            // and carries no city. IntentLocalities holds every id this produces to the viewer's
+            // scope, so a wrong-city binding is unbound there rather than filtering (spec §4.11).
+            return new Extraction(fallback.parse(query, CityScope.unset()), Mode.NONE);
           }
         }
       }

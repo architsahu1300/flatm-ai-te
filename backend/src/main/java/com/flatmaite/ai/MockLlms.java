@@ -1,5 +1,6 @@
 package com.flatmaite.ai;
 
+import com.flatmaite.search.CityScope;
 import com.flatmaite.search.KeywordIntentParser;
 import com.flatmaite.search.SearchIntent;
 import java.util.ArrayList;
@@ -16,9 +17,16 @@ public final class MockLlms {
 
     private final KeywordIntentParser parser;
 
+    /**
+     * Parsed unscoped, and deliberately so: {@link IntentLlm} is a provider contract shared with
+     * the real model, which is handed a vocabulary and emits names rather than ids, so it carries
+     * no city. The scope is enforced one layer up instead — {@code IntentLocalities} holds every
+     * pre-bound id to the viewer's city, so an id this mock resolves in the wrong one is unbound
+     * and the name is surfaced as unplaced rather than filtering on another city (spec §4.11).
+     */
     @Override
     public SearchIntent extract(String query, SearchIntent prior) {
-      SearchIntent parsed = parser.parse(query);
+      SearchIntent parsed = parser.parse(query, CityScope.unset());
       if (prior == null) {
         return parsed;
       }

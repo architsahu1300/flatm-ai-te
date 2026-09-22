@@ -100,7 +100,7 @@ class LocationWideningIntegrationTest {
   void nearbyHomes_areLabelledAndNoted_exactOnesAreNot() {
     String name = anchoredLocality();
 
-    AiSearchResponse r = pipeline.search(homeIn(name), null, null, UUID.randomUUID());
+    AiSearchResponse r = pipeline.search(homeIn(name), null, null, UUID.randomUUID(), null, false, CityScope.unset());
 
     List<AiResult> exact = r.homes().stream().filter(h -> h.commuteLabel() == null).toList();
     List<AiResult> nearby = r.homes().stream().filter(h -> h.commuteLabel() != null).toList();
@@ -119,7 +119,7 @@ class LocationWideningIntegrationTest {
     SearchIntent guessed =
         homeIn(name).toBuilder().confidence(java.util.Map.of("locations", 0.5)).build();
 
-    AiSearchResponse r = pipeline.search(guessed, null, null, UUID.randomUUID());
+    AiSearchResponse r = pipeline.search(guessed, null, null, UUID.randomUUID(), null, false, CityScope.unset());
 
     // nothing narrowed the query to a ring, so "within ~5.0 km" would be a claim about these rows
     // that the query never made true — the preferences sentence is what says something honest here
