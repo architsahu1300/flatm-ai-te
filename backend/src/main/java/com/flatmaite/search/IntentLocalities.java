@@ -12,16 +12,27 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Binds the names an intent carries (from the LLM, the parser or a chip edit) to locality ids, by
+ * Binds the names an intent carries (from the LLM or the keyword parser) to locality ids, by
  * walking the full resolution ladder — gazetteer, then our own listing inventory — inside the
  * viewer's city scope (spec §4.3). An ambiguous alias expands to one ref per locality; a name no
  * layer can place moves to {@code unresolvedLocations} and stays in {@code freeText} so lexical and
  * semantic retrieval still see it. Never guesses by substring.
  *
- * <p>Every locality id an intent carries passes through here, including ids some earlier step
- * already bound — the keyword parser, the mock provider, a chip edit. Those are checked against the
- * scope rather than trusted, because binding a name somewhere else must not become a way around the
- * city boundary; this is the one place they all funnel through.
+ * <p>Every locality id that reaches an intent <em>through extraction</em> passes through here,
+ * including ids an earlier step in that path already bound — the keyword parser, the mock provider.
+ * Those are checked against the scope rather than trusted, because binding a name somewhere else
+ * must not become a way around the city boundary.
+ *
+ * <p><b>The remaining seam is {@code /api/v1/ai/apply}.</b> {@link AiSearchController#apply} replays
+ * a client-posted intent straight through {@link SearchPipeline#search} without an extraction pass,
+ * so a chip edit's locality ids never reach this class and are not re-scoped; {@code
+ * HybridRetriever.idsOf} and {@code HybridRetriever.commuteAnchor} then resolve any bare names on
+ * that intent through the <em>unscoped</em> {@link LocalityResolver#resolve(String)}.
+ * Today that leaks nothing — one city is seeded, so unscoped and Mumbai-scoped resolution return
+ * the same rows, and locality ids are public data with no per-viewer authorization on them. It is
+ * recorded here rather than left implicit because the day a second city is imported it stops being
+ * harmless, and because a class javadoc claiming the check already happens is how a gap like this
+ * goes unnoticed.
  *
  * <p>This is the only production caller of {@link LocalityResolver#resolve(String, CityScope)}, so
  * it is also where the ladder's verdict is kept rather than thrown away. A binding the gazetteer

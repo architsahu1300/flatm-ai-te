@@ -431,7 +431,10 @@ public class SeedRunner implements ApplicationRunner {
       ListingType type = types[i];
       SeedLocalities.Seed ls = SeedLocalities.ALL.get(i % SeedLocalities.ALL.size());
       Locality loc = locs.get(i % locs.size());
-      User lister = allUsers.get(10 + (i % 40)); // users 11..50 are listers
+      // users 11..120 are listers. The modulus is USER_COUNT - 10 rather than a literal 40: at 40
+      // the tripled USER_COUNT left 70 users with nothing to their name and 40 listers carrying six
+      // listings each, which was the opposite of §4.2's reason for raising it.
+      User lister = allUsers.get(10 + (i % (USER_COUNT - 10)));
       short bhk = (short) (1 + rng.nextInt(3));
 
       Property prop =
