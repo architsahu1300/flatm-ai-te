@@ -40,6 +40,7 @@ public class AiSearchController {
   private final AiUsageService usage;
   private final RateLimiter rateLimiter;
   private final IntentArbiter arbiter;
+  private final ViewerCityScope cityScopes;
 
   @PostMapping("/search")
   public ResponseEntity<Map<String, Object>> search(
@@ -58,15 +59,20 @@ public class AiSearchController {
       prior = sessions.intentOf(session);
     }
 
+    // The city the viewer's places are resolved inside, and the city the response reports back.
+    // It reaches extraction as well as the search, because binding a name to a locality is where
+    // the scope actually bites — a scope carried only on the response would describe a search that
+    // never happened.
+    CityScope scope = cityScopes.forViewer(userId);
     IntentArbiter.Decision decision =
-        arbiter.decide(body.query(), prior, (q, p) -> pipeline.extractIntent(q, p, userId, anonKey));
+        arbiter.decide(body.query(), prior, (q, p) -> pipeline.extractIntent(q, p, userId, anonKey, scope));
     SearchIntent intent = decision.intent();
     String note = decision.note();
     if (session == null) {
       session = sessions.start(userId, anonKey, intent, body.query());
     }
 
-    AiSearchResponse result = pipeline.search(intent, userId, anonKey, session.getId(), note);
+    AiSearchResponse result = pipeline.search(intent, userId, anonKey, session.getId(), note, false, scope);
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
     result.flatmates().forEach(r -> resultIds.add(r.flatmate().id()));
@@ -134,9 +140,8 @@ public class AiSearchController {
             && endorsed.budgetMax() > prior.budgetMax();
 
     AiSearchResponse result =
-        escalatedBudget
-            ? pipeline.search(endorsed, userId, anonKey, session.getId(), null, true)
-            : pipeline.search(endorsed, userId, anonKey, session.getId());
+        pipeline.search(
+            endorsed, userId, anonKey, session.getId(), null, escalatedBudget, cityScopes.forViewer(userId));
     List<UUID> resultIds = new ArrayList<>();
     result.homes().forEach(r -> resultIds.add(r.home().id()));
     result.flatmates().forEach(r -> resultIds.add(r.flatmate().id()));
@@ -159,7 +164,8 @@ public class AiSearchController {
       throw ApiException.badRequest("compare_needs_results", "Pick 2–3 results from this search to compare");
     }
 
-    AiSearchResponse fresh = pipeline.search(intent, userId, anonKey, session.getId());
+    AiSearchResponse fresh =
+        pipeline.search(intent, userId, anonKey, session.getId(), null, false, cityScopes.forViewer(userId));
     List<AiResult> items =
         fresh.homes().stream().filter(r -> wanted.contains(r.home().id())).toList();
     if (items.size() < 2) {

@@ -17,6 +17,17 @@ public final class SearchDtos {
 
   public record CompareRequest(UUID sessionId, @Size(min = 2, max = 4) List<UUID> candidateIds) {}
 
+  /**
+   * One ranked row. The last four components are this workstream's addition (spec §4.6): which
+   * block of the page the row belongs to, and how far it is from the place the search is anchored
+   * on. All four are null when nothing anchored the search — a query naming no locality gets a
+   * citywide page with no distances to state, which is a different thing from an unplaceable name.
+   *
+   * <p>{@code commuteMinutes} and {@code minutesFromAnchor} are the same estimate but not the same
+   * field: {@code commuteMinutes} is set only when the row carries a {@code commuteLabel} to show,
+   * whereas {@code minutesFromAnchor} is filled whenever a distance was actually measured, so the
+   * client can sort or group by it without inheriting the labelling rule.
+   */
   public record AiResult(
       String kind, // "home" | "flatmate"
       int matchScore,
@@ -28,7 +39,11 @@ public final class SearchDtos {
       ListingDtos.CardResponse home,
       FlatmateDtos.CardResponse flatmate,
       boolean nearMiss,
-      String nearMissReason) {}
+      String nearMissReason,
+      RescueLadder.SearchTier tier,
+      Double distanceKm,
+      Integer minutesFromAnchor,
+      String anchorName) {}
 
   public record Relaxer(String label, String description, SearchIntent relaxedIntent, long extraResults) {}
 
@@ -46,6 +61,29 @@ public final class SearchDtos {
    */
   public record Choice(String label, ChoiceAction action, int value, long count) {}
 
+  /**
+   * How the page as a whole reads. {@code anchorName} is null when nothing anchored the search, and
+   * {@code headline} and {@code terminus} are null with it: a query naming no locality is citywide
+   * with no fallback framing at all (spec §4.8), which is deliberately not the same case as a name
+   * we could not place. {@code headline} is also null on a page that is simply healthy — three or
+   * more exact matches need no explaining.
+   */
+  public record ResultSummary(
+      String anchorName,
+      int exactCount,
+      int nearbyCount,
+      int overBudgetCount,
+      String headline,
+      String terminus) {}
+
+  /**
+   * The city this search was confined to, stated rather than left for the UI to infer (spec §4.11).
+   * {@code source} is {@code UNSET} — with a null {@code city} and a {@code prompt} to render — for
+   * anyone who has no profile locality, including every anonymous searcher. That is an explicit
+   * state, never a Mumbai default in disguise, and the results below the prompt are real.
+   */
+  public record CitySearch(String city, CityScope.Source source, String prompt) {}
+
   public record AiSearchResponse(
       UUID sessionId,
       SearchIntent intent,
@@ -53,8 +91,10 @@ public final class SearchDtos {
       List<AiResult> homes,
       List<AiResult> flatmates,
       List<Relaxer> relaxers,
+      String note,
+      ResultSummary resultSummary,
       List<Choice> choices,
-      String note) {}
+      CitySearch citySearch) {}
 
   public record CompareRow(String label, List<String> values, Integer bestIndex) {}
 

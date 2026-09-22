@@ -16,15 +16,25 @@ import org.mockito.Mockito;
 class IntentLocalitiesTest {
 
   private LocalityResolver resolver;
+  private PropertyRepository properties;
 
   private static Locality locality(String name, String... aliases) {
-    Locality l = Locality.builder().name(name).lat(19.0).lng(72.8).aliases(aliases).build();
+    return localityIn("Mumbai", name, aliases);
+  }
+
+  private static Locality localityIn(String city, String name, String... aliases) {
+    Locality l = Locality.builder().name(name).city(city).lat(19.0).lng(72.8).aliases(aliases).build();
     l.setId(UUID.nameUUIDFromBytes(name.getBytes()));
     return l;
   }
 
   private static UUID id(String name) {
     return UUID.nameUUIDFromBytes(name.getBytes());
+  }
+
+  /** The unscoped ladder — every seeded city, which is what an UNSET viewer gets (§4.11). */
+  private static SearchIntent resolve(SearchIntent intent, LocalityResolver resolver) {
+    return IntentLocalities.resolve(intent, resolver, CityScope.unset());
   }
 
   @BeforeEach
@@ -36,9 +46,24 @@ class IntentLocalitiesTest {
                 locality("Powai", "hiranandani"),
                 locality("Andheri East", "andheri"),
                 locality("Andheri West", "andheri"),
-                locality("BKC", "bandra kurla complex", "bandra kurla")));
-    resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
+                locality("BKC", "bandra kurla complex", "bandra kurla"),
+                localityIn("Bangalore", "Indiranagar")));
+    properties = Mockito.mock(PropertyRepository.class);
+    resolver = new LocalityResolver(repo, properties);
     resolver.load();
+  }
+
+  /**
+   * Makes our own Mumbai listings place {@code placeName} at {@code localityId} — resolution ladder
+   * step 2, the layer that exists so "Hiranandani" resolves because listings say Hiranandani.
+   */
+  private void ownData(String placeName, UUID localityId) {
+    PropertyRepository.PlacementRow row = Mockito.mock(PropertyRepository.PlacementRow.class);
+    Mockito.when(row.getLocalityId()).thenReturn(localityId);
+    Mockito.when(row.getLat()).thenReturn(19.12);
+    Mockito.when(row.getLng()).thenReturn(72.91);
+    List<PropertyRepository.PlacementRow> rows = List.of(row);
+    Mockito.when(properties.findPlacementByPlaceName(placeName, "Mumbai")).thenReturn(rows);
   }
 
   @Test
@@ -50,7 +75,7 @@ class IntentLocalitiesTest {
             .originalQuery("room in Atlantis")
             .build();
 
-    SearchIntent out = IntentLocalities.resolve(in, resolver);
+    SearchIntent out = resolve(in, resolver);
 
     assertThat(out.locations()).isNull();
     assertThat(out.unresolvedLocations()).containsExactly("Atlantis");
@@ -62,14 +87,14 @@ class IntentLocalitiesTest {
     SearchIntent in =
         SearchIntent.builder().locations(List.of(new LocationRef("Atlantis", null))).freeText("quiet room").build();
 
-    assertThat(IntentLocalities.resolve(in, resolver).freeText()).isEqualTo("quiet room Atlantis");
+    assertThat(resolve(in, resolver).freeText()).isEqualTo("quiet room Atlantis");
   }
 
   @Test
   void ambiguousAlias_expandsToEveryLocality() {
     SearchIntent in = SearchIntent.builder().locations(List.of(new LocationRef("andheri", null))).build();
 
-    SearchIntent out = IntentLocalities.resolve(in, resolver);
+    SearchIntent out = resolve(in, resolver);
 
     assertThat(out.locations()).extracting(LocationRef::localityId).containsExactlyInAnyOrder(id("Andheri East"), id("Andheri West"));
     assertThat(out.locations()).extracting(LocationRef::name).containsExactlyInAnyOrder("Andheri East", "Andheri West");
@@ -79,7 +104,7 @@ class IntentLocalitiesTest {
   void alreadyResolvedRef_keepsItsIdAndName() {
     SearchIntent in = SearchIntent.builder().locations(List.of(new LocationRef("My Powai", id("Powai")))).build();
 
-    assertThat(IntentLocalities.resolve(in, resolver).locations()).containsExactly(new LocationRef("My Powai", id("Powai")));
+    assertThat(resolve(in, resolver).locations()).containsExactly(new LocationRef("My Powai", id("Powai")));
   }
 
   @Test
@@ -87,12 +112,12 @@ class IntentLocalitiesTest {
     SearchIntent known = SearchIntent.builder().commuteTo(new CommuteTo("bandra kurla", null, 20)).build();
     SearchIntent unknown = SearchIntent.builder().commuteTo(new CommuteTo("Nowhere", null, 20)).build();
 
-    CommuteTo resolved = IntentLocalities.resolve(known, resolver).commuteTo();
+    CommuteTo resolved = resolve(known, resolver).commuteTo();
     assertThat(resolved.localityId()).isEqualTo(id("BKC"));
     assertThat(resolved.place()).isEqualTo("BKC");
     assertThat(resolved.maxMinutes()).isEqualTo(20);
 
-    SearchIntent out = IntentLocalities.resolve(unknown, resolver);
+    SearchIntent out = resolve(unknown, resolver);
     assertThat(out.commuteTo().localityId()).isNull();
     assertThat(out.unresolvedLocations()).containsExactly("Nowhere");
   }
@@ -101,7 +126,7 @@ class IntentLocalitiesTest {
   void excludedUnknownName_isSurfacedToo() {
     SearchIntent in = SearchIntent.builder().excludeLocations(List.of(new LocationRef("Atlantis", null))).build();
 
-    SearchIntent out = IntentLocalities.resolve(in, resolver);
+    SearchIntent out = resolve(in, resolver);
 
     assertThat(out.excludeLocations()).isNull();
     assertThat(out.unresolvedLocations()).containsExactly("Atlantis");
@@ -111,7 +136,7 @@ class IntentLocalitiesTest {
   void nothingToResolve_returnsTheSameIntent() {
     SearchIntent in = SearchIntent.builder().budgetMax(20000).build();
 
-    assertThat(IntentLocalities.resolve(in, resolver)).isSameAs(in);
+    assertThat(resolve(in, resolver)).isSameAs(in);
   }
 
   @Test
@@ -122,7 +147,7 @@ class IntentLocalitiesTest {
             .excludeLocations(List.of(new LocationRef("Powai", null)))
             .build();
 
-    SearchIntent out = IntentLocalities.resolve(in, resolver);
+    SearchIntent out = resolve(in, resolver);
 
     assertThat(out.locations()).isNull();
     assertThat(out.excludeLocations()).extracting(LocationRef::localityId).containsExactly(id("Powai"));
@@ -136,7 +161,7 @@ class IntentLocalitiesTest {
             .excludeLocations(List.of(new LocationRef("Powai", null)))
             .build();
 
-    SearchIntent out = IntentLocalities.resolve(in, resolver);
+    SearchIntent out = resolve(in, resolver);
 
     assertThat(out.locations()).extracting(LocationRef::localityId).containsExactly(id("Andheri East"));
   }
@@ -147,6 +172,136 @@ class IntentLocalitiesTest {
     SearchIntent in =
         SearchIntent.builder().unresolvedLocations(List.of("Atlantis")).freeText("quiet room").build();
 
-    assertThat(IntentLocalities.resolve(in, resolver).freeText()).isEqualTo("quiet room Atlantis");
+    assertThat(resolve(in, resolver).freeText()).isEqualTo("quiet room Atlantis");
+  }
+
+  // ---- the scoped resolution ladder (spec §4.3, ruling R9) ----
+
+  @Test
+  void aNameOnlyOurOwnListingsCanPlace_landsInLocations_notInUnresolved() {
+    ownData("Oberoi Splendor", id("Powai"));
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Oberoi Splendor", null)))
+            .originalQuery("room near Oberoi Splendor")
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.unresolvedLocations()).isNull();
+    assertThat(out.locations()).extracting(LocationRef::localityId).containsExactly(id("Powai"));
+    assertThat(out.locations()).extracting(LocationRef::name).containsExactly("Powai");
+  }
+
+  @Test
+  void anOwnDataBinding_arrivesAsAPreference_neverAsAHardFilter() {
+    ownData("Oberoi Splendor", id("Powai"));
+    SearchIntent in =
+        SearchIntent.builder().locations(List.of(new LocationRef("Oberoi Splendor", null))).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    // the fixed 0.5 the ladder's own-data step assigns, carried onto the slot it bound
+    assertThat(out.confidenceOf("locations")).isEqualTo(0.5);
+    assertThat(ConfidenceGate.isHard(out, "locations")).isFalse();
+  }
+
+  @Test
+  void aGazetteerHit_isNotDemotedToAPreference() {
+    SearchIntent in = SearchIntent.builder().locations(List.of(new LocationRef("Powai", null))).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.confidenceOf("locations")).isEqualTo(1.0);
+    assertThat(ConfidenceGate.isHard(out, "locations")).isTrue();
+  }
+
+  @Test
+  void oneInferredNameDragsTheWholeSlotDown_becauseTheFilterAppliesToTheListAtOnce() {
+    ownData("Oberoi Splendor", id("Andheri East"));
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Powai", null), new LocationRef("Oberoi Splendor", null)))
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.locations())
+        .extracting(LocationRef::localityId)
+        .containsExactly(id("Powai"), id("Andheri East"));
+    assertThat(out.confidenceOf("locations")).isEqualTo(0.5);
+  }
+
+  @Test
+  void ulweIsStillUnplaceable_whenNeitherLayerKnowsIt() {
+    // the spec's canonical unplaceable name: no gazetteer row, no listing of ours mentions it
+    Mockito.when(properties.findPlacementByPlaceName(Mockito.anyString(), Mockito.any()))
+        .thenReturn(List.of());
+    SearchIntent in =
+        SearchIntent.builder()
+            .locations(List.of(new LocationRef("Ulwe", null)))
+            .originalQuery("room in Ulwe")
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.locations()).isNull();
+    assertThat(out.unresolvedLocations()).containsExactly("Ulwe");
+    assertThat(out.confidence()).isNull();
+  }
+
+  @Test
+  void aNameFromAnotherCity_doesNotCrossTheScopeBoundary() {
+    SearchIntent in =
+        SearchIntent.builder().locations(List.of(new LocationRef("Indiranagar", null))).build();
+
+    SearchIntent scoped = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+    assertThat(scoped.locations()).isNull();
+    assertThat(scoped.unresolvedLocations()).containsExactly("Indiranagar");
+
+    // …and an UNSET viewer still reaches it, because unscoped means every city (§4.11)
+    SearchIntent unscoped = resolve(in, resolver);
+    assertThat(unscoped.locations()).extracting(LocationRef::localityId).containsExactly(id("Indiranagar"));
+  }
+
+  @Test
+  void anInferredNameNeverBindsAnExclusion_becauseNothingCanSoftenOne() {
+    // excludeLocations is ALWAYS_HARD, so a 0.5 would be recorded and then ignored: binding this
+    // would delete every listing in Powai on the strength of a society name we matched against our
+    // own inventory. It stays unplaced and is surfaced instead — what happens today.
+    ownData("Oberoi Splendor", id("Powai"));
+    SearchIntent in =
+        SearchIntent.builder()
+            .excludeLocations(List.of(new LocationRef("Oberoi Splendor", null)))
+            .build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.excludeLocations()).isNull();
+    assertThat(out.unresolvedLocations()).containsExactly("Oberoi Splendor");
+  }
+
+  @Test
+  void aGazetteerExclusionStillBinds() {
+    SearchIntent in =
+        SearchIntent.builder().excludeLocations(List.of(new LocationRef("Powai", null))).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.excludeLocations()).extracting(LocationRef::localityId).containsExactly(id("Powai"));
+    assertThat(out.unresolvedLocations()).isNull();
+  }
+
+  @Test
+  void aCommutePlaceOnlyOurOwnListingsCanPlace_stillAnchorsTheCommute() {
+    ownData("Oberoi Splendor", id("BKC"));
+    SearchIntent in =
+        SearchIntent.builder().commuteTo(new CommuteTo("Oberoi Splendor", null, 30)).build();
+
+    SearchIntent out = IntentLocalities.resolve(in, resolver, CityScope.of("Mumbai"));
+
+    assertThat(out.commuteTo().localityId()).isEqualTo(id("BKC"));
+    assertThat(out.unresolvedLocations()).isNull();
+    assertThat(out.confidenceOf("commuteTo")).isEqualTo(0.5);
   }
 }

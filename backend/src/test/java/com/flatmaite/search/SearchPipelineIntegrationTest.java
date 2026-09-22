@@ -501,6 +501,75 @@ class SearchPipelineIntegrationTest {
     assertThat(refinedIntent.get("verifiedOnly")).isEqualTo(true);
   }
 
+  // ---- what the API now tells the client about tiers, framing and the city (spec §4.6, §4.11) ----
+
+  @SuppressWarnings("unchecked")
+  private Map<String, Object> searchFor(String query) {
+    ResponseEntity<Map> response =
+        rest.postForEntity("/api/v1/ai/search", json(Map.of("query", query)), Map.class);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    return (Map<String, Object>) response.getBody().get("data");
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void aThinLocalityIsReportedAsSuchRatherThanQuietlyGoingCitywide() {
+    // Kandivali holds exactly one seed listing, so "under 15k" there is a thin page the ladder tops
+    // up — the client must be able to see that, not have to infer it from a prose note.
+    Map<String, Object> data = searchFor("single sharing room in Kandivali under 15k");
+
+    Map<String, Object> summary = (Map<String, Object>) data.get("resultSummary");
+    assertThat(summary.get("anchorName")).isEqualTo("Kandivali");
+    assertThat(summary.get("headline")).isNotNull();
+    assertThat(((Number) summary.get("exactCount")).intValue()).isLessThan(3);
+
+    List<Map<String, Object>> homes = (List<Map<String, Object>>) data.get("homes");
+    assertThat(homes).isNotEmpty();
+    assertThat(homes).allSatisfy(h -> assertThat(h.get("tier")).isNotNull());
+    assertThat(homes).allSatisfy(h -> assertThat(h.get("distanceKm")).isNotNull());
+    assertThat(homes).allSatisfy(h -> assertThat(h.get("anchorName")).isEqualTo("Kandivali"));
+    assertThat(homes).allSatisfy(h -> assertThat(h.get("minutesFromAnchor")).isNotNull());
+    // grouped in ladder order, so the client can render blocks by walking the list once
+    List<String> tierOrder = List.of("EXACT", "NEARBY", "OVER_BUDGET");
+    for (int i = 1; i < homes.size(); i++) {
+      assertThat(tierOrder.indexOf((String) homes.get(i).get("tier")))
+          .isGreaterThanOrEqualTo(tierOrder.indexOf((String) homes.get(i - 1).get("tier")));
+    }
+    // the counts add up to the page, so a client can group by tier without re-deriving them
+    int tiered =
+        ((Number) summary.get("exactCount")).intValue()
+            + ((Number) summary.get("nearbyCount")).intValue()
+            + ((Number) summary.get("overBudgetCount")).intValue();
+    assertThat(tiered).isEqualTo(homes.size());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void aUserWithNoProfileLocalityIsToldTheCityIsUnknown() {
+    // an anonymous searcher is UNSET too — results still appear, and the prompt says why
+    Map<String, Object> data = searchFor("private room under 20k");
+
+    Map<String, Object> citySearch = (Map<String, Object>) data.get("citySearch");
+    assertThat(citySearch.get("source")).isEqualTo("UNSET");
+    assertThat(citySearch.get("city")).isNull();
+    assertThat((String) citySearch.get("prompt")).contains("don't know which city");
+    assertThat((List<?>) data.get("homes")).isNotEmpty(); // not an error state
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void aQueryNamingNoLocalityGetsNoFallbackFraming() {
+    // citywide with no headline and no anchor — a different case from an unplaceable name
+    Map<String, Object> data = searchFor("private room under 20k");
+
+    Map<String, Object> summary = (Map<String, Object>) data.get("resultSummary");
+    assertThat(summary.get("headline")).isNull();
+    assertThat(summary.get("anchorName")).isNull();
+    assertThat(summary.get("terminus")).isNull();
+    assertThat((List<Map<String, Object>>) data.get("homes"))
+        .allSatisfy(h -> assertThat(h.get("distanceKm")).isNull());
+  }
+
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

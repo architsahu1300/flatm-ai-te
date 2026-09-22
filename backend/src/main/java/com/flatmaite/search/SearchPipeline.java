@@ -66,6 +66,14 @@ public class SearchPipeline {
   private static final int RESULT_LIMIT = 20;
   private static final org.slf4j.Logger CONFIDENCE_LOG = org.slf4j.LoggerFactory.getLogger(SearchPipeline.class);
 
+  /**
+   * What the UI renders above the results when the viewer has no city (spec §4.11). Not an error:
+   * the results below it are real, and once a second city exists this sentence becomes the entry
+   * point to a city selector rather than a link to the profile.
+   */
+  static final String CITY_PROMPT =
+      "We don't know which city you're in. Set your location on your profile so we can show homes near you.";
+
   private final IntentLlm intentLlm;
   private final KeywordIntentParser keywordParser;
   private final HybridRetriever retriever;
@@ -90,13 +98,18 @@ public class SearchPipeline {
    * Ranked homes plus whether any came from outside the requested localities, and — when the
    * exact-match page came back thin — how many of {@code results} are exact ({@code exactCount})
    * and which tiers topped it up ({@code rescueSummary}, null when the ladder never fired).
+   *
+   * <p>{@code exhausted} is the ladder's tier 4 (spec §4.4): every tier has been walked and the
+   * page is still short of {@code minResults}, so there is genuinely nothing more to add. That is
+   * what earns the summary's terminus line; a full page never says it.
    */
   private record Homes(
       List<AiResult> results,
       boolean includesNearby,
       double radiusKm,
       int exactCount,
-      String rescueSummary) {}
+      String rescueSummary,
+      boolean exhausted) {}
 
   /**
    * What walking the fallback ladder added on top of the exact page: the new candidates, which tier
@@ -170,7 +183,14 @@ public class SearchPipeline {
 
   // ------------------------------------------------------------- intent
 
-  public IntentLlm.Extraction extractIntent(String query, SearchIntent prior, UUID userId, String anonKey) {
+  /**
+   * @param scope the city the viewer's places are resolved inside (spec §4.11), which is part of
+   *     what a query means: "MG Road" is a different place in Mumbai and in Bangalore, so it is
+   *     part of the cache key too rather than letting two viewers in different cities share an
+   *     extraction.
+   */
+  public IntentLlm.Extraction extractIntent(
+      String query, SearchIntent prior, UUID userId, String anonKey, CityScope scope) {
     long start = System.currentTimeMillis();
     AiFeature feature = prior == null ? AiFeature.INTENT_EXTRACTION : AiFeature.REFINEMENT;
 
@@ -183,14 +203,14 @@ public class SearchPipeline {
       // changes exactly the slot instructed. The new number is our arithmetic, not the user's word,
       // so grading it against the query would demote the clearest thing they said. Carry the grades
       // the conversation already earned.
-      SearchIntent resolved = resolveLocalities(heuristic);
+      SearchIntent resolved = resolveLocalities(heuristic, scope);
       SearchIntent carried =
           resolved.toBuilder().confidence(prior == null ? null : prior.confidence()).build();
       return new IntentLlm.Extraction(carried, IntentLlm.Mode.NONE);
     }
 
     // 2) cache
-    String cacheKey = cacheKey(query, prior);
+    String cacheKey = cacheKey(query, prior, scope);
     IntentLlm.Extraction cached = intentCache.getIfPresent(cacheKey);
     if (cached != null) {
       usageService.log(userId, anonKey, feature, intentLlm.providerName(), intentLlm.model(), 0, 0, true, true,
@@ -210,7 +230,7 @@ public class SearchPipeline {
     }
     IntentLlm.Extraction resolved =
         new IntentLlm.Extraction(
-            withConfidence(resolveLocalities(extracted.intent()), query, prior, localityResolver),
+            withConfidence(resolveLocalities(extracted.intent(), scope), query, prior, localityResolver),
             extracted.mode());
     intentCache.put(cacheKey, resolved);
     usageService.log(
@@ -228,9 +248,13 @@ public class SearchPipeline {
     return resolved;
   }
 
-  /** Name → id binding; names no layer can place are surfaced and logged for the eval report. */
-  private SearchIntent resolveLocalities(SearchIntent intent) {
-    SearchIntent resolved = IntentLocalities.resolve(intent, localityResolver);
+  /**
+   * Name → id binding through the full resolution ladder, confined to {@code scope}; names no layer
+   * can place are surfaced and logged for the eval report. This is where the ladder built by tasks
+   * 5 and 6 actually runs in a production search — nothing else calls it.
+   */
+  private SearchIntent resolveLocalities(SearchIntent intent, CityScope scope) {
+    SearchIntent resolved = IntentLocalities.resolve(intent, localityResolver, scope);
     List<String> before = intent.unresolvedLocations() == null ? List.of() : intent.unresolvedLocations();
     if (resolved.unresolvedLocations() != null) {
       for (String name : resolved.unresolvedLocations()) {
@@ -312,15 +336,17 @@ public class SearchPipeline {
 
   // ------------------------------------------------------------- search
 
+  /** Unscoped: resolution reaches every seeded city, which is what an UNSET viewer gets (§4.11). */
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId) {
-    return search(intent, viewerId, anonKey, sessionId, null, false);
+    return search(intent, viewerId, anonKey, sessionId, null, false, CityScope.unset());
   }
 
+  /** Unscoped: resolution reaches every seeded city, which is what an UNSET viewer gets (§4.11). */
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(
-      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note) {
-    return search(intent, viewerId, anonKey, sessionId, note, false);
+      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note, boolean escalated) {
+    return search(intent, viewerId, anonKey, sessionId, note, escalated, CityScope.unset());
   }
 
   /**
@@ -331,17 +357,28 @@ public class SearchPipeline {
    *     {@link AiSearchController#apply} sets it, and only when the posted intent's own {@code
    *     budgetMax} is higher than the session's prior one. Viewing or scoring an auto-shown row is
    *     not the click that does this.
+   * @param scope the viewer's city (spec §4.11), reported back on the response so the UI never has
+   *     to infer it. An {@code UNSET} scope is a state, not a Mumbai default: the page is real and
+   *     carries a prompt saying we don't know where the viewer is.
    */
   @Transactional(readOnly = true)
   public SearchDtos.AiSearchResponse search(
-      SearchIntent intent, UUID viewerId, String anonKey, UUID sessionId, String note, boolean escalated) {
+      SearchIntent intent,
+      UUID viewerId,
+      String anonKey,
+      UUID sessionId,
+      String note,
+      boolean escalated,
+      CityScope scope) {
     String intentHash = EmbeddingTextComposer.sha256(intentJson(intent));
     SearchTarget target = intent.targetOrDefault();
+    CityScope citySearchScope = scope == null ? CityScope.unset() : scope;
+    Placement placement = placementOf(intent);
 
     Homes homes =
         target == SearchTarget.FLATMATES
-            ? new Homes(List.of(), false, 0.0, 0, null)
-            : searchHomes(intent, intentHash, viewerId, anonKey, escalated);
+            ? new Homes(List.of(), false, 0.0, 0, null, false)
+            : searchHomes(intent, intentHash, viewerId, anonKey, escalated, placement);
     List<AiResult> flatmates =
         target == SearchTarget.PROPERTIES ? List.of() : searchFlatmates(intent, intentHash, viewerId, anonKey);
 
@@ -357,7 +394,7 @@ public class SearchPipeline {
     List<Choice> choices =
         target == SearchTarget.FLATMATES
             ? List.of()
-            : budgetChoice(intent, placementOf(intent)).map(List::of).orElse(List.of());
+            : budgetChoice(intent, placement).map(List::of).orElse(List.of());
 
     String finalNote = note;
     if (homes.includesNearby()) {
@@ -385,6 +422,18 @@ public class SearchPipeline {
       finalNote = finalNote == null ? preferences : finalNote + " " + preferences;
     }
 
+    // A flatmate-only search has no homes to tier, so it is anchored nowhere as far as the summary
+    // is concerned — otherwise every such page would be headlined "No listings in Kandivali".
+    String anchorName = target == SearchTarget.FLATMATES ? null : anchorNameOf(placement);
+    SearchDtos.ResultSummary resultSummary =
+        summarize(
+            anchorName,
+            intent,
+            homes.exactCount(),
+            countOf(homes.results(), RescueLadder.SearchTier.NEARBY),
+            countOf(homes.results(), RescueLadder.SearchTier.OVER_BUDGET),
+            homes.exhausted());
+
     return new SearchDtos.AiSearchResponse(
         sessionId,
         intent,
@@ -392,8 +441,45 @@ public class SearchPipeline {
         homes.results(),
         flatmates,
         relaxers,
+        finalNote,
+        resultSummary,
         choices,
-        finalNote);
+        new SearchDtos.CitySearch(
+            citySearchScope.city(),
+            citySearchScope.source(),
+            citySearchScope.isSet() ? null : CITY_PROMPT));
+  }
+
+  private static int countOf(List<AiResult> results, RescueLadder.SearchTier tier) {
+    return (int) results.stream().filter(r -> r.tier() == tier).count();
+  }
+
+  /**
+   * The framing above the results (spec §4.6). Everything here hangs off {@code anchorName}: with
+   * no anchor there is no headline and no terminus, because a query naming no locality at all is
+   * simply a citywide search and saying anything about "here" would be inventing a place. A
+   * headline appears only on a page that needs explaining — nothing at all, or fewer than three
+   * exact matches — and the terminus only when the ladder ran out with a budget in play, which is
+   * the one case where "no more" is a claim we can actually stand behind.
+   */
+  private SearchDtos.ResultSummary summarize(
+      String anchorName, SearchIntent intent, int exact, int nearby, int overBudget, boolean exhausted) {
+    if (anchorName == null) {
+      return new SearchDtos.ResultSummary(null, exact, nearby, overBudget, null, null);
+    }
+    String budget = intent.budgetMax() == null ? null : "₹%,d".formatted(intent.budgetMax());
+    String headline =
+        exact == 0
+            ? "No listings in %s%s.".formatted(anchorName, budget == null ? "" : " under " + budget)
+            : exact < 3
+                ? "Only %d listing%s in %s%s."
+                    .formatted(exact, exact == 1 ? "" : "s", anchorName, budget == null ? "" : " under " + budget)
+                : null;
+    String terminus =
+        exhausted && budget != null
+            ? "No more listings within %s near %s.".formatted(budget, anchorName)
+            : null;
+    return new SearchDtos.ResultSummary(anchorName, exact, nearby, overBudget, headline, terminus);
   }
 
   /**
@@ -427,7 +513,12 @@ public class SearchPipeline {
   }
 
   private Homes searchHomes(
-      SearchIntent intent, String intentHash, UUID viewerId, String anonKey, boolean escalated) {
+      SearchIntent intent,
+      String intentHash,
+      UUID viewerId,
+      String anonKey,
+      boolean escalated,
+      Placement placement) {
     // Both default to 5.0 km but are configured separately on purpose (spec §4.7): the automatic
     // path never sees escalated=true, so a page the user never asked to widen stays within
     // nearbyRadiusKm, and only the re-run after an explicit "raise my budget" click reaches out to
@@ -435,7 +526,7 @@ public class SearchPipeline {
     double ringRadiusKm =
         escalated ? props.getSearch().getEscalationRadiusKm() : props.getSearch().getNearbyRadiusKm();
     List<RescueLadder.Tier> tiers =
-        RescueLadder.tiers(intent, placementOf(intent), props.getSearch(), ringRadiusKm);
+        RescueLadder.tiers(intent, placement, props.getSearch(), ringRadiusKm);
     // Tier 1 is the page itself: the requested placement only, and the budget exactly as stated.
     // Its radius is the ladder's, not a default — a row from five kilometres away is a tier 2 row
     // that says so, never an "exact match" the user has to discover is in another suburb.
@@ -462,9 +553,13 @@ public class SearchPipeline {
       tierOf.putAll(rescue.tierOf());
     }
     List<String> rescueReasons = rescue.reasons();
+    // Tier 4 (spec §4.4): every tier has been walked and the page is still short. Read off the
+    // whole union rather than the twenty rows shown, so a page truncated by RESULT_LIMIT — which
+    // has plenty more to offer — never claims there is nothing left.
+    boolean exhausted = byId.size() < props.getSearch().getMinResults();
 
     if (byId.isEmpty()) {
-      return new Homes(List.of(), false, 0.0, 0, null);
+      return new Homes(List.of(), false, 0.0, 0, null, exhausted);
     }
     List<Listing> hydrated = listingQueryService.hydrate(new ArrayList<>(byId.keySet()));
 
@@ -500,6 +595,7 @@ public class SearchPipeline {
         Candidate candidate,
         Scored scored,
         Integer commute,
+        Double distanceKm,
         String anchorName,
         boolean inPreferred,
         RescueLadder.SearchTier tier) {}
@@ -510,6 +606,7 @@ public class SearchPipeline {
       boolean inPreferred = c != null && preferred.contains(c.localityId());
       UUID anchor = commuteAnchor;
       Integer commuteMinutes = null;
+      Double distanceKm = null;
       if (c != null) {
         if (anchor == null && !preferred.isEmpty()) {
           anchor = nearestOf(preferred, c);
@@ -519,22 +616,28 @@ public class SearchPipeline {
               c.lat() != null
                   ? commuteEstimator.minutesFromPoint(c.lat(), c.lng(), anchor)
                   : commuteEstimator.minutesBetween(c.localityId(), anchor);
+          Double km =
+              c.lat() != null
+                  ? commuteEstimator.kmFromPoint(c.lat(), c.lng(), anchor)
+                  : commuteEstimator.kmBetween(c.localityId(), anchor);
+          // one decimal: the figure is a straight line between centroids, and "3.14159 km" would
+          // claim a precision the estimate does not have
+          distanceKm = km == null ? null : Math.round(km * 10) / 10.0;
         }
       }
       // anchor is a real, resolved locality id whenever it is non-null (see commuteAnchor/nearestOf
       // above), but nameOf can still come back null if the resolver's cache is stale relative to
-      // the id it was handed — "your area" is the same honest placeholder already used when there
-      // is no anchor at all, never a wrong city standing in for a place we cannot name. The
-      // commuteIntent branch needs the identical guard: commuteTo.place is a plain nullable String
-      // on the wire (SearchIntent.CommuteTo), and /apply replays a client-submitted intent straight
-      // through this pipeline with no IntentLocalities.resolve pass — a body carrying only
+      // the id it was handed. Null here means exactly "we cannot name this place", never a wrong
+      // city standing in for one: it is what the API reports as the row's anchorName, and it is
+      // what anchorLabel() turns into the honest "your area" placeholder for prose. The
+      // commuteIntent branch needs no different treatment: commuteTo.place is a plain nullable
+      // String on the wire (SearchIntent.CommuteTo), and /apply replays a client-submitted intent
+      // straight through this pipeline with no IntentLocalities.resolve pass — a body carrying only
       // commuteTo.localityId (no place) must not render the literal "null" into "~N min to null".
       String anchorName =
           commuteIntent
-              ? Objects.requireNonNullElse(intent.commuteTo().place(), "your area")
-              : anchor == null
-                  ? "your area"
-                  : Objects.requireNonNullElse(localityResolver.nameOf(anchor), "your area");
+              ? intent.commuteTo().place()
+              : anchor == null ? null : localityResolver.nameOf(anchor);
       ListingCandidate candidate =
           new ListingCandidate(
               l,
@@ -547,7 +650,7 @@ public class SearchPipeline {
               idVerified.contains(l.getListerId()),
               c == null ? HybridRetriever.Retrieval.NONE : c.retrieval(),
               commuteMinutes,
-              anchorName,
+              anchorLabel(anchorName),
               commuteIntent,
               decayMinutes,
               inPreferred);
@@ -557,6 +660,7 @@ public class SearchPipeline {
               c,
               MatchScorer.scoreListing(intent, candidate),
               commuteMinutes,
+              distanceKm,
               anchorName,
               inPreferred,
               tierOf.getOrDefault(l.getId(), RescueLadder.SearchTier.EXACT)));
@@ -610,7 +714,8 @@ public class SearchPipeline {
       String label =
           r.commute() == null || (!commuteIntent && r.inPreferred())
               ? null
-              : "~%d min %s %s (estimate)".formatted(r.commute(), commuteIntent ? "to" : "from", r.anchorName());
+              : "~%d min %s %s (estimate)"
+                  .formatted(r.commute(), commuteIntent ? "to" : "from", anchorLabel(r.anchorName()));
       boolean nearMiss = r.tier() != RescueLadder.SearchTier.EXACT;
       String nearMissReason =
           nearMiss
@@ -618,7 +723,7 @@ public class SearchPipeline {
                   r.tier(),
                   r.listing().getRentMonthly(),
                   r.commute(),
-                  r.anchorName(),
+                  anchorLabel(r.anchorName()),
                   commuteIntent,
                   intent)
               : null;
@@ -634,9 +739,22 @@ public class SearchPipeline {
               cards.get(r.listing().getId()),
               null,
               nearMiss,
-              nearMissReason));
+              nearMissReason,
+              r.tier(),
+              r.distanceKm(),
+              r.commute(),
+              r.anchorName()));
     }
-    return new Homes(out, includesNearby, nearbyRadiusKm, exactCount, rescueSummary);
+    return new Homes(out, includesNearby, nearbyRadiusKm, exactCount, rescueSummary, exhausted);
+  }
+
+  /**
+   * What to call the anchor in prose when we cannot name it. Null means "we don't know which place
+   * this is", which is honest on the wire but unreadable in a sentence — "your area" is the same
+   * placeholder the page has always used, and never a wrong city standing in for a real one.
+   */
+  private static String anchorLabel(String anchorName) {
+    return Objects.requireNonNullElse(anchorName, "your area");
   }
 
   /**
@@ -771,6 +889,12 @@ public class SearchPipeline {
               null,
               cards.get(r.fp().getId()),
               false,
+              null,
+              // a flatmate is not tiered and is not measured from a placement: the fallback ladder
+              // is a homes concern, so stating a tier or a distance here would be inventing one
+              null,
+              null,
+              null,
               null));
     }
     return out;
@@ -962,16 +1086,24 @@ public class SearchPipeline {
   }
 
   /**
-   * The name to show for a placement's anchor — the first of its requested localities, or "your
-   * area" when the resolver cannot name it. Mirrors the fallback already used for the per-row
-   * commute label ({@code anchorName} in {@link #searchHomes}), so a choice and a row never
-   * disagree about what to call the same place.
+   * The place a search is anchored on, by name — the first of the placement's localities — or null
+   * when there is nothing to name: no anchor at all, or an id the resolver cannot name. Null is the
+   * whole summary's switch: no anchor means no headline and no terminus (spec §4.8), because a
+   * query that named no locality is simply citywide and has nothing to be framed against.
+   */
+  private String anchorNameOf(Placement placement) {
+    if (!placement.placed() || placement.localityIds().isEmpty()) {
+      return null;
+    }
+    return localityResolver.nameOf(placement.localityIds().get(0));
+  }
+
+  /**
+   * The same anchor written for prose, so a choice chip and a result row never disagree about what
+   * to call the same place — both fall back to "your area" through {@link #anchorLabel}.
    */
   private String placementName(Placement placement) {
-    if (placement.localityIds().isEmpty()) {
-      return "your area";
-    }
-    return Objects.requireNonNullElse(localityResolver.nameOf(placement.localityIds().get(0)), "your area");
+    return anchorLabel(anchorNameOf(placement));
   }
 
   private long countFor(SearchIntent intent) {
@@ -998,9 +1130,15 @@ public class SearchPipeline {
     return objectMapper.writeValueAsString(intent);
   }
 
-  private static String cacheKey(String query, SearchIntent prior) {
+  /**
+   * The scope is part of the key, not decoration: the same words mean different places in different
+   * cities ("MG Road", "Indiranagar"), so two viewers scoped differently must never share a cached
+   * extraction. {@code UNSET} is its own key for the same reason — it resolves across every city.
+   */
+  private static String cacheKey(String query, SearchIntent prior, CityScope scope) {
     String normalized = query.toLowerCase(Locale.ROOT).trim().replaceAll("\\s+", " ");
     String priorPart = prior == null ? "" : String.valueOf(prior.hashCode());
-    return EmbeddingTextComposer.sha256(normalized + "|" + priorPart);
+    String scopePart = scope == null || !scope.isSet() ? "unset" : scope.city().toLowerCase(Locale.ROOT);
+    return EmbeddingTextComposer.sha256(normalized + "|" + priorPart + "|" + scopePart);
   }
 }

@@ -7,6 +7,7 @@ import com.flatmaite.listing.Property;
 import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.seed.SeedLocalities;
 import com.flatmaite.user.UserRepository;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,7 @@ class LocalityResolverOwnDataTest {
   @Autowired LocalityResolver resolver;
   @Autowired PropertyRepository properties;
   @Autowired UserRepository users;
+  @Autowired SearchPipeline pipeline;
 
   private static final UUID GOREGAON_ID = SeedLocalities.id("Goregaon");
   private static final UUID MALAD_ID = SeedLocalities.id("Malad");
@@ -128,5 +130,58 @@ class LocalityResolverOwnDataTest {
 
     assertThat(placement.source()).isEqualTo(Placement.Source.OWN_DATA);
     assertThat(placement.localityIds()).containsExactly(MALAD_ID);
+  }
+
+  // ---- the ladder actually runs in a real search (ruling R9) ----
+
+  @Test
+  void aSocietyNameOnlyOurListingsKnow_reachesTheSearchAsAnInferredPlace() {
+    UUID ownerId = users.findAll().iterator().next().getId();
+    properties.save(
+        Property.builder()
+            .ownerId(ownerId)
+            .localityId(KANDIVALI_ID)
+            .addressLine("Flat 11, Lokhandwala Infinity, Kandivali East")
+            .societyName("Lokhandwala Infinity")
+            .lat(19.2045)
+            .lng(72.8519)
+            .propertyType(PropertyType.APARTMENT)
+            .bhk((short) 2)
+            .build());
+    resolver.reload();
+
+    SearchIntent intent =
+        SearchIntent.builder()
+            .locations(List.of(new SearchIntent.LocationRef("Lokhandwala Infinity", null)))
+            .originalQuery("room in Lokhandwala Infinity")
+            .build();
+
+    SearchIntent resolved = IntentLocalities.resolve(intent, resolver, CityScope.of("Mumbai"));
+
+    // it is placed, not surfaced as unplaceable…
+    assertThat(resolved.unresolvedLocations()).isNull();
+    assertThat(resolved.locations())
+        .extracting(SearchIntent.LocationRef::localityId)
+        .containsExactly(KANDIVALI_ID);
+    // …at the ladder's fixed 0.5, so the gate ranks by it instead of filtering on it…
+    assertThat(resolved.confidenceOf("locations")).isEqualTo(0.5);
+    assertThat(ConfidenceGate.isHard(resolved, "locations")).isFalse();
+    // …and the pipeline never restamps those ids as a curated gazetteer statement
+    assertThat(pipeline.placementOf(resolved).source()).isNotEqualTo(Placement.Source.GAZETTEER);
+  }
+
+  @Test
+  void ulweIsStillUnplaceableThroughTheWholeLadder() {
+    SearchIntent intent =
+        SearchIntent.builder()
+            .locations(List.of(new SearchIntent.LocationRef("Ulwe", null)))
+            .originalQuery("room in Ulwe")
+            .build();
+
+    SearchIntent resolved = IntentLocalities.resolve(intent, resolver, CityScope.of("Mumbai"));
+
+    assertThat(resolved.locations()).isNull();
+    assertThat(resolved.unresolvedLocations()).containsExactly("Ulwe");
+    assertThat(pipeline.placementOf(resolved)).isEqualTo(Placement.none());
   }
 }

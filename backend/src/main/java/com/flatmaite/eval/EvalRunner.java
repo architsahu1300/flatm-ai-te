@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flatmaite.ai.AiProviderConfig;
 import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.common.config.FlatmaiteProperties;
+import com.flatmaite.search.CityScope;
 import com.flatmaite.search.IntentArbiter;
 import com.flatmaite.search.IntentLocalities;
 import com.flatmaite.search.LocalityResolver;
@@ -98,7 +99,8 @@ public class EvalRunner implements ApplicationRunner {
     long[] calls = {0};
     IntentEvaluator.Extractor extractor =
         (query, prior) -> {
-          SearchIntent p = prior == null ? null : IntentLocalities.resolve(prior, resolver);
+          // the eval has no viewer, so it runs the ladder unscoped — every seeded city (§4.11)
+          SearchIntent p = prior == null ? null : IntentLocalities.resolve(prior, resolver, CityScope.unset());
           return arbiter.decide(
               query,
               p,
@@ -106,7 +108,7 @@ public class EvalRunner implements ApplicationRunner {
                 if (needsProvider(q, pp)) {
                   pace(calls[0]++ > 0);
                 }
-                return pipeline.extractIntent(q, pp, null, "eval");
+                return pipeline.extractIntent(q, pp, null, "eval", CityScope.unset());
               });
         };
 

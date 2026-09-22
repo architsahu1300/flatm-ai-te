@@ -67,12 +67,28 @@ public class CommuteEstimator {
   }
 
   public Integer minutesFromPoint(Double lat, Double lng, UUID toLocality) {
+    // one read of the volatile map, as everywhere else here: a reload between two reads could
+    // otherwise hand this method a centroid on the first and nothing on the second
     Centroid b = centroids.get(toLocality);
     if (lat == null || lng == null || b == null) {
       return null;
     }
     double km = haversineKm(lat, lng, b.lat(), b.lng());
     return minutesForKm(km, props.getGeo().calibrationFor(b.city()));
+  }
+
+  /**
+   * Straight-line kilometres from an exact point to a locality centroid, or null when the locality
+   * is unknown or the point is missing. This is the figure the API states as {@code distanceKm}, so
+   * it is deliberately the same arithmetic the minutes estimate is derived from — a row can never
+   * report a distance and a travel time that disagree about where it is.
+   */
+  public Double kmFromPoint(Double lat, Double lng, UUID toLocality) {
+    Centroid b = centroids.get(toLocality);
+    if (lat == null || lng == null || b == null) {
+      return null;
+    }
+    return haversineKm(lat, lng, b.lat(), b.lng());
   }
 
   /** A locality, its straight-line distance from the anchor, and the estimated travel time. */

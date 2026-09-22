@@ -8,6 +8,7 @@ import com.flatmaite.ai.IntentLlm;
 import com.flatmaite.ai.MockLlms;
 import com.flatmaite.listing.LocalityRepository;
 import com.flatmaite.listing.PropertyRepository;
+import com.flatmaite.search.CityScope;
 import com.flatmaite.search.IntentArbiter;
 import com.flatmaite.search.IntentLocalities;
 import com.flatmaite.search.KeywordIntentParser;
@@ -45,14 +46,14 @@ class IntentGoldenTest {
     nameOf = ref -> ref.localityId() != null ? resolver.nameOf(ref.localityId()) : ref.name();
     extractor =
         (query, prior) -> {
-          SearchIntent p = prior == null ? null : IntentLocalities.resolve(prior, resolver);
+          SearchIntent p = prior == null ? null : IntentLocalities.resolve(prior, resolver, CityScope.unset());
           return arbiter.decide(
               query,
               p,
               (q, pp) -> {
                 SearchIntent heuristic = RefinementHeuristics.apply(pp, q);
                 SearchIntent raw = heuristic != null ? heuristic : llm.extract(q, pp);
-                return new IntentLlm.Extraction(IntentLocalities.resolve(raw, resolver), IntentLlm.Mode.NONE);
+                return new IntentLlm.Extraction(IntentLocalities.resolve(raw, resolver, CityScope.unset()), IntentLlm.Mode.NONE);
               });
         };
   }
