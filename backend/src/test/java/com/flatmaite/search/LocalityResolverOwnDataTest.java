@@ -40,6 +40,8 @@ class LocalityResolverOwnDataTest {
   @Autowired UserRepository users;
 
   private static final UUID GOREGAON_ID = SeedLocalities.id("Goregaon");
+  private static final UUID MALAD_ID = SeedLocalities.id("Malad");
+  private static final UUID KANDIVALI_ID = SeedLocalities.id("Kandivali");
 
   @Test
   void aSocietyNameNobodyCuratedStillResolves() {
@@ -90,5 +92,41 @@ class LocalityResolverOwnDataTest {
 
     assertThat(resolver.resolve("Oberoi Splendor", CityScope.of("Bangalore")).source())
         .isEqualTo(Placement.Source.NONE);
+  }
+
+  @Test
+  void underscoreInAPlaceNameIsMatchedLiterally_notAsAWildcard() {
+    // "_" is a single-character LIKE wildcard unless escaped: an unescaped needle would also match
+    // "SunXCity" (X standing in for the wildcard), pulling in a locality that has nothing to do
+    // with the literal name the user typed.
+    UUID ownerId = users.findAll().iterator().next().getId();
+    properties.save(
+        Property.builder()
+            .ownerId(ownerId)
+            .localityId(MALAD_ID)
+            .addressLine("Flat 1, Sun_City Residency, Malad West")
+            .societyName("Sun_City Residency")
+            .lat(19.1874)
+            .lng(72.8484)
+            .propertyType(PropertyType.APARTMENT)
+            .bhk((short) 1)
+            .build());
+    properties.save(
+        Property.builder()
+            .ownerId(ownerId)
+            .localityId(KANDIVALI_ID)
+            .addressLine("Flat 2, SunXCity Towers, Kandivali West")
+            .societyName("SunXCity Towers")
+            .lat(19.2045)
+            .lng(72.8519)
+            .propertyType(PropertyType.APARTMENT)
+            .bhk((short) 1)
+            .build());
+    resolver.reload();
+
+    Placement placement = resolver.resolve("Sun_City", CityScope.of("Mumbai"));
+
+    assertThat(placement.source()).isEqualTo(Placement.Source.OWN_DATA);
+    assertThat(placement.localityIds()).containsExactly(MALAD_ID);
   }
 }

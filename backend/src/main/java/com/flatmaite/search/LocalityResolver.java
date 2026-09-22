@@ -195,7 +195,7 @@ public class LocalityResolver {
     if (gazetteer.isPresent()) {
       return toPlacement(gazetteer.get());
     }
-    if (name != null && name.length() >= MIN_OWN_DATA_LENGTH) {
+    if (name != null && !name.isBlank() && name.length() >= MIN_OWN_DATA_LENGTH) {
       List<PropertyRepository.PlacementRow> rows =
           properties.findPlacementByPlaceName(name, scope.city());
       if (!rows.isEmpty()) {

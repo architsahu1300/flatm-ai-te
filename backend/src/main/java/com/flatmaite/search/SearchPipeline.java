@@ -453,10 +453,14 @@ public class SearchPipeline {
       // anchor is a real, resolved locality id whenever it is non-null (see commuteAnchor/nearestOf
       // above), but nameOf can still come back null if the resolver's cache is stale relative to
       // the id it was handed — "your area" is the same honest placeholder already used when there
-      // is no anchor at all, never a wrong city standing in for a place we cannot name.
+      // is no anchor at all, never a wrong city standing in for a place we cannot name. The
+      // commuteIntent branch needs the identical guard: commuteTo.place is a plain nullable String
+      // on the wire (SearchIntent.CommuteTo), and /apply replays a client-submitted intent straight
+      // through this pipeline with no IntentLocalities.resolve pass — a body carrying only
+      // commuteTo.localityId (no place) must not render the literal "null" into "~N min to null".
       String anchorName =
           commuteIntent
-              ? intent.commuteTo().place()
+              ? Objects.requireNonNullElse(intent.commuteTo().place(), "your area")
               : anchor == null
                   ? "your area"
                   : Objects.requireNonNullElse(localityResolver.nameOf(anchor), "your area");
@@ -622,8 +626,14 @@ public class SearchPipeline {
         }
         yield facets.isEmpty() ? "your lifestyle preferences" : String.join(", ", facets);
       }
+      // place is a plain nullable String on the wire and can be absent even when commuteTo itself
+      // carries a localityId (a client-submitted commuteTo with no place text) — "" matches this
+      // method's own convention for "nothing to say" elsewhere in this switch, never the literal
+      // "null" rendered into "Commute — you asked for null".
       case "commuteTo", "commuteTo.maxMinutes" ->
-          original.commuteTo() == null ? "" : original.commuteTo().place();
+          original.commuteTo() == null || original.commuteTo().place() == null
+              ? ""
+              : original.commuteTo().place();
       default -> "";
     };
   }

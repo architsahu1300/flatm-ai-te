@@ -3,6 +3,7 @@ package com.flatmaite.search;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.common.domain.SearchTarget;
+import com.flatmaite.seed.SeedLocalities;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -274,6 +275,42 @@ class SearchPipelineIntegrationTest {
     }
     assertThat(res.homes().stream().filter(SearchDtos.AiResult::nearMiss))
         .allSatisfy(r -> assertThat(r.nearMissReason()).isNotBlank());
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void aClientSubmittedCommuteToWithNoPlaceText_neverRendersTheLiteralNull() {
+    // /apply replays a client-submitted intent straight through the pipeline with no
+    // IntentLocalities.resolve pass — CommuteTo.place is a plain nullable String on the wire, so a
+    // body carrying only commuteTo.localityId (a chip re-submitting a stored locality id, say) must
+    // still degrade to an honest generic label, not the literal word "null" (R7 finding 1).
+    SearchIntent intent =
+        SearchIntent.builder()
+            .searchTarget(SearchTarget.PROPERTIES)
+            .commuteTo(new SearchIntent.CommuteTo(null, SeedLocalities.id("BKC"), 30))
+            .originalQuery("flat near work")
+            .build();
+
+    SearchDtos.AiSearchResponse res = pipeline.search(intent, null, "test", UUID.randomUUID());
+
+    assertThat(res.homes()).isNotEmpty();
+    // commuteLabel/nearMissReason are legitimately null on some rows (no commute measured, or not a
+    // near miss) — only their text, when present, must never be the literal word "null".
+    for (SearchDtos.AiResult r : res.homes()) {
+      if (r.commuteLabel() != null) {
+        assertThat(r.commuteLabel()).doesNotContainIgnoringCase("null");
+      }
+      if (r.nearMissReason() != null) {
+        assertThat(r.nearMissReason()).doesNotContainIgnoringCase("null");
+      }
+      for (MatchScorer.Component c : r.scoreBreakdown()) {
+        if (c.detail() != null) {
+          assertThat(c.detail()).doesNotContainIgnoringCase("null");
+        }
+      }
+      assertThat(r.matchReasons()).allSatisfy(s -> assertThat(s).doesNotContainIgnoringCase("null"));
+      assertThat(r.concerns()).allSatisfy(s -> assertThat(s).doesNotContainIgnoringCase("null"));
+    }
   }
 
   private static HttpEntity<Map<String, Object>> json(Map<String, Object> body) {
