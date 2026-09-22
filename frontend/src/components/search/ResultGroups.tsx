@@ -3,7 +3,7 @@
 import { AiMatchCard } from "@/components/search/AiMatchCard";
 import { Button } from "@/components/ui/button";
 import { resultId } from "@/stores/ai-search-store";
-import type { AiResult, Choice, ResultSummary } from "@/lib/ai-client";
+import { findRaiseBudgetChoice, type AiResult, type Choice, type ResultSummary } from "@/lib/ai-client";
 
 const TIER_ORDER = ["EXACT", "NEARBY", "OVER_BUDGET"] as const;
 
@@ -19,13 +19,38 @@ function tierTitle(tier: (typeof TIER_ORDER)[number], anchorName: string): strin
 }
 
 /**
+ * The one presentation of a counted "raise budget" choice, shared by the grouped-results view
+ * below and the empty-results view in search-screen.tsx — a single component so the two surfaces
+ * can't drift on how they show the same `Choice` (label only; the backend's own label already
+ * states the count and price, e.g. "Kandivali has 3 from ₹17,000", so nothing here repeats it).
+ */
+export function RaiseBudgetChoice({
+  choice,
+  onApply,
+}: {
+  choice: Choice;
+  onApply: (choice: Choice) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center justify-between gap-3 rounded-card border border-dashed border-border bg-surface p-3 text-sm">
+      <span>{choice.label}</span>
+      <Button size="sm" variant="outline" onClick={() => onApply(choice)}>
+        Raise budget
+      </Button>
+    </div>
+  );
+}
+
+/**
  * Groups results by tier under the headline the backend already worded (spec §4.6, §4.8). Renders
  * a flat list with no subheads when `summary.anchorName` is null — that covers both the plain
  * citywide case (no place named) and the case where a named place could not be placed at all; the
  * headline banner is what tells those two apart, and it is rendered verbatim rather than rebuilt.
  *
- * Also surfaces the counted "raise budget" choice, if one came back, alongside the results — this
- * is the one place that choice renders, so a caller must not also render it from `relaxers`.
+ * Also surfaces the counted "raise budget" choice, if one came back, alongside the results (via
+ * `RaiseBudgetChoice` above). This path and search-screen.tsx's empty-results path are mutually
+ * exclusive — this one only ever mounts when `results` is non-empty — so the same choice is never
+ * rendered twice; a caller must still not also render it from `relaxers`.
  */
 export function ResultGroups({
   results,
@@ -43,7 +68,7 @@ export function ResultGroups({
   onApplyChoice: (choice: Choice) => void;
 }) {
   const anchorName = summary?.anchorName ?? null;
-  const raiseBudget = (choices ?? []).find((c) => c.action === "RAISE_BUDGET") ?? null;
+  const raiseBudget = findRaiseBudgetChoice(choices);
 
   const card = (r: AiResult) => (
     <AiMatchCard
@@ -88,11 +113,8 @@ export function ResultGroups({
       )}
 
       {raiseBudget && (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-card border border-dashed border-border bg-surface p-3 text-sm">
-          <span>{raiseBudget.label}</span>
-          <Button size="sm" variant="outline" onClick={() => onApplyChoice(raiseBudget)}>
-            Raise budget
-          </Button>
+        <div className="mt-4">
+          <RaiseBudgetChoice choice={raiseBudget} onApply={onApplyChoice} />
         </div>
       )}
 

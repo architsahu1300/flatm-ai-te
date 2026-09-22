@@ -91,6 +91,10 @@ export interface Relaxer {
  */
 export interface ResultSummary {
   anchorName?: string | null;
+  // Deliberately unread by any component: the backend already folds these names into `headline`'s
+  // prose ("We couldn't place 'Ulwe'. Showing results across Mumbai."), so rendering them again
+  // separately would repeat the same information twice. Kept on the type only so the shape mirrors
+  // the wire contract and a future consumer isn't left guessing whether the field exists.
   unplacedNames?: string[] | null;
   exactCount: number;
   nearbyCount: number;
@@ -119,6 +123,49 @@ export interface Choice {
   action: "RAISE_BUDGET";
   value: number;
   count: number;
+}
+
+/**
+ * The counted "raise budget" compromise for this turn, if the backend offered one. A single
+ * source of truth so the empty-results view and the grouped-results view can never independently
+ * drift on how they pick it out of `choices[]`.
+ */
+export function findRaiseBudgetChoice(choices?: Choice[] | null): Choice | null {
+  return (choices ?? []).find((c) => c.action === "RAISE_BUDGET") ?? null;
+}
+
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((v, i) => deepEqual(v, b[i]));
+  }
+  const aRec = a as Record<string, unknown>;
+  const bRec = b as Record<string, unknown>;
+  const aKeys = Object.keys(aRec);
+  const bKeys = Object.keys(bRec);
+  return aKeys.length === bKeys.length && aKeys.every((k) => deepEqual(aRec[k], bRec[k]));
+}
+
+/**
+ * Identifies the relaxer that raises the budget by comparing its `relaxedIntent` against the
+ * current intent structurally, rather than matching the backend's hand-written label text — a
+ * label is prose the backend can reword at any time (copy tweak, localization) with nothing on
+ * the client to catch the drift. A relaxer "raises the budget" when it changes budgetMax and
+ * nothing else: every other field of `relaxedIntent` is deep-equal to the current intent's.
+ */
+export function isBudgetRaiseRelaxer(rx: Relaxer, currentIntent: SearchIntent | null): boolean {
+  if (!currentIntent || rx.relaxedIntent.budgetMax === currentIntent.budgetMax) {
+    return false;
+  }
+  return deepEqual(withoutBudgetMax(rx.relaxedIntent), withoutBudgetMax(currentIntent));
+}
+
+function withoutBudgetMax(intent: SearchIntent): Record<string, unknown> {
+  const rest: Record<string, unknown> = { ...intent };
+  delete rest.budgetMax;
+  return rest;
 }
 
 export interface AiSearchResponse {

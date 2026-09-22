@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { CityScopePrompt } from "@/components/search/CityScopePrompt";
 import { IntentChips } from "@/components/search/IntentChips";
-import { ResultGroups } from "@/components/search/ResultGroups";
+import { RaiseBudgetChoice, ResultGroups } from "@/components/search/ResultGroups";
 import { EXAMPLE_QUERIES, SearchBox } from "@/components/search/SearchBox";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
@@ -12,7 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { resultId, useAiSearchStore } from "@/stores/ai-search-store";
 import { createSavedSearch } from "@/lib/saved-client";
 import { ApiError } from "@/lib/api";
-import type { Choice } from "@/lib/ai-client";
+import { findRaiseBudgetChoice, isBudgetRaiseRelaxer, type Choice } from "@/lib/ai-client";
 import { cn } from "@/lib/utils";
 
 function SaveSearchButton() {
@@ -80,13 +80,16 @@ export function SearchScreen() {
     store.applyIntent({ ...store.intent, budgetMax: choice.value }, choice.label);
   }
 
-  // The empty-results relaxer list can independently offer its own "Raise budget to ₹X" entry
-  // (derived from budgetMax × 1.2) alongside the counted choices[] RAISE_BUDGET offer (the strict
+  // The empty-results relaxer list can independently offer its own "raise budget" entry (derived
+  // from budgetMax × 1.2) alongside the counted choices[] RAISE_BUDGET offer (the strict
   // cheapest-that-opens-something). Both are real, but a user cannot be asked to choose between
   // two prices for the same action — prefer the counted choice and drop the generic relaxer.
-  const raiseBudgetChoice = store.choices.find((c) => c.action === "RAISE_BUDGET") ?? null;
+  // The relaxer is identified structurally (its relaxedIntent changes only budgetMax), not by
+  // matching the backend's label text, so a copy change to that label can't silently reopen the
+  // two-competing-buttons bug this filter exists to prevent.
+  const raiseBudgetChoice = findRaiseBudgetChoice(store.choices);
   const visibleRelaxers = raiseBudgetChoice
-    ? store.relaxers.filter((rx) => !rx.label.startsWith("Raise budget"))
+    ? store.relaxers.filter((rx) => !isBudgetRaiseRelaxer(rx, store.intent))
     : store.relaxers;
 
   if (store.status === "idle") {
@@ -238,25 +241,31 @@ export function SearchScreen() {
               {raiseBudgetChoice || visibleRelaxers.length > 0 ? (
                 <>
                   <p className="mt-1 text-sm text-text-muted">One tap widens the search:</p>
-                  <div className="mt-4 flex flex-wrap justify-center gap-2">
-                    {raiseBudgetChoice && (
-                      <Button variant="outline" onClick={() => applyChoice(raiseBudgetChoice)}>
-                        {raiseBudgetChoice.label}{" "}
-                        <span className="text-text-muted">
-                          · {raiseBudgetChoice.count} option{raiseBudgetChoice.count === 1 ? "" : "s"}
-                        </span>
-                      </Button>
-                    )}
-                    {visibleRelaxers.map((rx) => (
-                      <Button
-                        key={rx.label}
-                        variant="outline"
-                        onClick={() => store.applyRelaxer(rx.relaxedIntent, rx.label)}
-                      >
-                        {rx.label} <span className="text-text-muted">· {rx.description}</span>
-                      </Button>
-                    ))}
-                  </div>
+                  {/* Same RaiseBudgetChoice presentation ResultGroups uses for a non-empty page —
+                      one shared component so the two surfaces can't drift on how a Choice reads. */}
+                  {raiseBudgetChoice && (
+                    <div className="mt-4">
+                      <RaiseBudgetChoice choice={raiseBudgetChoice} onApply={applyChoice} />
+                    </div>
+                  )}
+                  {visibleRelaxers.length > 0 && (
+                    <div
+                      className={cn(
+                        "flex flex-wrap justify-center gap-2",
+                        raiseBudgetChoice ? "mt-3" : "mt-4",
+                      )}
+                    >
+                      {visibleRelaxers.map((rx) => (
+                        <Button
+                          key={rx.label}
+                          variant="outline"
+                          onClick={() => store.applyRelaxer(rx.relaxedIntent, rx.label)}
+                        >
+                          {rx.label} <span className="text-text-muted">· {rx.description}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="mt-1 text-sm text-text-muted">Try changing the area or budget.</p>
