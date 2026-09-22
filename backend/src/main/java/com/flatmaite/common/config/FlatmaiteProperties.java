@@ -87,6 +87,21 @@ public class FlatmaiteProperties {
     /** city name (case-insensitive) → calibration; Mumbai's values when absent or unknown. */
     private Map<String, Calibration> calibration = new LinkedHashMap<>();
 
+    /**
+     * Per-city commute calibration, falling back to the Mumbai constants for an unknown or null
+     * {@code city}. This fallback is deliberate: the result feeds arithmetic (a distance-to-minutes
+     * conversion) that must produce some number regardless of which city is asked about (spec
+     * §4.10 point 3) — there is no such thing as "no commute estimate" for a listing that exists.
+     *
+     * <p>Its intentional counterpart is {@code boundsFor(String)}, which for the exact same
+     * unknown-or-null input deliberately does NOT fall back — it returns empty instead. Scoping a
+     * search cannot borrow another city's bounding box without silently placing a Bangalore user
+     * in Mumbai (§4.11), so that method's "no answer" is the correct answer where this method's
+     * "Mumbai's answer" is the correct answer here.
+     *
+     * <p>Making the two consistent — either by having this method return empty too, or by having
+     * {@code boundsFor(String)} fall back to Mumbai's box — is the bug, not the fix.
+     */
     public Calibration calibrationFor(String city) {
       if (city == null) {
         return MUMBAI;

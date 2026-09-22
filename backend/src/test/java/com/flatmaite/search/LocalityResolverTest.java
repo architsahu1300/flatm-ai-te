@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +15,7 @@ import org.mockito.Mockito;
 class LocalityResolverTest {
 
   private LocalityResolver resolver;
+  private LocalityRepository localities;
 
   static Locality locality(String name, String... aliases) {
     Locality l = Locality.builder().name(name).lat(19.0).lng(72.8).aliases(aliases).build();
@@ -27,9 +29,8 @@ class LocalityResolverTest {
 
   @BeforeEach
   void setUp() {
-    LocalityRepository repo = Mockito.mock(LocalityRepository.class);
-    Mockito.when(repo.findAll())
-        .thenReturn(
+    List<Locality> seedData =
+        new ArrayList<>(
             List.of(
                 locality("Powai", "hiranandani"),
                 locality("Goregaon", "goregaon east", "goregaon west"),
@@ -41,8 +42,32 @@ class LocalityResolverTest {
                 locality("Sion"),
                 locality("Parel", "parel"),
                 locality("Lower Parel", "lower parel"),
-                locality("Worli")));
-    resolver = new LocalityResolver(repo);
+                locality("Worli"),
+                // Present so anUnsetScopeStillResolvesAcrossEveryCity below exercises a real
+                // Mumbai locality — the same name that motivated this whole workstream (see
+                // task brief context: pre-Task-4, "Kandivali" resolved to nothing).
+                locality("Kandivali")));
+    // A mutable fake, not a fixed stub: the scoping tests below seed a second city straight
+    // through the repository (never through SeedLocalities), then reload() must see it.
+    localities = Mockito.mock(LocalityRepository.class);
+    Mockito.when(localities.findAll()).thenAnswer(inv -> new ArrayList<>(seedData));
+    Mockito.when(localities.save(Mockito.any(Locality.class)))
+        .thenAnswer(
+            inv -> {
+              Locality l = inv.getArgument(0);
+              if (l.getId() == null) {
+                l.setId(UUID.randomUUID());
+              }
+              seedData.add(l);
+              return l;
+            });
+    Mockito.when(localities.findById(Mockito.any(UUID.class)))
+        .thenAnswer(
+            inv -> {
+              UUID wanted = inv.getArgument(0);
+              return seedData.stream().filter(l -> wanted.equals(l.getId())).findFirst();
+            });
+    resolver = new LocalityResolver(localities);
     resolver.load();
   }
 
@@ -154,5 +179,35 @@ class LocalityResolverTest {
     resolver.reload();
 
     assertThat(resolver.version()).isGreaterThan(v0);
+  }
+
+  @Test
+  void aScopedResolutionNeverCrossesACityBoundary() {
+    localities.save(Locality.builder().name("MG Road").city("Bangalore").lat(12.97).lng(77.6).build());
+    localities.save(Locality.builder().name("MG Road").city("Mumbai").lat(19.06).lng(72.83).build());
+    resolver.reload();
+
+    Placement mumbai = resolver.resolve("MG Road", CityScope.of("Mumbai"));
+
+    assertThat(mumbai.source()).isEqualTo(Placement.Source.GAZETTEER);
+    assertThat(mumbai.localityIds()).hasSize(1);
+    assertThat(localities.findById(mumbai.localityIds().get(0)).orElseThrow().getCity())
+        .isEqualTo("Mumbai");
+  }
+
+  @Test
+  void fuzzyMatchingIsScopedToo() {
+    localities.save(Locality.builder().name("Indiranagar").city("Bangalore").lat(12.97).lng(77.64).build());
+    resolver.reload();
+
+    // near-miss spelling, but the wrong city — must not resolve
+    assertThat(resolver.resolve("indiranagr", CityScope.of("Mumbai")).source())
+        .isEqualTo(Placement.Source.NONE);
+  }
+
+  @Test
+  void anUnsetScopeStillResolvesAcrossEveryCity() {
+    assertThat(resolver.resolve("Kandivali", CityScope.unset()).source())
+        .isEqualTo(Placement.Source.GAZETTEER);
   }
 }
