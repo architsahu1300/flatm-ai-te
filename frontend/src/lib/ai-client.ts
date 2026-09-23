@@ -47,6 +47,10 @@ export interface ScoreComponent {
   detail: string | null;
 }
 
+// Which block of the results page a row belongs to (spec §4.6). Always set on a home row,
+// always null on a flatmate row.
+export type SearchTier = "EXACT" | "NEARBY" | "OVER_BUDGET";
+
 export interface AiResult {
   kind: "home" | "flatmate";
   matchScore: number;
@@ -59,6 +63,13 @@ export interface AiResult {
   flatmate: FlatmateCard | null;
   nearMiss?: boolean | null;
   nearMissReason?: string | null;
+  tier?: SearchTier | null;
+  // Set together only when the search was actually anchored on a place. Null together
+  // otherwise — including for a place the reader only inferred, which ranks but does not
+  // anchor. A distance chip must key off distanceKm being non-null, never off tier.
+  distanceKm?: number | null;
+  minutesFromAnchor?: number | null;
+  anchorName?: string | null;
 }
 
 export interface Relaxer {
@@ -66,6 +77,115 @@ export interface Relaxer {
   description: string;
   relaxedIntent: SearchIntent;
   extraResults: number;
+}
+
+/**
+ * How the page as a whole reads (spec §4.8). `headline` is worded correctly by the backend for
+ * both cases below — render it verbatim, never rebuild it client-side:
+ *  - A place was named and nothing could place it: `anchorName` is null, `unplacedNames` holds
+ *    what the user typed, `headline` says so, and the results below it are still real.
+ *  - No place was named at all: `anchorName` null, `unplacedNames` empty, `headline` null — no
+ *    fallback framing of any kind, citywide exactly as before this workstream.
+ * A place named AND placed sets `anchorName`, and `headline` is present only when the page needs
+ * explaining (nothing, or fewer than three exact matches).
+ */
+export interface ResultSummary {
+  anchorName?: string | null;
+  // Deliberately unread by any component: the backend already folds these names into `headline`'s
+  // prose ("We couldn't place 'Ulwe'. Showing results across Mumbai."), so rendering them again
+  // separately would repeat the same information twice. Kept on the type only so the shape mirrors
+  // the wire contract and a future consumer isn't left guessing whether the field exists.
+  unplacedNames?: string[] | null;
+  exactCount: number;
+  nearbyCount: number;
+  overBudgetCount: number;
+  headline?: string | null;
+  terminus?: string | null;
+  // The two distances this page may print, sent so nothing here holds one of its own. Both are
+  // configurable server-side (SEARCH_NEARBY_RADIUS_KM, SEARCH_CLOSE_RADIUS_KM) and the ring
+  // additionally changes per search — the re-run after an explicit budget raise reaches out to
+  // SEARCH_ESCALATION_RADIUS_KM instead — so a hardcoded "5 km" in a subhead is wrong in three
+  // ways at once and says nothing when it is. `nearbyRadiusKm` is null when no ring was drawn
+  // around this page at all, and a subhead must then be worded without a figure.
+  nearbyRadiusKm?: number | null;
+  closeRadiusKm?: number | null;
+}
+
+/**
+ * A ring or threshold for a heading: "5" for 5.0, "2.5" for 2.5. The backend keeps these as
+ * doubles because they are configuration, but "Within 5.0 km" reads like a measurement nobody
+ * took — and this figure is a straight line between centroids, so a decimal that is always zero
+ * would claim a precision it does not have.
+ */
+export function formatRadiusKm(km: number): string {
+  return Number.isInteger(km) ? String(km) : km.toFixed(1);
+}
+
+/**
+ * The city this search was confined to (spec §4.11). `source: "UNSET"` — null `city`, a
+ * `prompt` to render — covers anyone with no profile locality, including every anonymous
+ * searcher. That is an explicit, first-class state, never an error, and never gates the results.
+ */
+export interface CitySearch {
+  city?: string | null;
+  source: "PROFILE" | "UNSET";
+  prompt?: string | null;
+}
+
+/**
+ * A counted, one-click compromise offered alongside the results, whatever their number. Never
+ * applied automatically — the stated budget changes only once this is posted via applyIntent.
+ */
+export interface Choice {
+  label: string;
+  action: "RAISE_BUDGET";
+  value: number;
+  count: number;
+}
+
+/**
+ * The counted "raise budget" compromise for this turn, if the backend offered one. A single
+ * source of truth so the empty-results view and the grouped-results view can never independently
+ * drift on how they pick it out of `choices[]`.
+ */
+export function findRaiseBudgetChoice(choices?: Choice[] | null): Choice | null {
+  return (choices ?? []).find((c) => c.action === "RAISE_BUDGET") ?? null;
+}
+
+function deepEqual(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (typeof a !== "object" || typeof b !== "object" || a === null || b === null) return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    return a.length === b.length && a.every((v, i) => deepEqual(v, b[i]));
+  }
+  const aRec = a as Record<string, unknown>;
+  const bRec = b as Record<string, unknown>;
+  const aKeys = Object.keys(aRec);
+  const bKeys = Object.keys(bRec);
+  return aKeys.length === bKeys.length && aKeys.every((k) => deepEqual(aRec[k], bRec[k]));
+}
+
+/**
+ * Identifies the relaxer that raises the budget by comparing its `relaxedIntent` against the
+ * current intent structurally, rather than matching the backend's hand-written label text — a
+ * label is prose the backend can reword at any time (copy tweak, localization) with nothing on
+ * the client to catch the drift. A relaxer "raises the budget" when it changes budgetMax and
+ * nothing else: every other field of `relaxedIntent` is deep-equal to the current intent's.
+ */
+export function isBudgetRaiseRelaxer(rx: Relaxer, currentIntent: SearchIntent | null): boolean {
+  // relaxedIntent is non-null per the contract, but this runs on a parsed HTTP body: a truncated
+  // or older response reaching it must filter nothing rather than throw inside a render.
+  if (!currentIntent || !rx.relaxedIntent || rx.relaxedIntent.budgetMax === currentIntent.budgetMax) {
+    return false;
+  }
+  return deepEqual(withoutBudgetMax(rx.relaxedIntent), withoutBudgetMax(currentIntent));
+}
+
+function withoutBudgetMax(intent: SearchIntent): Record<string, unknown> {
+  const rest: Record<string, unknown> = { ...intent };
+  delete rest.budgetMax;
+  return rest;
 }
 
 export interface AiSearchResponse {
@@ -76,6 +196,10 @@ export interface AiSearchResponse {
   flatmates: AiResult[];
   relaxers: Relaxer[];
   note: string | null;
+  // Every field below is optional on the client so a stale backend response cannot blank the page.
+  resultSummary?: ResultSummary | null;
+  choices?: Choice[] | null;
+  citySearch?: CitySearch | null;
 }
 
 export interface CompareRow {

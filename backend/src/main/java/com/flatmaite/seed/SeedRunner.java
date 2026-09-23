@@ -121,8 +121,8 @@ public class SeedRunner implements ApplicationRunner {
   private final Random rng = new Random(42);
   private final Faker faker = new Faker(new Locale("en", "IND"), new Random(42));
 
-  private static final int USER_COUNT = 54;
-  private static final int LISTING_COUNT = 80;
+  private static final int USER_COUNT = 120;
+  private static final int LISTING_COUNT = 240;
   private static final int FLATMATE_COUNT = 35;
   private static final int IMAGE_COUNT = 15;
 
@@ -418,19 +418,23 @@ public class SeedRunner implements ApplicationRunner {
   private List<Listing> seedListings(List<User> allUsers, List<Locality> locs, List<Amenity> amens) {
     List<Listing> out = new ArrayList<>();
     List<UUID> expectedImageIds = new ArrayList<>();
+    // same 29:16:16:13:6 mix as the original 80-listing seed, scaled 3x to fill LISTING_COUNT.
     ListingType[] types = new ListingType[LISTING_COUNT];
     int idx = 0;
-    for (int i = 0; i < 29; i++) types[idx++] = ListingType.PRIVATE_ROOM;
-    for (int i = 0; i < 16; i++) types[idx++] = ListingType.SHARED_ROOM;
-    for (int i = 0; i < 16; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
-    for (int i = 0; i < 13; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
-    for (int i = 0; i < 6; i++) types[idx++] = ListingType.REPLACEMENT;
+    for (int i = 0; i < 87; i++) types[idx++] = ListingType.PRIVATE_ROOM;
+    for (int i = 0; i < 48; i++) types[idx++] = ListingType.SHARED_ROOM;
+    for (int i = 0; i < 48; i++) types[idx++] = ListingType.ENTIRE_APARTMENT;
+    for (int i = 0; i < 39; i++) types[idx++] = ListingType.LOOKING_FOR_FLATMATE;
+    for (int i = 0; i < 18; i++) types[idx++] = ListingType.REPLACEMENT;
 
     for (int i = 0; i < LISTING_COUNT; i++) {
       ListingType type = types[i];
       SeedLocalities.Seed ls = SeedLocalities.ALL.get(i % SeedLocalities.ALL.size());
       Locality loc = locs.get(i % locs.size());
-      User lister = allUsers.get(10 + (i % 40)); // users 11..50 are listers
+      // users 11..120 are listers. The modulus is USER_COUNT - 10 rather than a literal 40: at 40
+      // the tripled USER_COUNT left 70 users with nothing to their name and 40 listers carrying six
+      // listings each, which was the opposite of §4.2's reason for raising it.
+      User lister = allUsers.get(10 + (i % (USER_COUNT - 10)));
       short bhk = (short) (1 + rng.nextInt(3));
 
       Property prop =
@@ -533,7 +537,13 @@ public class SeedRunner implements ApplicationRunner {
           .ifPresent(existing -> l.setEmbeddingTextHash(existing.getEmbeddingTextHash()));
       out.add(listings.save(l));
     }
-    // orphanRemoval does not fire on detached-merge; drop stale images from earlier seed versions
+    // orphanRemoval is unreliable on this detached-merge pattern: for most listings it never
+    // queues a delete (hence the raw JDBC sweep below), but for some it does, deferred to the
+    // next flush. Flush now, while those rows still exist, so any such delete lands normally
+    // instead of racing the raw sweep and later exploding as a StaleObjectStateException on
+    // whatever unrelated query (e.g. embedListings' properties.findAll()) triggers the auto-flush.
+    listings.flush();
+    // drop whatever orphanRemoval still didn't catch: stale images from earlier seed versions
     int strays =
         jdbcTemplate.update(
             "DELETE FROM listing_images WHERE id <> ALL (?)",

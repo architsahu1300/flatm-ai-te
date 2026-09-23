@@ -11,6 +11,7 @@ import com.flatmaite.search.AiUsageService;
 import com.flatmaite.search.SearchIntent;
 import com.flatmaite.search.SearchPipeline;
 import com.flatmaite.search.SearchSessionService;
+import com.flatmaite.search.ViewerCityScope;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -43,6 +44,7 @@ public class SavedController {
   private final SearchPipeline pipeline;
   private final SearchSessionService sessions;
   private final AiUsageService usage;
+  private final ViewerCityScope cityScopes;
   private final ObjectMapper objectMapper;
 
   // ---------- saved listings ----------
@@ -143,7 +145,10 @@ public class SavedController {
     usage.checkQuota(user.userId(), null);
     SearchIntent intent = objectMapper.readValue(search.getIntent(), SearchIntent.class);
     var session = sessions.start(user.userId(), null, intent, "(saved search: " + search.getName() + ")");
-    var result = pipeline.search(intent, user.userId(), null, session.getId());
+    // a replay is a search like any other: it runs in the owner's own city (spec §4.11)
+    var result =
+        pipeline.search(
+            intent, user.userId(), null, session.getId(), null, false, cityScopes.forViewer(user.userId()));
     search.setLastRunAt(Instant.now());
     search.setLastResultCount(result.homes().size() + result.flatmates().size());
     savedSearches.save(search);

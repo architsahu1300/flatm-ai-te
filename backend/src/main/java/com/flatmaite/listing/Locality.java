@@ -21,7 +21,11 @@ import org.hibernate.type.SqlTypes;
 @Builder
 public class Locality extends BaseEntity {
 
-  @Column(nullable = false, unique = true)
+  // Not unique on its own: V3__geo.sql replaced localities_name_key with UNIQUE (city, name),
+  // because Bangalore and Pune both have an Indiranagar (spec §4.10). Flyway owns the DDL
+  // (ddl-auto=none), so the real constraint lives there; this annotation is documentation and
+  // must not go on saying a single-city invariant still holds.
+  @Column(nullable = false)
   private String name;
 
   @Column(nullable = false)

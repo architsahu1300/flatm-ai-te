@@ -6,6 +6,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,104 +35,112 @@ class KeywordIntentParserTest {
                 locality("Andheri West", "andheri west", "andheri"),
                 locality("BKC", "bandra kurla complex"),
                 locality("Malad")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     parser = new KeywordIntentParser(resolver);
   }
 
+  /**
+   * Unscoped — every seeded city, which is what an UNSET viewer gets (§4.11). These cases are about
+   * the parser's own grammar, so each one states that rather than inheriting a default.
+   */
+  private SearchIntent parse(String query) {
+    return parser.parse(query, CityScope.unset());
+  }
+
   @Test
   void ceilingCues_setBudgetMax() {
-    assertThat(parser.parse("private room in goregaon under 25000").budgetMax()).isEqualTo(25000);
-    assertThat(parser.parse("room upto 30k").budgetMax()).isEqualTo(30000);
-    assertThat(parser.parse("max 1 lakh flat").budgetMax()).isEqualTo(100000);
-    assertThat(parser.parse("budget 22k").budgetMax()).isEqualTo(22000);
-    assertThat(parser.parse("not more than 18k").budgetMax()).isEqualTo(18000);
-    assertThat(parser.parse("private room in goregaon under 25000").budgetMin()).isNull();
+    assertThat(parse("private room in goregaon under 25000").budgetMax()).isEqualTo(25000);
+    assertThat(parse("room upto 30k").budgetMax()).isEqualTo(30000);
+    assertThat(parse("max 1 lakh flat").budgetMax()).isEqualTo(100000);
+    assertThat(parse("budget 22k").budgetMax()).isEqualTo(22000);
+    assertThat(parse("not more than 18k").budgetMax()).isEqualTo(18000);
+    assertThat(parse("private room in goregaon under 25000").budgetMin()).isNull();
   }
 
   @Test
   void floorCues_setBudgetMin_notMax() {
-    SearchIntent i = parser.parse("flat in andheri more than 30000");
+    SearchIntent i = parse("flat in andheri more than 30000");
 
     assertThat(i.budgetMin()).isEqualTo(30000);
     assertThat(i.budgetMax()).isNull();
-    assertThat(parser.parse("rooms above 20k please").budgetMin()).isEqualTo(20000);
-    assertThat(parser.parse("at least 15k").budgetMin()).isEqualTo(15000);
+    assertThat(parse("rooms above 20k please").budgetMin()).isEqualTo(20000);
+    assertThat(parse("at least 15k").budgetMin()).isEqualTo(15000);
   }
 
   @Test
   void ranges_setBoth() {
-    SearchIntent between = parser.parse("room between 20k and 30k in powai");
+    SearchIntent between = parse("room between 20k and 30k in powai");
     assertThat(between.budgetMin()).isEqualTo(20000);
     assertThat(between.budgetMax()).isEqualTo(30000);
 
-    SearchIntent to = parser.parse("20000 to 25000 rent");
+    SearchIntent to = parse("20000 to 25000 rent");
     assertThat(to.budgetMin()).isEqualTo(20000);
     assertThat(to.budgetMax()).isEqualTo(25000);
 
-    SearchIntent dash = parser.parse("25k-35k 2bhk");
+    SearchIntent dash = parse("25k-35k 2bhk");
     assertThat(dash.budgetMin()).isEqualTo(25000);
     assertThat(dash.budgetMax()).isEqualTo(35000);
   }
 
   @Test
   void adjacentThresholds_doNotLeakCuesIntoEachOther() {
-    SearchIntent k = parser.parse("min 20k max 30k");
+    SearchIntent k = parse("min 20k max 30k");
     assertThat(k.budgetMin()).isEqualTo(20000);
     assertThat(k.budgetMax()).isEqualTo(30000);
 
-    SearchIntent words = parser.parse("over 20k under 30k in powai");
+    SearchIntent words = parse("over 20k under 30k in powai");
     assertThat(words.budgetMin()).isEqualTo(20000);
     assertThat(words.budgetMax()).isEqualTo(30000);
 
-    SearchIntent bare = parser.parse("min 20000 max 30000");
+    SearchIntent bare = parse("min 20000 max 30000");
     assertThat(bare.budgetMin()).isEqualTo(20000);
     assertThat(bare.budgetMax()).isEqualTo(30000);
   }
 
   @Test
   void upTo_isACeiling_forBareNumbersToo() {
-    assertThat(parser.parse("flat up to 30000").budgetMax()).isEqualTo(30000);
-    assertThat(parser.parse("budget up to 30000 in malad").budgetMax()).isEqualTo(30000);
-    assertThat(parser.parse("not more than 18000").budgetMax()).isEqualTo(18000);
-    assertThat(parser.parse("flat up to 30000").budgetMin()).isNull();
+    assertThat(parse("flat up to 30000").budgetMax()).isEqualTo(30000);
+    assertThat(parse("budget up to 30000 in malad").budgetMax()).isEqualTo(30000);
+    assertThat(parse("not more than 18000").budgetMax()).isEqualTo(18000);
+    assertThat(parse("flat up to 30000").budgetMin()).isNull();
   }
 
   @Test
   void bareNumbers_areBudgetsOnlyWithMoneyContext() {
-    assertThat(parser.parse("flat near pincode 400076").budgetMax()).isNull();
-    assertThat(parser.parse("1200 sqft flat in powai").budgetMax()).isNull();
-    assertThat(parser.parse("room for 25000").budgetMax()).isEqualTo(25000);
-    assertThat(parser.parse("25000 rent in powai").budgetMax()).isEqualTo(25000);
-    assertThat(parser.parse("rs 25000 in powai").budgetMax()).isEqualTo(25000);
+    assertThat(parse("flat near pincode 400076").budgetMax()).isNull();
+    assertThat(parse("1200 sqft flat in powai").budgetMax()).isNull();
+    assertThat(parse("room for 25000").budgetMax()).isEqualTo(25000);
+    assertThat(parse("25000 rent in powai").budgetMax()).isEqualTo(25000);
+    assertThat(parse("rs 25000 in powai").budgetMax()).isEqualTo(25000);
   }
 
   @Test
   void spelledOutAmounts_matchTheGlossary() {
-    assertThat(parser.parse("room for twenty five thousand in malad").budgetMax()).isEqualTo(25000);
-    assertThat(parser.parse("flat around one and a half lakh").budgetMax()).isEqualTo(150000);
+    assertThat(parse("room for twenty five thousand in malad").budgetMax()).isEqualTo(25000);
+    assertThat(parse("flat around one and a half lakh").budgetMax()).isEqualTo(150000);
   }
 
   @Test
   void depositStaysSeparateFromRent() {
-    SearchIntent i = parser.parse("2 lakh deposit, 30k rent");
+    SearchIntent i = parse("2 lakh deposit, 30k rent");
 
     assertThat(i.maxDeposit()).isEqualTo(200000);
     assertThat(i.budgetMax()).isEqualTo(30000);
-    assertThat(parser.parse("deposit under 50k").maxDeposit()).isEqualTo(50000);
+    assertThat(parse("deposit under 50k").maxDeposit()).isEqualTo(50000);
   }
 
   @Test
   void verified_onlyWhenNotNegated() {
-    assertThat(parser.parse("verified listings only").verifiedOnly()).isTrue();
-    assertThat(parser.parse("not verified listings are fine").verifiedOnly()).isNull();
-    assertThat(parser.parse("unverified is ok").verifiedOnly()).isNull();
-    assertThat(parser.parse("non-verified also fine").verifiedOnly()).isNull();
+    assertThat(parse("verified listings only").verifiedOnly()).isTrue();
+    assertThat(parse("not verified listings are fine").verifiedOnly()).isNull();
+    assertThat(parse("unverified is ok").verifiedOnly()).isNull();
+    assertThat(parse("non-verified also fine").verifiedOnly()).isNull();
   }
 
   @Test
   void minutesPhrase_isNotMisreadAsAMinimum() {
-    SearchIntent i = parser.parse("room within 20 min of bkc, 25k");
+    SearchIntent i = parse("room within 20 min of bkc, 25k");
 
     assertThat(i.budgetMax()).isEqualTo(25000);
     assertThat(i.budgetMin()).isNull();
@@ -141,7 +150,7 @@ class KeywordIntentParserTest {
 
   @Test
   void fromAPlace_isNotMisreadAsAFloor_whenNotAdjacentToTheAmount() {
-    SearchIntent i = parser.parse("15 min from powai for 25000");
+    SearchIntent i = parse("15 min from powai for 25000");
 
     assertThat(i.budgetMax()).isEqualTo(25000);
     assertThat(i.budgetMin()).isNull();
@@ -151,13 +160,13 @@ class KeywordIntentParserTest {
 
   @Test
   void minAndMinimum_stayFloors_whenNotAMinutesPhrase() {
-    assertThat(parser.parse("min 20k").budgetMin()).isEqualTo(20000);
-    assertThat(parser.parse("minimum 20k in andheri").budgetMin()).isEqualTo(20000);
+    assertThat(parse("min 20k").budgetMin()).isEqualTo(20000);
+    assertThat(parse("minimum 20k in andheri").budgetMin()).isEqualTo(20000);
   }
 
   @Test
   void fromToRange_stillWorks() {
-    SearchIntent i = parser.parse("from 20k to 30k");
+    SearchIntent i = parse("from 20k to 30k");
 
     assertThat(i.budgetMin()).isEqualTo(20000);
     assertThat(i.budgetMax()).isEqualTo(30000);
@@ -165,7 +174,7 @@ class KeywordIntentParserTest {
 
   @Test
   void liveHere_workThere() {
-    SearchIntent i = parser.parse("room in andheri, i work at bkc");
+    SearchIntent i = parse("room in andheri, i work at bkc");
 
     assertThat(i.locations()).extracting(SearchIntent.LocationRef::name)
         .containsExactlyInAnyOrder("Andheri East", "Andheri West");
@@ -175,7 +184,7 @@ class KeywordIntentParserTest {
 
   @Test
   void commuteMinutes_whenStated() {
-    SearchIntent i = parser.parse("near bkc within 20 mins under 25k");
+    SearchIntent i = parse("near bkc within 20 mins under 25k");
 
     assertThat(i.commuteTo().maxMinutes()).isEqualTo(20);
     assertThat(i.locations()).isNull();
@@ -184,7 +193,7 @@ class KeywordIntentParserTest {
 
   @Test
   void negation_excludesInsteadOfFiltersTo() {
-    SearchIntent i = parser.parse("anywhere but andheri, budget 25k");
+    SearchIntent i = parse("anywhere but andheri, budget 25k");
 
     assertThat(i.locations()).isNull();
     assertThat(i.excludeLocations()).extracting(SearchIntent.LocationRef::name)
@@ -192,9 +201,34 @@ class KeywordIntentParserTest {
     assertThat(i.budgetMax()).isEqualTo(25000);
   }
 
+  // ---- the parser resolves inside the viewer's city too (spec §4.11, review finding 1) ----
+
+  @Test
+  void aPlaceOutsideTheScopeIsNotEvenAMention() {
+    // the fallback parser is live twice: it is the mock provider, and it is what extractIntent
+    // degrades to when the model hard-fails. A Bangalore viewer whose LLM call fails must not have
+    // "andheri" bound to Mumbai.
+    SearchIntent mumbai = parser.parse("room in andheri under 25k", CityScope.of("Mumbai"));
+    assertThat(mumbai.locations()).extracting(SearchIntent.LocationRef::name)
+        .containsExactlyInAnyOrder("Andheri East", "Andheri West");
+
+    SearchIntent bangalore = parser.parse("room in andheri under 25k", CityScope.of("Bangalore"));
+    assertThat(bangalore.locations()).isNull();
+    // still a real search, just not one anchored on somebody else's city
+    assertThat(bangalore.budgetMax()).isEqualTo(25000);
+  }
+
+  @Test
+  void aCommuteAnchorOutsideTheScopeIsNotBoundEither() {
+    assertThat(parser.parse("room within 20 min of bkc", CityScope.of("Mumbai")).commuteTo().place())
+        .isEqualTo("BKC");
+    assertThat(parser.parse("room within 20 min of bkc", CityScope.of("Bangalore")).commuteTo())
+        .isNull();
+  }
+
   @Test
   void theOriginalIntegrationQuery_stillParses() {
-    SearchIntent i = parser.parse("Find me a room near BKC under 25k, no smokers");
+    SearchIntent i = parse("Find me a room near BKC under 25k, no smokers");
 
     assertThat(i.searchTarget()).isEqualTo(SearchTarget.PROPERTIES);
     assertThat(i.budgetMax()).isEqualTo(25000);
@@ -206,7 +240,7 @@ class KeywordIntentParserTest {
 
   @Test
   void singleSharingIsStillPrivate_andHinglishStillWorks() {
-    SearchIntent i = parser.parse("Single sharing room chahiye powai me budget 40k hai");
+    SearchIntent i = parse("Single sharing room chahiye powai me budget 40k hai");
 
     assertThat(i.roomType()).isEqualTo(RoomType.PRIVATE);
     assertThat(i.locations()).extracting(SearchIntent.LocationRef::name).containsExactly("Powai");

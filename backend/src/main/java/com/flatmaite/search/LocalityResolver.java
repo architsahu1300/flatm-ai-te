@@ -2,6 +2,7 @@ package com.flatmaite.search;
 
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import jakarta.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,6 +38,8 @@ public class LocalityResolver {
   public static final double CONFIDENT = 0.75;
   public static final int MIN_FUZZY_LENGTH = 5;
   public static final int MAX_WINDOW = 3;
+  /** Below this a token could LIKE-match half the table; own-data matching stays out. */
+  public static final int MIN_OWN_DATA_LENGTH = 5;
 
   /** A located mention. {@code tokenEnd} is exclusive. */
   public record Match(
@@ -48,21 +51,30 @@ public class LocalityResolver {
       double confidence) {}
 
   private final LocalityRepository localities;
+  private final PropertyRepository properties;
   // volatile + rebuild-then-swap in load(): a concurrent scan/resolve reads one consistent
   // generation of the gazetteer rather than racing a clear()-then-repopulate in place.
   private volatile Map<String, List<UUID>> byPhrase = new LinkedHashMap<>();
   private volatile Map<UUID, String> nameById = new LinkedHashMap<>();
+  private volatile Map<UUID, String> cityById = new LinkedHashMap<>();
+  private volatile Map<UUID, Point> pointById = new LinkedHashMap<>();
   private volatile List<Locality> loaded = new ArrayList<>();
   private final AtomicLong version = new AtomicLong();
+
+  private record Point(double lat, double lng) {}
 
   @PostConstruct
   void load() {
     Map<String, List<UUID>> newByPhrase = new LinkedHashMap<>();
     Map<UUID, String> newNameById = new LinkedHashMap<>();
+    Map<UUID, String> newCityById = new LinkedHashMap<>();
+    Map<UUID, Point> newPointById = new LinkedHashMap<>();
     List<Locality> newLoaded = new ArrayList<>();
     for (Locality l : localities.findAll()) {
       newLoaded.add(l);
       newNameById.put(l.getId(), l.getName());
+      newCityById.put(l.getId(), l.getCity());
+      newPointById.put(l.getId(), new Point(l.getLat(), l.getLng()));
       index(newByPhrase, l.getName(), l.getId());
       for (String alias : l.getAliases()) {
         index(newByPhrase, alias, l.getId());
@@ -70,6 +82,8 @@ public class LocalityResolver {
     }
     byPhrase = newByPhrase;
     nameById = newNameById;
+    cityById = newCityById;
+    pointById = newPointById;
     loaded = newLoaded;
     version.incrementAndGet();
   }
@@ -105,8 +119,18 @@ public class LocalityResolver {
     return Tokens.of(phrase).stream().map(Tokens.Token::text).collect(Collectors.joining(" "));
   }
 
-  /** Every locality mentioned in the text, non-overlapping, in text order. */
+  /** Every locality mentioned in the text, non-overlapping, in text order — unscoped: every city. */
   public List<Match> scan(String text) {
+    return scan(text, CityScope.unset());
+  }
+
+  /**
+   * Every locality mentioned in the text, non-overlapping, in text order, confined to {@code
+   * scope} when it is set. Scoping is applied to the exact/alias layer and, critically, inside
+   * fuzzy matching before similarity is scored — a wrong-city candidate can win on spelling alone
+   * if it is filtered out only afterward.
+   */
+  public List<Match> scan(String text, CityScope scope) {
     List<Tokens.Token> tokens = Tokens.of(text);
     boolean[] taken = new boolean[tokens.size()];
     List<Match> out = new ArrayList<>();
@@ -118,9 +142,9 @@ public class LocalityResolver {
           continue;
         }
         String phrase = Tokens.phrase(tokens, i, i + w);
-        List<UUID> ids = byPhrase.get(phrase);
-        if (ids != null) {
-          out.add(new Match(List.copyOf(ids), canonical(ids), i, i + w, phrase, EXACT));
+        List<UUID> ids = inScope(byPhrase.get(phrase), scope);
+        if (!ids.isEmpty()) {
+          out.add(new Match(ids, canonical(ids), i, i + w, phrase, EXACT));
           mark(taken, i, i + w);
         }
       }
@@ -136,7 +160,7 @@ public class LocalityResolver {
         if (phrase.length() < MIN_FUZZY_LENGTH) {
           continue;
         }
-        Fuzzy best = bestFuzzy(phrase, w);
+        Fuzzy best = bestFuzzy(phrase, w, scope);
         if (best != null) {
           out.add(new Match(best.ids(), canonical(best.ids()), i, i + w, phrase, best.similarity()));
           mark(taken, i, i + w);
@@ -148,8 +172,45 @@ public class LocalityResolver {
     return out;
   }
 
-  /** Whole-string resolution of a name the LLM or a chip supplied; never guesses by substring. */
+  /**
+   * Whole-string resolution of a name the LLM or a chip supplied; never guesses by substring.
+   * Unscoped: reaches every seeded city.
+   */
   public Optional<Match> resolve(String name) {
+    return resolveMatch(name, CityScope.unset());
+  }
+
+  /**
+   * Whole-string resolution confined to {@code scope} when it is set — the resolution ladder (spec
+   * §4.3). Step 1 is the gazetteer: a hit is always {@link Placement.Source#GAZETTEER}, and a name
+   * that only matches outside {@code scope} — exactly or by fuzzy similarity — never crosses the
+   * city boundary. Step 2, when the gazetteer misses, is our own inventory: a society or address
+   * name already sitting on a listing in {@code scope}, scored {@link Placement.Source#OWN_DATA}
+   * at a fixed 0.5 confidence — an inference from what renters actually wrote, not a curated
+   * statement, so {@code ConfidenceGate} treats it as a ranking preference rather than a hard
+   * filter. Only then does an unplaced name fall all the way to {@link Placement#none()}.
+   */
+  public Placement resolve(String name, CityScope scope) {
+    Optional<Match> gazetteer = resolveMatch(name, scope);
+    if (gazetteer.isPresent()) {
+      return toPlacement(gazetteer.get());
+    }
+    if (name != null && !name.isBlank() && name.length() >= MIN_OWN_DATA_LENGTH) {
+      List<PropertyRepository.PlacementRow> rows =
+          properties.findPlacementByPlaceName(name, scope.city());
+      if (!rows.isEmpty()) {
+        return new Placement(
+            rows.stream().map(PropertyRepository.PlacementRow::getLocalityId).toList(),
+            rows.get(0).getLat(),
+            rows.get(0).getLng(),
+            Placement.Source.OWN_DATA,
+            0.5); // INFERRED — ConfidenceGate treats it as a preference, not a filter
+      }
+    }
+    return Placement.none();
+  }
+
+  private Optional<Match> resolveMatch(String name, CityScope scope) {
     if (name == null || name.isBlank()) {
       return Optional.empty();
     }
@@ -157,22 +218,110 @@ public class LocalityResolver {
     if (key.isEmpty()) {
       return Optional.empty();
     }
-    List<UUID> exact = byPhrase.get(key);
-    if (exact != null) {
-      return Optional.of(new Match(List.copyOf(exact), canonical(exact), 0, 0, key, EXACT));
+    List<UUID> exact = inScope(byPhrase.get(key), scope);
+    if (!exact.isEmpty()) {
+      return Optional.of(new Match(exact, canonical(exact), 0, 0, key, EXACT));
     }
     if (key.length() < MIN_FUZZY_LENGTH) {
       return Optional.empty();
     }
-    Fuzzy best = bestFuzzy(key, key.split(" ").length);
+    Fuzzy best = bestFuzzy(key, key.split(" ").length, scope);
     if (best == null) {
       return Optional.empty();
     }
     return Optional.of(new Match(best.ids(), canonical(best.ids()), 0, 0, key, best.similarity()));
   }
 
+  /**
+   * The placement that locality ids already bound to an intent stand for: the gazetteer rows they
+   * name and the point at their centre, which is what the fallback ladder measures its rings from.
+   * Ids this resolver does not know contribute nothing, and an anchor made entirely of such ids is
+   * {@link Placement#none()} — the caller then has no place to widen around rather than a
+   * fictitious one. {@code confidence} is the grade the slot that named them already earned.
+   *
+   * <p>The name carries the assumption: this always stamps {@link Placement.Source#GAZETTEER}, so
+   * it is only correct for ids that came from the gazetteer. Anything derived from the own-data
+   * step of {@link #resolve(String, CityScope)} must keep that step's own source and its fixed 0.5
+   * confidence (spec §4.3) and must not be run back through here.
+   */
+  public Placement gazetteerPlacementOf(List<UUID> localityIds, double confidence) {
+    List<UUID> known =
+        localityIds == null
+            ? List.of()
+            : localityIds.stream().filter(id -> id != null && nameById.containsKey(id)).toList();
+    if (known.isEmpty()) {
+      return Placement.none();
+    }
+    Point centroid = centroidOf(known);
+    return new Placement(
+        known,
+        centroid == null ? null : centroid.lat(),
+        centroid == null ? null : centroid.lng(),
+        Placement.Source.GAZETTEER,
+        confidence);
+  }
+
+  private Placement toPlacement(Match m) {
+    Point centroid = centroidOf(m.localityIds());
+    Double lat = centroid == null ? null : centroid.lat();
+    Double lng = centroid == null ? null : centroid.lng();
+    return new Placement(m.localityIds(), lat, lng, Placement.Source.GAZETTEER, m.confidence());
+  }
+
+  /** Average of the matched localities' points; a single id is simply that locality's point. */
+  private Point centroidOf(List<UUID> ids) {
+    double lat = 0;
+    double lng = 0;
+    int n = 0;
+    for (UUID id : ids) {
+      Point p = pointById.get(id);
+      if (p != null) {
+        lat += p.lat();
+        lng += p.lng();
+        n++;
+      }
+    }
+    return n == 0 ? null : new Point(lat / n, lng / n);
+  }
+
+  /**
+   * Filters candidate ids to {@code scope} before any similarity scoring can see them — an UNSET
+   * scope reaches every city (today that is only Mumbai, §4.11); a set scope keeps only ids whose
+   * locality belongs to it. Always returns an immutable list, never the caller's own reference.
+   */
+  private List<UUID> inScope(List<UUID> ids, CityScope scope) {
+    if (ids == null) {
+      return List.of();
+    }
+    if (!scope.isSet()) {
+      return List.copyOf(ids);
+    }
+    return ids.stream().filter(id -> scope.city().equalsIgnoreCase(cityById.get(id))).toList();
+  }
+
+  /**
+   * The locality's name, or {@code null} when {@code id} is not one this resolver knows — never a
+   * city name standing in for an unknown place. Callers show nothing rather than invent a place.
+   */
   public String nameOf(UUID id) {
-    return nameById.getOrDefault(id, "Mumbai");
+    return nameById.get(id);
+  }
+
+  /** The city a locality belongs to, or null when the id is unknown — callers fall back themselves. */
+  public String cityOf(UUID id) {
+    return cityById.get(id);
+  }
+
+  /**
+   * The locality's centroid as {@code {lat, lng}}, or null when the id is not one this resolver
+   * knows — a ring is simply not drawn around a place we cannot locate, rather than around a
+   * guessed point. This is the centre a per-property ring is measured from (spec §4.1), and it is
+   * the same point {@link CommuteEstimator} measures its locality distances between, so the ring
+   * a heading names and the distance a row prints can never describe different circles.
+   */
+  public double[] pointOf(UUID id) {
+    Point p = id == null ? null : pointById.get(id);
+    return p == null ? null : new double[] {p.lat(), p.lng()};
   }
 
   /** "Name (alias, alias)" per locality — the controlled vocabulary handed to the intent prompt. */
@@ -187,16 +336,25 @@ public class LocalityResolver {
 
   private record Fuzzy(List<UUID> ids, double similarity) {}
 
-  /** Best phrase with the same word count whose trigram similarity clears the threshold. */
-  private Fuzzy bestFuzzy(String phrase, int words) {
+  /**
+   * Best phrase with the same word count whose trigram similarity clears the threshold, among
+   * candidates already narrowed to {@code scope}. Scoping happens before scoring — a phrase whose
+   * every id is filtered out never gets a similarity computed, so a wrong-city near-miss can never
+   * outscore an in-scope one (or resolve at all, when nothing in scope is close).
+   */
+  private Fuzzy bestFuzzy(String phrase, int words, CityScope scope) {
     Fuzzy best = null;
     for (Map.Entry<String, List<UUID>> e : byPhrase.entrySet()) {
       if (e.getKey().split(" ").length != words) {
         continue;
       }
+      List<UUID> ids = inScope(e.getValue(), scope);
+      if (ids.isEmpty()) {
+        continue;
+      }
       double sim = Trigrams.similarity(phrase, e.getKey());
       if (sim >= FUZZY_THRESHOLD && (best == null || sim > best.similarity())) {
-        best = new Fuzzy(List.copyOf(e.getValue()), sim);
+        best = new Fuzzy(ids, sim);
       }
     }
     return best;

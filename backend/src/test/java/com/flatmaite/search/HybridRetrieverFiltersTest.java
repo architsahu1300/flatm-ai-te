@@ -6,6 +6,7 @@ import com.flatmaite.common.config.FlatmaiteProperties;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
 import com.flatmaite.listing.ListingFilters;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,7 @@ class HybridRetrieverFiltersTest {
                 locality("Andheri East", "andheri east", "andheri"),
                 locality("Andheri West", "andheri west", "andheri"),
                 locality("BKC", "bandra kurla complex")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
     parser = new KeywordIntentParser(resolver);
     CommuteEstimator estimator = Mockito.mock(CommuteEstimator.class);
@@ -48,7 +49,7 @@ class HybridRetrieverFiltersTest {
 
   @Test
   void withinMinutesOfPlace_parsesAsACeiling_andReachesTheFilter() {
-    SearchIntent intent = parser.parse("room within 20 min of bkc, 25k");
+    SearchIntent intent = parser.parse("room within 20 min of bkc, 25k", CityScope.unset());
 
     assertThat(intent.budgetMax()).isEqualTo(25000);
     assertThat(intent.budgetMin()).isNull();
@@ -56,13 +57,13 @@ class HybridRetrieverFiltersTest {
     assertThat(intent.commuteTo().maxMinutes()).isEqualTo(20);
 
     ListingFilters filters = retriever.toFilters(intent);
-    assertThat(filters.budgetMax()).isEqualTo(27500); // 25000 * 1.1 headroom
+    assertThat(filters.budgetMax()).isEqualTo(25000); // exactly what was asked; the band is a tier
     assertThat(filters.budgetMin()).isNull();
   }
 
   @Test
   void moreThan_parsesAsAFloor_andReachesTheFilterWithNoHeadroom() {
-    SearchIntent intent = parser.parse("flat in andheri more than 30000");
+    SearchIntent intent = parser.parse("flat in andheri more than 30000", CityScope.unset());
 
     assertThat(intent.budgetMin()).isEqualTo(30000);
     assertThat(intent.budgetMax()).isNull();

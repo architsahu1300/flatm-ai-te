@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flatmaite.listing.Locality;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.AiUsageService;
 import com.flatmaite.search.LocalityResolver;
 import java.util.List;
@@ -53,7 +54,7 @@ class OpenAiLlmsPromptTest {
   void promptOverheadTokens_reflectsTheActualSystemPrompt_notAHardcodedGuess() {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll()).thenReturn(List.of(locality("Powai", "hiranandani")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.reload();
 
     int overhead = intentLlm(resolver).promptOverheadTokens();
@@ -71,7 +72,7 @@ class OpenAiLlmsPromptTest {
     Mockito.when(repo.findAll())
         .thenReturn(List.of(locality("Powai", "hiranandani")))
         .thenReturn(List.of(locality("Powai", "hiranandani"), locality("Chembur")));
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.reload();
     OpenAiLlms.OpenAiIntentLlm llm = intentLlm(resolver);
 

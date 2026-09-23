@@ -60,14 +60,19 @@ public class HybridRetriever {
   /** Row attributes carried through fusion, keyed by id while the rankings are collected. */
   private record Row(UUID localityId, Double lat, Double lng) {}
 
+  /**
+   * Retrieval at the configured neighbourhood radius. The AI pipeline does not come through here —
+   * it asks for each {@link RescueLadder.Tier}'s own radius, so that the block it labels as the
+   * requested area contains only the requested area.
+   */
   @Transactional(readOnly = true)
   public List<Candidate> retrieveListings(SearchIntent intent) {
-    return retrieveListings(intent, props.getSearch().getNearbyRadiusMinutes());
+    return retrieveListings(intent, props.getSearch().getNearbyRadiusKm());
   }
 
   @Transactional(readOnly = true)
-  public List<Candidate> retrieveListings(SearchIntent intent, Integer radiusMinutes) {
-    ListingFilters filters = toFiltersWithRadius(intent, radiusMinutes);
+  public List<Candidate> retrieveListings(SearchIntent intent, double radiusKm) {
+    ListingFilters filters = toFiltersWithRadius(intent, radiusKm);
     Map<String, Object> params = new LinkedHashMap<>();
     String where = ListingQueryService.buildWhere(filters, params);
 
@@ -291,33 +296,42 @@ public class HybridRetriever {
 
   /** Browse-time filters: the widened admission. */
   public ListingFilters toFilters(SearchIntent intent) {
-    return toFiltersWithRadius(intent, props.getSearch().getNearbyRadiusMinutes());
+    return toFiltersWithRadius(intent, props.getSearch().getNearbyRadiusKm());
   }
 
   /** Saved-search alerts pass {@code false}: an alert cannot explain a widened area. */
   public ListingFilters toFilters(SearchIntent intent, boolean widenToNearby) {
-    return toFiltersWithRadius(intent, widenToNearby ? props.getSearch().getNearbyRadiusMinutes() : null);
+    return toFiltersWithRadius(intent, widenToNearby ? props.getSearch().getNearbyRadiusKm() : 0.0);
   }
 
   /**
    * Maps intent → hard filters, honouring the confidence gate: a slot the reader only inferred is
-   * left out entirely, so it ranks (via {@link MatchScorer}) instead of deleting rows. Budget keeps
-   * its ×1.1 headroom — near-misses surface as concerns.
+   * left out entirely, so it ranks (via {@link MatchScorer}) instead of deleting rows. Budget is
+   * exactly what the user said: the ×1.1 headroom that used to be applied to every query is now
+   * {@link RescueLadder.SearchTier#OVER_BUDGET}'s own labelled band (spec §4.5), because a block
+   * headed as within budget must hold only listings within it.
    *
-   * @param radiusMinutes how far a named locality's neighbourhood reaches; null = strict (alerts).
+   * @param radiusKm how far a named locality's neighbourhood reaches, in straight-line kilometres;
+   *     0.0 = strict (alerts).
    */
-  public ListingFilters toFiltersWithRadius(SearchIntent intent, Integer radiusMinutes) {
+  public ListingFilters toFiltersWithRadius(SearchIntent intent, double radiusKm) {
     SearchIntent.Lifestyle lifestyle = intent.lifestyleOrEmpty();
+    Admission admission = admission(intent, radiusKm);
     ListingFilters.ListingFiltersBuilder b =
         ListingFilters.builder()
-            // admittedLocalityIds gates its two rings itself; an empty list is "no locality filter"
-            .localityIds(admittedLocalityIds(intent, radiusMinutes))
+            // admission gates its two rings itself; an empty list is "no locality filter"
+            .localityIds(admission.localityIds())
+            // and the same rings again per property, so a locality admitted by its centroid cannot
+            // smuggle in a listing at its far edge that the page's heading would misdescribe
+            .geoRings(admission.rings())
+            .geoExemptLocalityIds(admission.exemptIds())
             .excludeLocalityIds(excludedLocalityIds(intent));
     if (ConfidenceGate.isHard(intent, "budgetMin")) {
       b.budgetMin(intent.budgetMin());
     }
     if (ConfidenceGate.isHard(intent, "budgetMax")) {
-      b.budgetMax(intent.budgetMax() == null ? null : (int) (intent.budgetMax() * 1.1));
+      // exactly what the user said — the +10% band is its own tier now (WS6 §4.5)
+      b.budgetMax(intent.budgetMax());
     }
     if (ConfidenceGate.isHard(intent, "maxDeposit")) {
       b.maxDeposit(intent.maxDeposit());
@@ -401,6 +415,11 @@ public class HybridRetriever {
     return localityResolver.resolve(intent.commuteTo().place()).map(m -> m.localityIds().get(0)).orElse(null);
   }
 
+  /** The city a locality belongs to, or null when it cannot be placed — callers fall back to Mumbai. */
+  private String cityOf(UUID localityId) {
+    return localityId == null ? null : localityResolver.cityOf(localityId);
+  }
+
   /** Browse-time admission: requested localities plus their nearby radius. */
   public List<UUID> admittedLocalityIds(SearchIntent intent) {
     return admittedLocalityIds(intent, true);
@@ -408,13 +427,14 @@ public class HybridRetriever {
 
   /** Boolean convenience: {@code true} widens by the configured radius, {@code false} is strict. */
   public List<UUID> admittedLocalityIds(SearchIntent intent, boolean widenToNearby) {
-    return admittedLocalityIds(intent, widenToNearby ? props.getSearch().getNearbyRadiusMinutes() : null);
+    return admittedLocalityIds(intent, widenToNearby ? props.getSearch().getNearbyRadiusKm() : 0.0);
   }
 
   /**
-   * Requested localities; plus everything within {@code radiusMinutes} of each (when non-null);
-   * plus the commute ring when a workplace and a travel time were both stated; minus exclusions.
-   * Requested ids come first, then by minutes. Empty list = no locality hard filter.
+   * Requested localities; plus everything within {@code radiusKm} straight-line kilometres of each
+   * (when positive); plus the commute ring when a workplace and a travel time were both stated;
+   * minus exclusions. Requested ids come first, then by distance. Empty list = no locality hard
+   * filter.
    *
    * <p>The two rings are gated separately because they are two separate claims by the user, and
    * collapsing them behind one gate fails in both directions: a home area the reader only guessed
@@ -425,21 +445,49 @@ public class HybridRetriever {
    * names no travel time, so {@link SearchIntent#DEFAULT_COMMUTE_MINUTES} is our guess, and a guess
    * must not delete a listing 35 minutes from BKC. Nothing is lost but the {@code AND}: the
    * {@code location} score component and the per-result commute label both still measure distance
-   * to the anchor, so near-by homes still rank first — they are simply no longer the only ones.
+   * to the anchor, so near-by homes still rank first — they are simply no longer the only ones. A
+   * stated commute cap is in minutes (that is what the user said), so it is converted to a kilometre
+   * budget through the anchor city's calibration before it becomes a ring — the same conversion the
+   * minutes side of the calibration uses, inverted.
    *
    * <p>Exclusions are removed however the positive side was graded: they are {@code ALWAYS_HARD}.
    */
-  public List<UUID> admittedLocalityIds(SearchIntent intent, Integer radiusMinutes) {
+  public List<UUID> admittedLocalityIds(SearchIntent intent, double radiusKm) {
+    return admission(intent, radiusKm).localityIds();
+  }
+
+  /**
+   * What a radius admits, in both granularities at once: the locality ids the SQL locality filter
+   * needs, and the same rings expressed as points and metres for {@link ListingFilters.GeoRing} to
+   * enforce per property (ruling R14). They are computed in one pass precisely so they cannot come
+   * to describe different circles — a heading naming 5 km and a row reporting 6.3 km is the exact
+   * disagreement this pairing exists to prevent.
+   *
+   * @param localityIds every admitted locality, requested ones first, then by distance
+   * @param exemptIds the localities the user <em>named</em> — home areas and a stated workplace.
+   *     They are admitted because the user asked for them, not because of a distance we measured,
+   *     so no distance claim is being made about them and no ring may evict them.
+   * @param rings one per named place, at that place's own radius; empty when no radius applies or
+   *     no centroid could be found, which leaves retrieval exactly as it was before R14
+   */
+  private record Admission(
+      List<UUID> localityIds, List<UUID> exemptIds, List<ListingFilters.GeoRing> rings) {}
+
+  private Admission admission(SearchIntent intent, double radiusKm) {
     Set<UUID> excluded = new HashSet<>(excludedLocalityIds(intent));
     LinkedHashSet<UUID> admitted = new LinkedHashSet<>();
-    Map<UUID, Integer> nearbyMinutes = new HashMap<>();
+    LinkedHashSet<UUID> exempt = new LinkedHashSet<>();
+    Map<UUID, Double> nearbyKm = new HashMap<>();
+    List<ListingFilters.GeoRing> rings = new ArrayList<>();
     if (ConfidenceGate.isHard(intent, "locations")) {
       List<UUID> requested = requestedLocalityIds(intent);
       admitted.addAll(requested);
-      if (radiusMinutes != null) {
+      exempt.addAll(requested);
+      if (radiusKm > 0) {
         for (UUID id : requested) {
-          for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusMinutes, Integer.MAX_VALUE)) {
-            nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+          addRing(rings, id, radiusKm);
+          for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(id, radiusKm, Integer.MAX_VALUE)) {
+            nearbyKm.merge(n.localityId(), n.km(), Math::min);
           }
         }
       }
@@ -447,16 +495,52 @@ public class HybridRetriever {
     Integer commuteMinutes = enforceableCommuteMinutes(intent);
     UUID anchor = commuteMinutes == null ? null : commuteAnchor(intent);
     if (anchor != null) {
-      nearbyMinutes.merge(anchor, 0, Math::min);
-      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, commuteMinutes, Integer.MAX_VALUE)) {
-        nearbyMinutes.merge(n.localityId(), n.minutes(), Math::min);
+      FlatmaiteProperties.Calibration cal = props.getGeo().calibrationFor(cityOf(anchor));
+      double budgetKm =
+          Math.max(0, (commuteMinutes - cal.overheadMin()) / 60.0 * cal.speedKmph() / cal.roadCircuity());
+      nearbyKm.merge(anchor, 0.0, Math::min);
+      exempt.add(anchor);
+      // On a widened call the commute anchor gets a per-property ring of its own, at the same
+      // kilometre budget the locality side just used. Without one it would be the home ring's
+      // collateral damage: a query naming both a home area and a workplace would draw circles only
+      // around the home, and every locality admitted for being near the office would be evicted by
+      // a circle it was never measured against.
+      //
+      // Gated on radiusKm, unlike the locality-level admission above it, which deliberately applies
+      // a stated commute cap even in strict mode. Tightening that cap to per-property on the strict
+      // path is arguably the more correct reading — the km budget is the exact inverse of the
+      // minutes conversion the user stated their cap in — but it is not this wave's to make:
+      // SavedSearchAlertRunner asks for radius 0.0, so it would silently change what every stored
+      // "within 30 minutes of BKC" alert matches on, with nobody told. Proposed separately.
+      if (radiusKm > 0) {
+        addRing(rings, anchor, budgetKm);
+      }
+      for (CommuteEstimator.Nearby n : commuteEstimator.nearestLocalities(anchor, budgetKm, Integer.MAX_VALUE)) {
+        nearbyKm.merge(n.localityId(), n.km(), Math::min);
       }
     }
-    nearbyMinutes.entrySet().stream()
+    nearbyKm.entrySet().stream()
         .sorted(Map.Entry.comparingByValue())
         .forEach(e -> admitted.add(e.getKey()));
     admitted.removeAll(excluded);
-    return new ArrayList<>(admitted);
+    exempt.removeAll(excluded);
+    return new Admission(new ArrayList<>(admitted), new ArrayList<>(exempt), rings);
+  }
+
+  /**
+   * A ring around one locality's centroid, or nothing at all when the resolver cannot place it.
+   * Nothing is the right answer: {@link CommuteEstimator#nearestLocalities} admits nothing around
+   * an anchor it has no centroid for either, so a ring-less admission is an admission with no
+   * proximity claim in it to police.
+   */
+  private void addRing(List<ListingFilters.GeoRing> rings, UUID localityId, double radiusKm) {
+    if (radiusKm <= 0) {
+      return;
+    }
+    double[] point = localityResolver.pointOf(localityId);
+    if (point != null) {
+      rings.add(new ListingFilters.GeoRing(point[0], point[1], radiusKm * 1000.0));
+    }
   }
 
   /**

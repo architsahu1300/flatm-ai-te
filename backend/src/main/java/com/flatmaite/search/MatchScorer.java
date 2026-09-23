@@ -102,13 +102,20 @@ public final class MatchScorer {
       String detail;
       if (c.inPreferredLocality()) {
         score = 1.0;
-        detail = "In %s — one of your preferred areas".formatted(c.localityName());
+        // localityName can be null when the id came back from a resolver generation that no
+        // longer recognises it — say so without it rather than naming the wrong place.
+        detail =
+            c.localityName() == null
+                ? "One of your preferred areas"
+                : "In %s — one of your preferred areas".formatted(c.localityName());
       } else if (c.commuteMinutes() != null) {
         int radius = Math.max(1, c.radiusMinutes());
         score = Math.max(MIN_LOCATION_SCORE, 1.0 - c.commuteMinutes() / (2.0 * radius));
         detail =
-            "~%d min %s %s (estimate)"
-                .formatted(c.commuteMinutes(), c.anchorIsCommute() ? "to" : "from", c.anchorName());
+            c.anchorName() == null
+                ? "~%d min away (estimate)".formatted(c.commuteMinutes())
+                : "~%d min %s %s (estimate)"
+                    .formatted(c.commuteMinutes(), c.anchorIsCommute() ? "to" : "from", c.anchorName());
       } else {
         score = MIN_LOCATION_SCORE;
         detail = "Outside your preferred areas";

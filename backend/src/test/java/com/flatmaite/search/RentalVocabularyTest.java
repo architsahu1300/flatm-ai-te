@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -62,10 +63,10 @@ class RentalVocabularyTest {
     // no locality data needed: these assertions are about room type only
     LocalityRepository localities = Mockito.mock(LocalityRepository.class);
     Mockito.when(localities.findAll()).thenReturn(List.of());
-    LocalityResolver resolver = new LocalityResolver(localities);
+    LocalityResolver resolver = new LocalityResolver(localities, Mockito.mock(PropertyRepository.class));
     resolver.load();
 
-    SearchIntent intent = new KeywordIntentParser(resolver).parse(query);
+    SearchIntent intent = new KeywordIntentParser(resolver).parse(query, CityScope.unset());
     assertThat(intent.roomType()).isEqualTo(expected);
   }
 }

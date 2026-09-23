@@ -8,6 +8,7 @@ import com.flatmaite.common.domain.RoomType;
 import com.flatmaite.common.domain.SearchTarget;
 import com.flatmaite.listing.ListingFilters;
 import com.flatmaite.listing.LocalityRepository;
+import com.flatmaite.listing.PropertyRepository;
 import com.flatmaite.search.SearchIntent.CommuteTo;
 import com.flatmaite.search.SearchIntent.LocationRef;
 import com.flatmaite.seed.SeedLocalities;
@@ -32,11 +33,11 @@ class HybridRetrieverGatingTest {
   void setUp() {
     LocalityRepository repo = Mockito.mock(LocalityRepository.class);
     Mockito.when(repo.findAll()).thenReturn(SeedLocalities.entities());
-    LocalityResolver resolver = new LocalityResolver(repo);
+    LocalityResolver resolver = new LocalityResolver(repo, Mockito.mock(PropertyRepository.class));
     resolver.load();
-    CommuteEstimator estimator = new CommuteEstimator(repo);
+    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusKm defaults to 5.0
+    CommuteEstimator estimator = new CommuteEstimator(repo, props);
     estimator.reload();
-    FlatmaiteProperties props = new FlatmaiteProperties(); // nearbyRadiusMinutes defaults to 25
     // constructor arguments follow HybridRetriever's field declaration order
     retriever = new HybridRetriever(null, null, estimator, resolver, props);
   }
@@ -136,9 +137,13 @@ class HybridRetrieverGatingTest {
   void aWiderRescueRadiusAdmitsMoreLocalities() {
     SearchIntent intent =
         SearchIntent.builder().locations(List.of(new LocationRef("Goregaon", SeedLocalities.id("Goregaon")))).build();
-    int normal = retriever.toFilters(intent).localityIds().size();
-    int wide = retriever.toFiltersWithRadius(intent, 45).localityIds().size();
-    assertThat(wide).isGreaterThan(normal);
+
+    // Two explicit, different radii — not the configured defaults, which are both 5.0 and so
+    // cannot tell a wider ring from a narrower one.
+    int narrow = retriever.admittedLocalityIds(intent, 2.0).size();
+    int wide = retriever.admittedLocalityIds(intent, 8.0).size();
+
+    assertThat(wide).isGreaterThan(narrow);
   }
 
   @Test

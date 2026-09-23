@@ -2,8 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { AiMatchCard } from "@/components/search/AiMatchCard";
+import { CityScopePrompt } from "@/components/search/CityScopePrompt";
 import { IntentChips } from "@/components/search/IntentChips";
+import { RaiseBudgetChoice, ResultGroups } from "@/components/search/ResultGroups";
 import { EXAMPLE_QUERIES, SearchBox } from "@/components/search/SearchBox";
 import { Button } from "@/components/ui/button";
 import { Sheet } from "@/components/ui/sheet";
@@ -11,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { resultId, useAiSearchStore } from "@/stores/ai-search-store";
 import { createSavedSearch } from "@/lib/saved-client";
 import { ApiError } from "@/lib/api";
+import { findRaiseBudgetChoice, isBudgetRaiseRelaxer, type Choice } from "@/lib/ai-client";
 import { cn } from "@/lib/utils";
 
 function SaveSearchButton() {
@@ -69,6 +71,26 @@ export function SearchScreen() {
   const busy = store.status === "understanding" || store.status === "searching";
   const results = store.activeTab === "homes" ? store.homes : store.flatmates;
   const showTabs = store.homes.length > 0 && store.flatmates.length > 0;
+  // Tiering (and the summary it drives) only ever describes the homes collection — a flatmate
+  // row's tier is always null, so grouping the flatmates tab by it would be meaningless.
+  const activeSummary = store.activeTab === "homes" ? store.resultSummary : null;
+
+  function applyChoice(choice: Choice) {
+    if (!store.intent) return;
+    store.applyIntent({ ...store.intent, budgetMax: choice.value }, choice.label);
+  }
+
+  // The empty-results relaxer list can independently offer its own "raise budget" entry (derived
+  // from budgetMax × 1.2) alongside the counted choices[] RAISE_BUDGET offer (the strict
+  // cheapest-that-opens-something). Both are real, but a user cannot be asked to choose between
+  // two prices for the same action — prefer the counted choice and drop the generic relaxer.
+  // The relaxer is identified structurally (its relaxedIntent changes only budgetMax), not by
+  // matching the backend's label text, so a copy change to that label can't silently reopen the
+  // two-competing-buttons bug this filter exists to prevent.
+  const raiseBudgetChoice = findRaiseBudgetChoice(store.choices);
+  const visibleRelaxers = raiseBudgetChoice
+    ? store.relaxers.filter((rx) => !isBudgetRaiseRelaxer(rx, store.intent))
+    : store.relaxers;
 
   if (store.status === "idle") {
     return (
@@ -152,6 +174,10 @@ export function SearchScreen() {
       {/* Results */}
       {store.status === "done" && (
         <div className="mt-6">
+          {/* Informational only — never gates the results rendered below it, and shows for
+              every anonymous searcher (source "UNSET") just as much as a profile-less user. */}
+          <CityScopePrompt citySearch={store.citySearch} />
+
           {showTabs && (
             <div className="mb-4 flex w-fit rounded-control bg-surface-2 p-1 text-sm font-medium">
               {(
@@ -200,34 +226,46 @@ export function SearchScreen() {
                 </p>
                 <SaveSearchButton />
               </div>
-              <div className="space-y-4">
-                {results.map((r) => (
-                  <AiMatchCard
-                    key={resultId(r)}
-                    result={r}
-                    compareSelected={store.compareIds.includes(resultId(r))}
-                    onToggleCompare={() => store.toggleCompare(resultId(r))}
-                  />
-                ))}
-              </div>
+              <ResultGroups
+                results={results}
+                summary={activeSummary}
+                choices={store.activeTab === "homes" ? store.choices : null}
+                compareIds={store.compareIds}
+                onToggleCompare={store.toggleCompare}
+                onApplyChoice={applyChoice}
+              />
             </>
           ) : (
             <div className="rounded-card border border-border bg-surface p-8 text-center">
               <p className="text-lg font-medium">No close matches for this</p>
-              {store.relaxers.length > 0 ? (
+              {raiseBudgetChoice || visibleRelaxers.length > 0 ? (
                 <>
                   <p className="mt-1 text-sm text-text-muted">One tap widens the search:</p>
-                  <div className="mt-4 flex flex-wrap justify-center gap-2">
-                    {store.relaxers.map((rx) => (
-                      <Button
-                        key={rx.label}
-                        variant="outline"
-                        onClick={() => store.applyRelaxer(rx.relaxedIntent, rx.label)}
-                      >
-                        {rx.label} <span className="text-text-muted">· {rx.description}</span>
-                      </Button>
-                    ))}
-                  </div>
+                  {/* Same RaiseBudgetChoice presentation ResultGroups uses for a non-empty page —
+                      one shared component so the two surfaces can't drift on how a Choice reads. */}
+                  {raiseBudgetChoice && (
+                    <div className="mt-4">
+                      <RaiseBudgetChoice choice={raiseBudgetChoice} onApply={applyChoice} />
+                    </div>
+                  )}
+                  {visibleRelaxers.length > 0 && (
+                    <div
+                      className={cn(
+                        "flex flex-wrap justify-center gap-2",
+                        raiseBudgetChoice ? "mt-3" : "mt-4",
+                      )}
+                    >
+                      {visibleRelaxers.map((rx) => (
+                        <Button
+                          key={rx.label}
+                          variant="outline"
+                          onClick={() => store.applyRelaxer(rx.relaxedIntent, rx.label)}
+                        >
+                          {rx.label} <span className="text-text-muted">· {rx.description}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  )}
                 </>
               ) : (
                 <p className="mt-1 text-sm text-text-muted">Try changing the area or budget.</p>

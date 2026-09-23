@@ -195,6 +195,37 @@ class MatchScorerTest {
   }
 
   @Test
+  void locationDetail_withNoLocalityName_degradesGracefully_neverRendersTheLiteralNull() {
+    // localityName can be null now that LocalityResolver.nameOf honestly returns null for an id it
+    // doesn't recognise (R7) — the location component must drop the place-name clause, not print
+    // "In null — one of your preferred areas".
+    SearchIntent intent = intent(25000, null, null);
+    ListingCandidate noNameButPreferred =
+        new ListingCandidate(
+            listing(20000, null, null), UUID.randomUUID(), null, true, true, true, SEMANTIC_TOP, null, null, false, 30, true);
+
+    MatchScorer.Scored scored = MatchScorer.scoreListing(intent, noNameButPreferred);
+
+    assertThat(component(scored, "location").detail()).isEqualTo("One of your preferred areas");
+    assertThat(component(scored, "location").detail()).doesNotContainIgnoringCase("null");
+  }
+
+  @Test
+  void commuteDetail_withNoAnchorName_degradesGracefully_neverRendersTheLiteralNull() {
+    // anchorName can be null the same way (a client-submitted commuteTo.localityId with no place
+    // text) — the estimate must still read as a distance, not "~40 min from null (estimate)".
+    SearchIntent intent = intent(25000, null, null);
+    ListingCandidate commuteWithNoAnchorName =
+        new ListingCandidate(
+            listing(20000, null, null), UUID.randomUUID(), null, true, true, true, SEMANTIC_TOP, 40, null, true, 30, false);
+
+    MatchScorer.Scored scored = MatchScorer.scoreListing(intent, commuteWithNoAnchorName);
+
+    assertThat(component(scored, "location").detail()).isEqualTo("~40 min away (estimate)");
+    assertThat(component(scored, "location").detail()).doesNotContainIgnoringCase("null");
+  }
+
+  @Test
   void flatmateRelevanceDetail_matchesSpec() {
     assertThat(MatchScorer.flatmateRelevanceDetail(new Retrieval(1, true, true)))
         .isEqualTo("Matches your description on both wording and meaning");

@@ -64,7 +64,14 @@ public class KeywordIntentParser {
    */
   private record Amount(int value, int start, int end, boolean bare) {}
 
-  public SearchIntent parse(String query) {
+  /**
+   * @param scope the viewer's city (spec §4.11). It reaches {@link LocalityResolver#scan} rather
+   *     than being applied to the result, because scanning is where the boundary has to hold: a
+   *     wrong-city phrase filtered out afterwards would already have won a fuzzy match and would
+   *     already have been classified as this query's home area, exclusion or workplace. Out of
+   *     scope, a name is simply not a mention here and survives as free text.
+   */
+  public SearchIntent parse(String query, CityScope scope) {
     String q = query.toLowerCase(Locale.ROOT);
     List<Tokens.Token> tokens = Tokens.of(query);
 
@@ -128,7 +135,7 @@ public class KeywordIntentParser {
     }
 
     // --- locations & commute, by the words around each mention ---
-    LocationMentions mentions = LocationMentions.from(tokens, localityResolver.scan(query));
+    LocationMentions mentions = LocationMentions.from(tokens, localityResolver.scan(query, scope));
     List<LocationRef> locations = refs(mentions.home());
     List<LocationRef> excludeLocations = refs(mentions.exclude());
     CommuteTo commuteTo = null;

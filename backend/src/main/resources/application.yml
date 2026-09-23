@@ -92,8 +92,11 @@ flatmaite:
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
   search:
-    # a named home locality also admits every locality within this many estimated minutes
-    nearby-radius-minutes: ${SEARCH_NEARBY_RADIUS_MINUTES:25}
+    # a named home locality also admits every locality within this many straight-line kilometres
+    nearby-radius-km: ${SEARCH_NEARBY_RADIUS_KM:5.0}
+    # inside this distance a result is labelled "very close" rather than given a figure
+    close-radius-km: ${SEARCH_CLOSE_RADIUS_KM:2.0}
     min-results: ${SEARCH_MIN_RESULTS:6}
-    rescue-radius-minutes: ${SEARCH_RESCUE_RADIUS_MINUTES:45}
+    # the ring the fallback ladder searches after the user raises their budget
+    escalation-radius-km: ${SEARCH_ESCALATION_RADIUS_KM:5.0}
   frontend-url: ${FRONTEND_URL:http://localhost:3000}

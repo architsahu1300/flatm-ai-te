@@ -96,6 +96,7 @@ public class ListingQueryService {
       where.append(" AND (p.locality_id IS NULL OR p.locality_id NOT IN (:excludeLocalityIds))");
       params.put("excludeLocalityIds", f.excludeLocalityIds());
     }
+    appendGeoRings(f, where, params);
     if (f.budgetMin() != null) {
       where.append(" AND l.rent_monthly >= :budgetMin");
       params.put("budgetMin", f.budgetMin());
@@ -178,5 +179,58 @@ public class ListingQueryService {
       params.put("amenityCount", f.amenitySlugs().size());
     }
     return where.toString();
+  }
+
+  /**
+   * Holds each admitted property to the ring the page's heading names (spec §4.1, ruling R14).
+   * Locality admission is centroid-granular, so without this a property at the far edge of a
+   * locality 4.9 km away renders "6.3 km from Kandivali" under a heading claiming 5 km.
+   *
+   * <p><b>{@code earth_box} is a bounding cube, not a circle</b> — on its own it would admit a
+   * corner property up to √3 × the radius out, which is the same lie in a smaller font. It is
+   * paired with {@code earth_distance}, which trims the corners to the exact ring, and the pair is
+   * what makes the figure in the heading true of every row under it.
+   *
+   * <p>{@code earth_box ... @>} is also the only <em>index-compatible</em> half of that pair:
+   * standing alone it plans as {@code Index Scan using idx_properties_geo}, which
+   * {@code earth_distance} never can. It does not get that plan <em>here</em>, though, and the
+   * comment should not pretend otherwise: this clause is a disjunction (the two escapes below), and
+   * the join is driven by {@code properties_pkey} from the listing side, so Postgres evaluates the
+   * whole thing as a per-row {@code Filter} — with {@code enable_seqscan = off} as well, so it is
+   * not merely an artefact of the seed's size. It is cheap to evaluate, not index-accelerated, and
+   * the index earns its keep only if a future query applies the ring on its own.
+   *
+   * <p>Two escapes, both deliberate and both {@code OR}-ed in ahead of the rings:
+   *
+   * <ul>
+   *   <li>A property with no {@code lat}/{@code lng} falls back to its locality centroid, which
+   *       admission has already vetted, and still appears (spec §4.9). Dropping it would be a
+   *       missing coordinate silently deleting a listing.
+   *   <li>A property inside a locality the user actually <em>named</em> is in the place they asked
+   *       for, however far from its centroid it sits. The ring exists to police localities admitted
+   *       <em>by proximity</em>, which is where the distance claim is made.
+   * </ul>
+   */
+  private static void appendGeoRings(ListingFilters f, StringBuilder where, Map<String, Object> params) {
+    List<ListingFilters.GeoRing> rings = f.geoRings();
+    if (rings == null || rings.isEmpty()) {
+      return;
+    }
+    where.append(" AND (p.lat IS NULL OR p.lng IS NULL");
+    if (f.geoExemptLocalityIds() != null && !f.geoExemptLocalityIds().isEmpty()) {
+      where.append(" OR p.locality_id IN (:geoExemptIds)");
+      params.put("geoExemptIds", f.geoExemptLocalityIds());
+    }
+    for (int i = 0; i < rings.size(); i++) {
+      where.append(
+          (" OR (earth_box(ll_to_earth(:geoLat%1$d, :geoLng%1$d), :geoM%1$d) @> ll_to_earth(p.lat, p.lng)"
+                  + " AND earth_distance(ll_to_earth(:geoLat%1$d, :geoLng%1$d), ll_to_earth(p.lat, p.lng))"
+                  + " <= :geoM%1$d)")
+              .formatted(i));
+      params.put("geoLat" + i, rings.get(i).lat());
+      params.put("geoLng" + i, rings.get(i).lng());
+      params.put("geoM" + i, rings.get(i).meters());
+    }
+    where.append(")");
   }
 }
