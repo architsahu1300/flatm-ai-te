@@ -86,8 +86,10 @@ Optional, all with working defaults in `application.yml`:
 | `SPRINGDOC_API_DOCS_ENABLED` | `true` | **set `false`** — `SecurityConfig` permits `/v3/api-docs/**` unauthenticated |
 | `SPRINGDOC_SWAGGER_UI_ENABLED` | `true` | **set `false`** — same, for `/swagger-ui` |
 | `MAX_FILE_SIZE` / `MAX_REQUEST_SIZE` | `10MB` / `25MB` | Spring's multipart ceiling; see the upload limit below |
-| `SEARCH_NEARBY_RADIUS_MINUTES` | `25` | locality widening |
-| `SEARCH_MIN_RESULTS` / `SEARCH_RESCUE_RADIUS_MINUTES` | `6` / `45` | WS4 rescue ladder |
+| `SEARCH_NEARBY_RADIUS_KM` | `5.0` | a named locality also admits everything within this many km |
+| `SEARCH_CLOSE_RADIUS_KM` | `2.0` | inside this distance a result reads "very close" rather than a figure |
+| `SEARCH_ESCALATION_RADIUS_KM` | `5.0` | the ring searched after the user raises their budget |
+| `SEARCH_MIN_RESULTS` | `6` | below this many homes, the fallback ladder tops the page up |
 
 If you enable Google sign-in, add `https://<railway-domain>/login/oauth2/code/google`
 to the authorised redirect URIs in the Google Cloud console.
