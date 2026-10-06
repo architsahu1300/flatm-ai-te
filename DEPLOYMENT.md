@@ -33,9 +33,17 @@ Postgres one (the plain image may not ship the extension). If `vector` is missin
 you will know immediately: the backend fails at startup with a Flyway migration
 error naming the extension, not a subtle runtime bug.
 
+[`V3__geo.sql`](backend/src/main/resources/db/migration/V3__geo.sql) adds two more:
+`CREATE EXTENSION cube` and `earthdistance`, which the distance ladder's per-property
+rings are built on. These are **required, not optional** — a server without them fails
+the same way a missing `vector` does, loudly at startup on the migration. The official
+Postgres image ships both as contrib modules, so any pgvector image built on it has
+them (verified on `pgvector/pgvector:pg16`, which is what `docker-compose.yml` runs);
+only a stripped-down image would be a problem.
+
 [Neon](https://neon.tech) works equally well as an alternative — it ships `vector`,
-`pgcrypto`, and also `cube`/`earthdistance`, which WS6's distance ladder will want.
-If you use Neon, append `?sslmode=require` to the JDBC URL below.
+`pgcrypto`, `cube` and `earthdistance`. If you use Neon, append `?sslmode=require` to
+the JDBC URL below.
 
 Note both connection strings the provider gives you:
 
@@ -118,7 +126,7 @@ then come back and set `FRONTEND_URL` on Railway to the Vercel domain.
 ## 4. Seed data (optional)
 
 Production can start empty — real listings arrive through the app. But if this is a
-demo deploy and you want the 80 listings / 35 flatmates / 38 localities:
+demo deploy and you want the 240 listings / 35 flatmates / 59 localities:
 
 **Run the seed profile on Railway, not from your laptop.** `SeedRunner` writes 15
 sample SVGs into `${UPLOAD_DIR}/seed/`, so seeding from a local machine puts rows in
