@@ -128,16 +128,29 @@ then come back and set `FRONTEND_URL` on Railway to the Vercel domain.
 Production can start empty — real listings arrive through the app. But if this is a
 demo deploy and you want the 240 listings / 35 flatmates / 59 localities:
 
-**Run the seed profile on Railway, not from your laptop.** `SeedRunner` writes 15
-sample SVGs into `${UPLOAD_DIR}/seed/`, so seeding from a local machine puts rows in
-the remote database pointing at files that only exist on your disk — every seed
-listing image would 404.
+`SeedRunner` touches the database only — the placeholder listing photos ship inside
+the jar as classpath resources, so nothing is written to `UPLOAD_DIR` and it no longer
+matters where the seed runs from. (It did once: the seeder used to write 15 SVGs to
+disk, which made seeding from a laptop leave rows pointing at files only your machine
+had.)
 
-1. Set `SPRING_PROFILES_ACTIVE=seed` on the Railway service and redeploy.
-2. The seed runner populates the database, writes the SVGs to the volume, and exits.
-   Railway will show the deployment as stopped — that is expected, the seed profile
-   is a one-shot job.
+On the host:
+
+1. Set `SPRING_PROFILES_ACTIVE=seed` on the service and redeploy.
+2. The seed runner populates the database and exits. Railway or Render will show the
+   deployment as stopped — expected, the seed profile is a one-shot job with no web
+   server.
 3. Remove `SPRING_PROFILES_ACTIVE` and redeploy to get the normal service back.
+
+Or from your laptop, against the provider's **public** connection string:
+
+```bash
+cd backend && DB_URL='jdbc:postgresql://<public-host>/<db>?sslmode=require' \
+  DB_USER=... DB_PASSWORD=... ./mvnw spring-boot:run -Dspring-boot.run.profiles=seed
+```
+
+Re-running is safe either way: seed ids are UUIDv3 over a stable key, so a second run
+upserts rather than duplicating.
 
 ## 5. Post-deploy checks
 
@@ -174,6 +187,50 @@ the cookie is flowing through the proxy correctly.
 - **Tests do not run in the image build.** The suite needs Testcontainers, i.e. a
   Docker daemon inside the build, so `./mvnw verify` stays a local/CI gate. Run it
   before you push.
+
+## Free-tier deploy: Neon + Render + Vercel
+
+A zero-cost variant for a demo. It trades away persistence and first-request
+latency; everything below is a consequence of that, not an oversight.
+
+| Piece | Host | Why this one |
+| --- | --- | --- |
+| Postgres | **Neon free** | Does not expire, and ships `vector`, `pgcrypto`, `cube`, `earthdistance` |
+| Backend | **Render free web service** | Docker from `backend/`, health check `/actuator/health` |
+| Frontend | **Vercel Hobby** | Unchanged from the main path |
+
+**Do not use Render's free Postgres.** It expires 30 days after creation, becomes
+inaccessible, and is deleted after a 14-day grace period. Render's free *web service*
+tier has no such expiry — the two limits get conflated often. Neon's free plan has no
+expiry at all, which is why the database goes there.
+
+Append `?sslmode=require` to the Neon JDBC URL. Everything else in the backend
+environment table above applies unchanged, including the JDBC-form `DB_URL`: Neon
+hands you a `postgres://` URL, which the driver rejects exactly as Railway's does.
+
+### Settings this variant needs
+
+| Variable | Value | Why |
+| --- | --- | --- |
+| `SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE` | `0` | Neon suspends compute after 5 minutes idle, but an open pooled connection counts as activity. With Spring's default pool the database never sleeps and burns the month's 100 CU-hours, after which Neon suspends it until the next billing period. |
+| `SPRING_DATASOURCE_HIKARI_IDLE_TIMEOUT` | `30000` | Drains those connections quickly enough for the compute to actually suspend. |
+
+No disk. Render disks are paid-only, and the seeded listing photos no longer need
+one — they ship as classpath resources under `backend/src/main/resources/seed-images/`
+and are served by `WebConfig`'s fallback resource location, so an ephemeral filesystem
+cannot break them. `SeedImageServingIntegrationTest` pins that behaviour.
+
+### What you are giving up
+
+- **Cold starts, twice over.** Render spins a free service down after 15 minutes
+  without inbound traffic and takes about a minute to wake; Neon suspends its compute
+  after 5 minutes idle. The first click on an idle demo is slow.
+- **Real uploads do not survive.** User-uploaded listing photos and generated
+  agreement PDFs still go to the local filesystem, which is wiped on every redeploy,
+  restart and spin-down. Only the *seeded* images are safe. This is a demo-only
+  configuration; anything else needs object storage.
+- **1 GB of Postgres storage** on Neon's free plan, and 100 CU-hours of compute per
+  month per project.
 
 ## Rollback
 

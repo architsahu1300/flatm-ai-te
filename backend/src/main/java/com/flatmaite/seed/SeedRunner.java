@@ -64,9 +64,6 @@ import com.flatmaite.verification.Verification;
 import com.flatmaite.verification.VerificationRepository;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -144,7 +141,10 @@ public class SeedRunner implements ApplicationRunner {
   @Transactional
   public void run(ApplicationArguments args) throws Exception {
     log.info("Seeding Flatm'AI'te (embedding provider: {})", embeddingProvider.providerName());
-    writePlaceholderImages();
+    // The placeholder photos the seeded listings point at ship as classpath resources
+    // (resources/seed-images/seed/), served by WebConfig's fallback location. They are
+    // deliberately not written to UPLOAD_DIR: a host with an ephemeral filesystem would
+    // lose them on the next restart and leave every seeded listing image broken.
     List<Locality> locs = seedLocalities();
     // both caches loaded at startup, before this runner ran — refresh them so anything else in
     // this JVM (integration tests, a freshly seeded deployment) sees the localities just written
@@ -207,39 +207,6 @@ public class SeedRunner implements ApplicationRunner {
 
   // ---------- reference ----------
 
-  private void writePlaceholderImages() throws Exception {
-    Path dir = Paths.get(props.getStorage().getUploadDir(), "seed");
-    Files.createDirectories(dir);
-    String[][] palettes = {
-      {"#e8eaf6", "#c5cae9"}, {"#e0f2f1", "#b2dfdb"}, {"#fff3e0", "#ffe0b2"},
-      {"#fce4ec", "#f8bbd0"}, {"#e8f5e9", "#c8e6c9"}, {"#ede7f6", "#d1c4e9"},
-      {"#e1f5fe", "#b3e5fc"}, {"#f3e5f5", "#e1bee7"}, {"#fffde7", "#fff9c4"},
-      {"#efebe9", "#d7ccc8"}, {"#eceff1", "#cfd8dc"}, {"#e0f7fa", "#b2ebf2"},
-      {"#f1f8e9", "#dcedc8"}, {"#fbe9e7", "#ffccbc"}, {"#f9fbe7", "#f0f4c3"},
-    };
-    String[] labels = {
-      "Living Room", "Bedroom", "Kitchen", "Balcony View", "Master Bedroom",
-      "Hall", "Study Corner", "Dining Area", "Bedroom 2", "Terrace",
-      "Living Area", "Compact Room", "Sea View", "Society Garden", "Workspace",
-    };
-    for (int i = 0; i < IMAGE_COUNT; i++) {
-      String svg =
-          """
-          <svg xmlns="http://www.w3.org/2000/svg" width="800" height="500" viewBox="0 0 800 500">
-            <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%%" stop-color="%s"/><stop offset="100%%" stop-color="%s"/>
-            </linearGradient></defs>
-            <rect width="800" height="500" fill="url(#g)"/>
-            <g fill="#71717a" font-family="system-ui, sans-serif" text-anchor="middle">
-              <text x="400" y="245" font-size="30" font-weight="600">%s</text>
-              <text x="400" y="280" font-size="16">Flatm'AI'te sample photo</text>
-            </g>
-          </svg>
-          """
-              .formatted(palettes[i][0], palettes[i][1], labels[i]);
-      Files.writeString(dir.resolve("img-%02d.svg".formatted(i + 1)), svg);
-    }
-  }
 
   private List<Locality> seedLocalities() {
     List<Locality> out = new ArrayList<>();

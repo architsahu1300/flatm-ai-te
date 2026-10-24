@@ -17,9 +17,13 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
     String dir = Paths.get(props.getStorage().getUploadDir()).toAbsolutePath().normalize().toString();
+    // Disk first — real uploads live there. The classpath fallback carries the seeded
+    // placeholder photos, which must survive hosts with an ephemeral filesystem: free
+    // tiers wipe the disk on every redeploy, restart and idle spin-down, and the seeded
+    // listing_images rows would then point at files that no longer exist.
     registry
         .addResourceHandler("/uploads/**")
-        .addResourceLocations("file:" + dir + "/")
+        .addResourceLocations("file:" + dir + "/", "classpath:/seed-images/")
         .setCachePeriod(3600);
   }
 }
