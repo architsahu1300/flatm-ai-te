@@ -14,9 +14,10 @@ export function slugify(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-async function cachedGet<T>(path: string): Promise<T> {
+async function cachedGet<T>(path: string, timeoutMs?: number): Promise<T> {
   const res = await fetch(`${BACKEND_URL}${path}`, {
     next: { revalidate: SEO_REVALIDATE_SECONDS },
+    signal: timeoutMs ? AbortSignal.timeout(timeoutMs) : undefined,
   });
   if (!res.ok) {
     throw new Error(`SEO fetch failed: ${path} → ${res.status}`);
@@ -25,8 +26,8 @@ async function cachedGet<T>(path: string): Promise<T> {
   return body.data;
 }
 
-export function fetchLocalitiesCached(): Promise<Locality[]> {
-  return cachedGet<Locality[]>("/api/v1/localities");
+export function fetchLocalitiesCached(timeoutMs?: number): Promise<Locality[]> {
+  return cachedGet<Locality[]>("/api/v1/localities", timeoutMs);
 }
 
 export async function findLocalityBySlug(slug: string): Promise<Locality | null> {
