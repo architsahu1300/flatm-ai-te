@@ -91,6 +91,9 @@ Optional, all with working defaults in `application.yml`:
 | `AI_ANON_DAILY_SEARCH_LIMIT` | `10` | per anonymous key |
 | `AI_DAILY_COST_LIMIT_USD` | `0.50` | hard stop on model spend |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | unset | Google sign-in stays hidden while unset |
+| `FM_OTP_PROVIDER` | `mock` | `message-central` sends real SMS; see "Phone sign-in" below. An unknown value fails startup |
+| `MESSAGE_CENTRAL_CUSTOMER_ID` / `MESSAGE_CENTRAL_PASSWORD` | unset | required by `message-central`, which refuses to start without them |
+| `OTP_DAILY_SEND_LIMIT` | `200` | OTP sends per UTC day across all users — hard stop on SMS spend |
 | `SPRINGDOC_API_DOCS_ENABLED` | `true` | **set `false`** — `SecurityConfig` permits `/v3/api-docs/**` unauthenticated |
 | `SPRINGDOC_SWAGGER_UI_ENABLED` | `true` | **set `false`** — same, for `/swagger-ui` |
 | `MAX_FILE_SIZE` / `MAX_REQUEST_SIZE` | `10MB` / `25MB` | Spring's multipart ceiling; see the upload limit below |
@@ -101,6 +104,26 @@ Optional, all with working defaults in `application.yml`:
 
 If you enable Google sign-in, add `https://<railway-domain>/login/oauth2/code/google`
 to the authorised redirect URIs in the Google Cloud console.
+
+### Phone sign-in
+
+By default phone OTP is a mock: the code is written to the backend log as
+`[MOCK SMS] OTP for +91…` and nothing is sent. To text real codes, sign up at
+[Message Central](https://www.messagecentral.com), take the customer ID and password from
+its console, and set `FM_OTP_PROVIDER=message-central` plus both `MESSAGE_CENTRAL_*`
+variables. Verify Now sends from Message Central's own pre-approved OTP template, so no
+DLT registration of your own is needed; new accounts get free credits, then it is
+pay-as-you-go.
+
+Three limits protect the credit: 3 codes per 10 minutes per number, 10 per hour per
+client address, and `OTP_DAILY_SEND_LIMIT` per day overall. The first two live in memory
+and reset on restart; the daily cap is counted in the `otp_sends` table, so it survives
+Render's spin-downs. The per-address limit reads `X-Forwarded-For`, which anyone calling
+the backend domain directly can forge, so the daily cap is the one that bounds spend.
+
+After switching, request a code for your own number through the deployed frontend. A
+code that never arrives shows up in the backend log as `Message Central send failed`
+with their response code.
 
 ## 3. Frontend — Vercel
 

@@ -60,6 +60,9 @@ Backend (all optional in dev — sane defaults in `application.yml`):
 | `DB_URL` | `jdbc:postgresql://localhost:5433/flatmaite` | |
 | `JWT_SECRET` | dev-only value | HS256 signing key (≥32 bytes) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | _unset_ → Google login hidden | OAuth |
+| `FM_OTP_PROVIDER` | `mock` | Phone OTP: `mock` (code in the backend log) or `message-central` (real SMS); anything else fails startup |
+| `MESSAGE_CENTRAL_CUSTOMER_ID` / `MESSAGE_CENTRAL_PASSWORD` | _unset_ | Required when `FM_OTP_PROVIDER=message-central`; the plain console password, not base64 |
+| `OTP_DAILY_SEND_LIMIT` | `200` | OTP sends per UTC day across all users — the ceiling on SMS spend |
 | `AI_MOCK` | `auto` | `true`/`false` to force provider mode |
 | `AI_EXPLANATIONS_ENABLED` | `true` | Kill-switch → score-breakdown-only UI |
 | `SEARCH_NEARBY_RADIUS_KM` | `5.0` | A named locality also admits every locality within this many km |

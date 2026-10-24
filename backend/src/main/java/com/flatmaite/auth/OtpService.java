@@ -1,36 +1,56 @@
 package com.flatmaite.auth;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import java.security.SecureRandom;
-import java.time.Duration;
-import lombok.extern.slf4j.Slf4j;
+import com.flatmaite.auth.otp.OtpProvider;
+import com.flatmaite.common.config.FlatmaiteProperties;
+import com.flatmaite.common.web.ApiException;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 /**
- * Mock OTP provider: generates a code, "sends" it by logging. A real SMS provider implements the
- * same request/verify surface. In dev the code also appears in the backend log.
+ * Phone sign-in codes: the daily send cap, then whichever {@link OtpProvider} is configured.
+ *
+ * <p>The cap is counted in the database, not memory, because it is the control that protects real
+ * money and Render's free tier restarts the app every time it wakes. Checking before the send and
+ * recording after can overshoot by the requests in flight at the boundary — a handful, not a leak.
+ * The per-number and per-address rate limits sit in {@link AuthController} with the other auth
+ * limits.
  */
 @Service
-@Slf4j
+@RequiredArgsConstructor
 public class OtpService {
 
-  private final SecureRandom random = new SecureRandom();
-  private final Cache<String, String> codes =
-      Caffeine.newBuilder().expireAfterWrite(Duration.ofMinutes(5)).maximumSize(50_000).build();
+  private final OtpProvider provider;
+  private final JdbcTemplate jdbc;
+  private final FlatmaiteProperties props;
 
   public void request(String phone) {
-    String code = "%06d".formatted(random.nextInt(1_000_000));
-    codes.put(phone, code);
-    log.info("[MOCK SMS] OTP for +91{}: {}", phone, code);
+    if (sendsToday() >= props.getOtp().getDailySendLimit()) {
+      throw ApiException.tooManyRequests(
+          "Phone sign-in has reached today's limit — sign in with email, or try again tomorrow.");
+    }
+    provider.send(phone);
+    jdbc.update("INSERT INTO otp_sends (provider) VALUES (?)", provider.name());
   }
 
   public boolean verify(String phone, String otp) {
-    String expected = codes.getIfPresent(phone);
-    if (expected != null && expected.equals(otp)) {
-      codes.invalidate(phone);
-      return true;
-    }
-    return false;
+    return provider.verify(phone, otp);
+  }
+
+  /** Shown under the code box after a send, or null. */
+  public String note() {
+    return provider.note();
+  }
+
+  private int sendsToday() {
+    Timestamp dayStart =
+        Timestamp.from(LocalDate.now(ZoneOffset.UTC).atStartOfDay().toInstant(ZoneOffset.UTC));
+    Integer sends =
+        jdbc.queryForObject(
+            "SELECT count(*) FROM otp_sends WHERE created_at >= ?", Integer.class, dayStart);
+    return sends == null ? 0 : sends;
   }
 }

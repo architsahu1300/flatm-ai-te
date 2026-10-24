@@ -16,6 +16,7 @@ import com.flatmaite.user.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -71,13 +72,23 @@ public class AuthController {
   @PostMapping("/otp/request")
   public ResponseEntity<Map<String, Object>> otpRequest(
       @Valid @RequestBody OtpRequest body, HttpServletRequest req) {
+    // 10 codes / hour / IP — stops one address cycling through numbers. X-Forwarded-For can be
+    // forged by anyone calling the backend directly, so the hard spend ceiling is OtpService's cap
+    if (!rateLimiter.tryAcquire("auth:otp:ip:" + clientIp(req), 10, 360)) {
+      throw ApiException.tooManyRequests("Too many codes requested from this address — try again later");
+    }
     // 3 codes / 10 min / phone
     if (!rateLimiter.tryAcquire("auth:otp:" + body.phone(), 3, 200)) {
       throw ApiException.tooManyRequests("Too many OTP requests for this number");
     }
     otpService.request(body.phone());
-    return ResponseEntity.ok(
-        Map.of("data", Map.of("sent", true, "note", "Mock provider — code is in the backend log")));
+    Map<String, Object> data = new LinkedHashMap<>();
+    data.put("sent", true);
+    String note = otpService.note();
+    if (note != null) {
+      data.put("note", note);
+    }
+    return ResponseEntity.ok(Map.of("data", data));
   }
 
   @PostMapping("/otp/verify")

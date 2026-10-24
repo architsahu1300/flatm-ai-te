@@ -18,6 +18,7 @@ public class FlatmaiteProperties {
   private Storage storage = new Storage();
   private Search search = new Search();
   private Geo geo = new Geo();
+  private Otp otp = new Otp();
   private String frontendUrl = "http://localhost:3000";
 
   /** Per-city travel calibration: road-circuity multiplier, effective speed, fixed overhead. */
@@ -54,6 +55,27 @@ public class FlatmaiteProperties {
     public boolean isConfigured() {
       return !clientId.isBlank() && !clientSecret.isBlank();
     }
+  }
+
+  @Getter
+  @Setter
+  public static class Otp {
+    /** mock | message-central — anything else fails startup. */
+    private String provider = "mock";
+
+    /** OTP sends allowed per UTC day across all users: the ceiling on SMS spend. */
+    private int dailySendLimit = 200;
+
+    private MessageCentral messageCentral = new MessageCentral();
+  }
+
+  @Getter
+  @Setter
+  public static class MessageCentral {
+    private String baseUrl = "https://cpaas.messagecentral.com";
+    private String customerId = "";
+    /** The account password as shown in their console; the provider base64-encodes it. */
+    private String password = "";
   }
 
   @Getter

@@ -89,6 +89,14 @@ flatmaite:
   google:
     client-id: ${GOOGLE_CLIENT_ID:}
     client-secret: ${GOOGLE_CLIENT_SECRET:}
+  otp:
+    # mock (default: codes go to the backend log) | message-central (real SMS, no DLT of our own)
+    provider: ${FM_OTP_PROVIDER:mock}
+    # OTP sends per UTC day across all users — the ceiling on SMS spend
+    daily-send-limit: ${OTP_DAILY_SEND_LIMIT:200}
+    message-central:
+      customer-id: ${MESSAGE_CENTRAL_CUSTOMER_ID:}
+      password: ${MESSAGE_CENTRAL_PASSWORD:}
   storage:
     upload-dir: ${UPLOAD_DIR:./uploads}
   search:
